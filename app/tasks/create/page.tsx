@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '@/app/lib/firebase/config';
-import Navbar from '@/app/components/navigation/Navbar';
+import Link from 'next/link';
 
 const CreateTaskPage = () => {
   const router = useRouter();
@@ -40,6 +40,11 @@ const CreateTaskPage = () => {
       if (locationType === 'inPerson' && address) {
         location.address = address;
         // In a real app, you'd geocode the address to get coordinates
+        // For now, just add some placeholder coordinates
+        location.coordinates = {
+          latitude: 0,
+          longitude: 0
+        };
       }
       
       // Create the task
@@ -51,9 +56,13 @@ const CreateTaskPage = () => {
         estimatedTime: parseInt(estimatedTime.toString()),
         location: Object.keys(location).length > 0 ? location : null,
         createdBy: user.uid,
+        assignedTo: user.uid, // Assign to the user who created it
+        isAssigned: true,     // Mark as assigned
+        isCustom: true,       // Mark as custom task
+        status: 'open',       // Initial status is open
+        completedBy: [],      // No one has completed it yet
         createdAt: serverTimestamp(),
-        isCustom: true,
-        status: 'open'
+        updatedAt: serverTimestamp()
       };
       
       // Add to Firestore
@@ -71,12 +80,20 @@ const CreateTaskPage = () => {
   };
   
   return (
-    <div>
-      <Navbar />
-      
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-4 max-w-2xl">
-        <div className="bg-white rounded-lg shadow-md p-6 mt-4">
-          <h1 className="text-2xl font-bold mb-6">Create Custom Volunteer Task</h1>
+        {/* Back button */}
+        <div className="mb-4">
+          <Link href="/dashboard" className="text-green-600 hover:text-green-700 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Dashboard
+          </Link>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-6">Create Custom Volunteer Task</h1>
           
           {error && (
             <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
@@ -176,14 +193,14 @@ const CreateTaskPage = () => {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50 hover:cursor-pointer"
+                className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className={`px-4 py-2 ${loading ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700 hover:cursor-pointer'} text-white rounded-md flex items-center`}
+                className={`px-4 py-2 ${loading ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'} text-white rounded-md flex items-center`}
               >
                 {loading ? (
                   <>

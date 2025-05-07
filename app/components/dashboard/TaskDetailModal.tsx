@@ -1,5 +1,8 @@
-// app/components/dashboard/TaskDetailModal.tsx
-'use client';
+// app/components/dashboard/TaskDetailModal.tsx - Fixed version for date handling and optional properties
+
+// Fix for the lines with Date.toDate() errors
+// The issue is that we're treating Date objects as if they were Firestore Timestamps
+// Let's create a helper function to safely handle both:
 
 import { useState } from 'react';
 import { VolunteerTask } from '@/app/lib/firebase/firestore';
@@ -25,17 +28,50 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   userId
 }) => {
   const [selectedTab, setSelectedTab] = useState('details');
-  
-  // Format the creation date if available
-  const formatDate = (date: any) => {
-    if (!date) return 'Not specified';
+  const [showCalendarOptions, setShowCalendarOptions] = useState(false);
+
+  // Helper function to safely format dates from either Date objects or Firestore Timestamps
+  const formatDate = (dateValue: any): string => {
+    if (!dateValue) return 'Not specified';
     
-    const d = date.toDate ? date.toDate() : new Date(date);
-    return d.toLocaleDateString('en-US', { 
+    // Create a JavaScript Date object, handling both regular Date objects and Firestore Timestamps
+    let date: Date;
+    if (typeof dateValue.toDate === 'function') {
+      // It's a Firestore Timestamp
+      date = dateValue.toDate();
+    } else if (dateValue instanceof Date) {
+      // It's already a Date object
+      date = dateValue;
+    } else {
+      // It might be a string or number, try to convert
+      date = new Date(dateValue);
+    }
+    
+    return date.toLocaleDateString('en-US', { 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric' 
     });
+  };
+  
+  // Helper function to safely format time from either Date objects or Firestore Timestamps
+  const formatTime = (dateValue: any): string => {
+    if (!dateValue) return '';
+    
+    // Create a JavaScript Date object, handling both regular Date objects and Firestore Timestamps
+    let date: Date;
+    if (typeof dateValue.toDate === 'function') {
+      // It's a Firestore Timestamp
+      date = dateValue.toDate();
+    } else if (dateValue instanceof Date) {
+      // It's already a Date object
+      date = dateValue;
+    } else {
+      // It might be a string or number, try to convert
+      date = new Date(dateValue);
+    }
+    
+    return date.toLocaleTimeString();
   };
   
   // Format address if available
@@ -51,6 +87,24 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
     return 'Location not specified';
   };
 
+  // Handle calendar export
+  const handleCalendarExport = (type: string) => {
+    // In a real implementation, you would generate the appropriate calendar file
+    alert(`Exporting to ${type} calendar. This would download a calendar file in a real implementation.`);
+    setShowCalendarOptions(false);
+  };
+
+  // Format time spent (handle undefined value)
+  const formatTimeSpent = (seconds?: number): string => {
+    if (seconds === undefined || seconds <= 0) return 'None';
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    return `${hours}h ${minutes}m ${secs}s`;
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
@@ -59,7 +113,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
             <h2 className="text-2xl font-bold text-gray-900 pr-8">{task.title}</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-500 hover:cursor-pointer"
+              className="text-gray-400 hover:text-gray-500"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -97,6 +151,16 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
               }`}
             >
               Activity
+            </button>
+            <button
+              onClick={() => setSelectedTab('status')}
+              className={`px-4 py-2 text-sm font-medium ${
+                selectedTab === 'status'
+                  ? 'text-green-700 border-b-2 border-green-500'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Status
             </button>
           </div>
         </div>
@@ -222,20 +286,14 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                         <div>
                           <h4 className="font-medium text-gray-900">Task Paused</h4>
                           <p className="text-sm text-gray-600">
-                            {formatDate(pause.pauseTime)} at {pause.pauseTime.toDate ? 
-                              pause.pauseTime.toDate().toLocaleTimeString() : 
-                              new Date(pause.pauseTime).toLocaleTimeString()
-                            }
+                            {formatDate(pause.pauseTime)} at {formatTime(pause.pauseTime)}
                           </p>
                         </div>
                         {pause.resumeTime && (
                           <div className="text-right">
                             <h4 className="font-medium text-green-600">Resumed</h4>
                             <p className="text-sm text-gray-600">
-                              {formatDate(pause.resumeTime)} at {pause.resumeTime.toDate ? 
-                                pause.resumeTime.toDate().toLocaleTimeString() : 
-                                new Date(pause.resumeTime).toLocaleTimeString()
-                              }
+                              {formatDate(pause.resumeTime)} at {formatTime(pause.resumeTime)}
                             </p>
                           </div>
                         )}
@@ -255,13 +313,91 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 <div className="mt-4 border-l-4 border-green-400 pl-4 py-2">
                   <h4 className="font-medium text-gray-900">Task Completed</h4>
                   <p className="text-sm text-gray-600">
-                    {formatDate(task.completionDate)} at {task.completionDate.toDate ? 
-                      task.completionDate.toDate().toLocaleTimeString() : 
-                      new Date(task.completionDate).toLocaleTimeString()
-                    }
+                    {formatDate(task.completionDate)} at {formatTime(task.completionDate)}
                   </p>
                 </div>
               )}
+            </div>
+          )}
+          
+          {selectedTab === 'status' && (
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Task Status</h3>
+              
+              <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                <div className="flex items-center mb-2">
+                  <div className={`w-3 h-3 rounded-full mr-2 ${
+                    isCompleted ? 'bg-green-500' : 
+                    isInProgress ? 'bg-blue-500' :
+                    task.status === 'paused' ? 'bg-yellow-500' :
+                    task.status === 'scheduled' ? 'bg-purple-500' : 'bg-gray-500'
+                  }`}></div>
+                  <h4 className="font-medium">Current Status:</h4>
+                  <span className={`ml-2 ${
+                    isCompleted ? 'text-green-600' : 
+                    isInProgress ? 'text-blue-600' :
+                    task.status === 'paused' ? 'text-yellow-600' :
+                    task.status === 'scheduled' ? 'text-purple-600' : 'text-gray-600'
+                  }`}>
+                    {isCompleted ? 'Completed' : 
+                     isInProgress ? 'In Progress' :
+                     task.status === 'paused' ? 'Paused' :
+                     task.status === 'scheduled' ? 'Scheduled' : 'Open'}
+                  </span>
+                </div>
+                
+                {task.scheduledTime && (
+                  <div className="ml-5 text-sm text-gray-600">
+                    Scheduled for: {formatDate(task.scheduledTime)} at {formatTime(task.scheduledTime)}
+                  </div>
+                )}
+                
+                {task.timeSpent !== undefined && task.timeSpent > 0 && (
+                  <div className="ml-5 text-sm text-gray-600">
+                    Time spent: {formatTimeSpent(task.timeSpent)}
+                  </div>
+                )}
+              </div>
+              
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">Task Progress</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full mr-2 ${task.createdAt ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                    <span className="text-sm">Created</span>
+                    {task.createdAt && (
+                      <span className="text-xs text-gray-500 ml-2">
+                        {formatDate(task.createdAt)}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full mr-2 ${task.scheduledTime ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                    <span className="text-sm">Scheduled</span>
+                    {task.scheduledTime && (
+                      <span className="text-xs text-gray-500 ml-2">
+                        {formatDate(task.scheduledTime)}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full mr-2 ${task.status === 'in-progress' || task.status === 'paused' || isCompleted ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                    <span className="text-sm">Started</span>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full mr-2 ${isCompleted ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                    <span className="text-sm">Completed</span>
+                    {isCompleted && task.completionDate && (
+                      <span className="text-xs text-gray-500 ml-2">
+                        {formatDate(task.completionDate)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -278,22 +414,72 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
           <div className="flex space-x-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50 hover:cursor-pointer"
+              className="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50"
             >
               Close
             </button>
             
             {!isCompleted && (
-              <button
-                onClick={onStartTask}
-                className={`px-4 py-2 ${
-                  isInProgress 
-                    ? 'bg-blue-600 hover:bg-blue-700' 
-                    : 'bg-green-600 hover:bg-green-700'
-                } text-white rounded hover:cursor-pointer`}
-              >
-                {isInProgress ? 'View Progress' : 'Start Task'}
-              </button>
+              <div className="relative">
+                <button
+                  onClick={onStartTask}
+                  className={`px-4 py-2 ${
+                    isInProgress 
+                      ? 'bg-blue-600 hover:bg-blue-700' 
+                      : 'bg-green-600 hover:bg-green-700'
+                  } text-white rounded`}
+                >
+                  {isInProgress ? 'View Progress' : 'Start Task'}
+                </button>
+                
+                {/* Calendar Options Dropdown */}
+                {!isInProgress && !isCompleted && (
+                  <div className="relative">
+                    <button
+                      onMouseEnter={() => setShowCalendarOptions(true)}
+                      onMouseLeave={() => setShowCalendarOptions(false)}
+                      className="absolute -top-10 right-0 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded"
+                    >
+                      Schedule Task
+                    </button>
+                    
+                    {showCalendarOptions && (
+                      <div 
+                        className="absolute -top-10 right-full mr-1 bg-white shadow-lg rounded-md overflow-hidden z-10"
+                        onMouseEnter={() => setShowCalendarOptions(true)}
+                        onMouseLeave={() => setShowCalendarOptions(false)}
+                      >
+                        <div className="flex flex-col">
+                          <button
+                            onClick={() => handleCalendarExport('Google')}
+                            className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left whitespace-nowrap"
+                          >
+                            Google Calendar
+                          </button>
+                          <button
+                            onClick={() => handleCalendarExport('Outlook')}
+                            className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left whitespace-nowrap"
+                          >
+                            Outlook
+                          </button>
+                          <button
+                            onClick={() => handleCalendarExport('iCal')}
+                            className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left whitespace-nowrap"
+                          >
+                            iCal
+                          </button>
+                          <button
+                            onClick={() => handleCalendarExport('Office365')}
+                            className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left whitespace-nowrap"
+                          >
+                            Office365
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>

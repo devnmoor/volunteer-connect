@@ -45,14 +45,26 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
     task.status === 'completed'
   );
 
+  // Effect to update scheduled tasks
+  useEffect(() => {
+    // Find tasks with scheduled times
+    const scheduledTasksData = tasks
+      .filter(task => task.scheduledTime && !task.completedBy?.includes(userId))
+      .map(task => ({
+        task,
+        scheduledTime: task.scheduledTime.toDate ? task.scheduledTime.toDate() : new Date(task.scheduledTime)
+      }));
+    
+    setScheduledTasks(scheduledTasksData);
+  }, [tasks, userId]);
+
+  // Handle complete task action
   const handleCompleteTask = async (task: VolunteerTask) => {
     try {
       if (!task || !task.id) {
         console.error('Invalid task or missing task ID');
         return;
       }
-      
-      console.log('Completing task:', task.id);
       
       const taskRef = doc(db, 'tasks', task.id);
       
@@ -67,18 +79,15 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
         updateData.completedBy = arrayUnion(userId);
       }
       
-      console.log('Update data:', updateData);
-      
       // Update the task in Firestore
       await updateDoc(taskRef, updateData);
       
       // Add a seed to the user
       const userRef = doc(db, 'users', userId);
       await updateDoc(userRef, {
-        seeds: increment(1)
+        seeds: increment(1),
+        completedTasks: increment(1)
       });
-      
-      console.log('Task completed successfully');
       
       // Check for mystery seed
       const mysteryReward = checkForMysteryReward();
@@ -247,7 +256,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
         
         <button
           onClick={handleCreateCustomTask}
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 hover:cursor-pointer text-white rounded-md text-sm font-medium flex items-center"
+          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium flex items-center"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -272,7 +281,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
                   {`Starts in ${Math.ceil((scheduled.scheduledTime.getTime() - now.getTime()) / 60000)} minutes`}
                 </p>
               </div>
-              <button className="ml-3 text-gray-500 hover:text-gray-700 hover:cursor-pointer">
+              <button className="ml-3 text-gray-500 hover:text-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -310,7 +319,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
               onComplete={() => handleTaskCardClick(task)}
               userId={userId}
               isDisabled={activeTaskId !== null && activeTaskId !== task.id}
-              onTaskStart={() => handleTaskStart(task.id)}
+              onTaskStart={() => handleTaskStart(task.id!)}
               onTaskPause={handleTaskPause}
             />
           ))}
@@ -324,6 +333,8 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
           userId={userId}
           onClose={closeCompletionModal}
           onComplete={() => handleCompleteTask(selectedTask)}
+          onTaskStart={handleTaskStart}
+          onTaskPause={handleTaskPause}
         />
       )}
 

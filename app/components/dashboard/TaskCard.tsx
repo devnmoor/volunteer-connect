@@ -95,7 +95,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       {/* Expand button */}
       <button 
         onClick={() => setShowDetailModal(true)}
-        className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white hover:cursor-pointer"
+        className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white"
         title="View details"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -135,7 +135,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
           {isDescriptionLong && (
             <button 
               onClick={() => setShowFullDescription(!showFullDescription)}
-              className="text-xs text-green-600 mt-1 hover:underline hover:cursor-pointer"
+              className="text-xs text-green-600 mt-1 hover:underline"
             >
               {showFullDescription ? 'View Less' : 'View More'}
             </button>
@@ -199,7 +199,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
               {resources.length > 2 && (
                 <button 
                   onClick={() => setShowDetailModal(true)}
-                  className="text-xs text-green-600 hover:underline hover:cursor-pointer"
+                  className="text-xs text-green-600 hover:underline"
                 >
                   +{resources.length - 2} more
                 </button>
@@ -215,14 +215,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
         ) : isInProgress ? (
           <button
             onClick={() => onComplete(task)}
-            className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 hover:cursor-pointer"
+            className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
             View Progress
           </button>
         ) : (
           <button
             onClick={() => onComplete(task)}
-            className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 hover:cursor-pointer"
+            className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
           >
             Start Task
           </button>

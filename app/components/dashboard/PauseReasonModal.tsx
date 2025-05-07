@@ -74,7 +74,7 @@ const PauseReasonModal: React.FC<PauseReasonModalProps> = ({ onSubmit, onResume 
         <div className="flex justify-between">
           <button
             onClick={onResume}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 hover:cursor-pointer"
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
           >
             Resume Instead
           </button>
@@ -85,7 +85,7 @@ const PauseReasonModal: React.FC<PauseReasonModalProps> = ({ onSubmit, onResume 
             className={`px-4 py-2 ${
               selectedReasons.length === 0 || !description.trim() 
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                : 'bg-yellow-500 text-white hover:bg-yellow-600 hover:cursor-pointer'
+                : 'bg-yellow-500 text-white hover:bg-yellow-600'
             } rounded-md`}
           >
             Pause Task
