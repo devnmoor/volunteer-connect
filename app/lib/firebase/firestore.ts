@@ -34,8 +34,31 @@ export interface VolunteerTask {
   completionDate?: any; // Firestore timestamp
   createdAt?: any; // Firestore timestamp
   updatedAt?: any; // Firestore timestamp
-  createdBy?: string; // Add this property
-  isCustom?: boolean; // Add this property
+  createdBy?: string;
+  isCustom?: boolean;
+  
+  // Add the missing properties that are causing TypeScript errors
+  status?: 'open' | 'scheduled' | 'in-progress' | 'paused' | 'completed';
+  scheduledTime?: any; // Firestore timestamp
+  timeSpent?: number;
+  impact?: string;
+  requirements?: string;
+  pauseData?: Array<{
+    pauseTime: Date;
+    resumeTime?: Date;
+    reason: string;
+    description: string;
+  }>;
+  assignedTo?: string;
+  isAssigned?: boolean;
+  images?: string[];
+  achievements?: string;
+  feedback?: string;
+  contact?: {
+    name: string;
+    type: string;
+    value: string;
+  };
 }
 
 export interface TaskCompletion {

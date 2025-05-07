@@ -123,7 +123,8 @@ const TaskFinalCompletionModal: React.FC<TaskFinalCompletionModalProps> = ({
       // Add a seed to the user's account
       const userRef = doc(db, 'users', userId);
       await updateDoc(userRef, {
-        seeds: increment(1)
+        seeds: increment(1),
+        completedTasks: increment(1)
       });
       
       // Call the completion callback to show animation, etc.
@@ -148,7 +149,7 @@ const TaskFinalCompletionModal: React.FC<TaskFinalCompletionModalProps> = ({
             <h2 className="text-2xl font-bold text-gray-900 pr-8">Complete Task: {task.title}</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-500 hover:cursor-pointer"
+              className="text-gray-400 hover:text-gray-500"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -209,7 +210,7 @@ const TaskFinalCompletionModal: React.FC<TaskFinalCompletionModalProps> = ({
                         />
                         <button
                           onClick={() => handleRemoveImage(index)}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 hover:cursor-pointer"
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600"
                           title="Remove image"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -224,7 +225,7 @@ const TaskFinalCompletionModal: React.FC<TaskFinalCompletionModalProps> = ({
               
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full py-2 px-3 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center text-gray-600 hover:bg-gray-50 hover:cursor-pointer"
+                className="w-full py-2 px-3 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center text-gray-600 hover:bg-gray-50"
                 disabled={loading || images.length >= 15}
               >
                 {loading ? (
@@ -305,7 +306,7 @@ const TaskFinalCompletionModal: React.FC<TaskFinalCompletionModalProps> = ({
         <div className="p-4 border-t flex justify-end space-x-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50 hover:cursor-pointer"
+            className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
             disabled={loading}
           >
             Cancel
@@ -314,7 +315,9 @@ const TaskFinalCompletionModal: React.FC<TaskFinalCompletionModalProps> = ({
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className={`px-6 py-2 ${loading ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700 hover:cursor-pointer'} text-white rounded-md flex items-center`}
+            className={`px-6 py-2 ${
+              loading ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'
+            } text-white rounded-md flex items-center`}
           >
             {loading ? (
               <>

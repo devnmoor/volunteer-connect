@@ -6,19 +6,25 @@ import { VolunteerTask } from '@/app/lib/firebase/firestore';
 import { doc, updateDoc, arrayUnion, serverTimestamp, increment } from 'firebase/firestore';
 import { db } from '@/app/lib/firebase/config';
 import PauseReasonModal from './PauseReasonModal';
+import { storage } from '@/app/lib/firebase/config';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface TaskCompletionModalProps {
   task: VolunteerTask;
   userId: string;
   onClose: () => void;
   onComplete: () => void;
+  onTaskStart: (taskId: string) => void;
+  onTaskPause: () => void;
 }
 
 const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({ 
   task, 
   userId, 
   onClose,
-  onComplete
+  onComplete,
+  onTaskStart,
+  onTaskPause
 }) => {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -32,21 +38,34 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
   const [scheduledDateTime, setScheduledDateTime] = useState<Date | null>(null);
   const [calendarType, setCalendarType] = useState<string | null>(null);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  const [taskStatus, setTaskStatus] = useState(task.completedBy?.includes(userId) ? 'completed' : 'open');
+  const [taskStatus, setTaskStatus] = useState(task.completedBy?.includes(userId) ? 'completed' : task.status || 'open');
   const [pauseData, setPauseData] = useState<{
     pauseTime: Date;
     resumeTime?: Date;
     reason: string;
     description: string;
-  }[]>([]);
+  }[]>(task.pauseData || []);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Check if the scheduled time has arrived and if we're within the 10-minute window
+  const isTimerEnabled = () => {
+    if (!scheduledDateTime) return false;
+    
+    const now = new Date();
+    const timeDiff = now.getTime() - scheduledDateTime.getTime();
+    
+    // Enable if scheduled time has passed but not more than 10 minutes ago
+    return timeDiff >= 0 && timeDiff <= 10 * 60 * 1000;
+  };
   
   // Start timer function
   const startTimer = () => {
     if (!timerActive) {
       setTimerActive(true);
       setTaskStatus('in-progress');
+      onTaskStart(task.id!);
+      
       const interval = setInterval(() => {
         setTimeSpent(prev => prev + 1);
       }, 1000);
@@ -63,15 +82,19 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
       clearInterval(timerIntervalId);
       setTimerActive(false);
       setShowPauseReasonModal(true);
+      onTaskPause();
     }
   };
   
   // Update task status in Firestore
   const updateTaskStatus = async (status: string) => {
     try {
+      if (!task.id) return;
+      
       const taskRef = doc(db, 'tasks', task.id);
       await updateDoc(taskRef, {
         status: status,
+        timeSpent: timeSpent,
         lastUpdated: serverTimestamp()
       });
     } catch (error) {
@@ -82,11 +105,15 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
   // Complete task now
   const completeTaskNow = async () => {
     try {
+      if (!task.id) return;
+      
       // Create update data
       const updateData = {
         completedBy: arrayUnion(userId),
         completionDate: serverTimestamp(),
-        status: 'completed'
+        timeSpent: timeSpent,
+        status: 'completed',
+        uploadedImages: uploadedImages
       };
       
       // Update the task in Firestore
@@ -96,13 +123,12 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
       // Add a seed to the user's account
       const userRef = doc(db, 'users', userId);
       await updateDoc(userRef, {
-        seeds: increment(1)
+        seeds: increment(1),
+        completedTasks: increment(1)
       });
       
       // Call the callback
       onComplete();
-      
-      // Show completion animation (this will be handled in the parent component)
       
       // Close the modal
       onClose();
@@ -127,42 +153,59 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
   };
 
   // Handle image upload
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.length) {
-      // In a real app, you would upload these to storage
-      // For now, we'll just create URLs
-      const newImages = Array.from(e.target.files).map(file => 
-        URL.createObjectURL(file)
-      );
-      setUploadedImages(prev => [...prev, ...newImages]);
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length || !task.id) return;
+    
+    try {
+      const file = e.target.files[0];
+      
+      // Create a storage reference
+      const storageRef = ref(storage, `task-images/${task.id}/${Date.now()}-${file.name}`);
+      
+      // Upload the file
+      await uploadBytes(storageRef, file);
+      
+      // Get the download URL
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      // Add to uploaded images array
+      setUploadedImages(prev => [...prev, downloadURL]);
+      
+      // Update the task in Firestore with the new image
+      const taskRef = doc(db, 'tasks', task.id);
+      await updateDoc(taskRef, {
+        uploadedImages: arrayUnion(downloadURL)
+      });
+      
+    } catch (error) {
+      console.error('Error uploading image:', error);
     }
   };
 
   // Remove image
   const handleRemoveImage = (index: number) => {
     setUploadedImages(prev => prev.filter((_, i) => i !== index));
+    
+    // In a full implementation, you would also remove from storage
+    // and update the Firestore document
   };
   
   // Handle calendar selection
   const handleCalendarSelect = (type: string) => {
     setCalendarType(type);
     // In a real app, you would generate the appropriate calendar link/file
-    // For now, we'll just store the type
   };
 
   // Handle confirmation
-  const handleConfirmation = (addToCalendar: boolean) => {
+  const handleConfirmation = async (addToCalendar: boolean) => {
     setShowConfirmationModal(false);
     
-    if (!scheduledDateTime) return;
+    if (!scheduledDateTime || !task.id) return;
     
-    // Create Date object from scheduled date/time
-    const now = new Date();
-    
-    // Update task with scheduled time in Firestore
     try {
+      // Update task with scheduled time in Firestore
       const taskRef = doc(db, 'tasks', task.id);
-      updateDoc(taskRef, {
+      await updateDoc(taskRef, {
         scheduledTime: scheduledDateTime,
         status: 'scheduled'
       });
@@ -170,6 +213,7 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
       setTaskStatus('scheduled');
       
       // If scheduled time is now or in the past, start timer immediately
+      const now = new Date();
       if (scheduledDateTime <= now) {
         setTimerVisible(true);
         startTimer();
@@ -182,7 +226,7 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
         }, timeUntilStart);
       }
     } catch (error) {
-      console.error('Error updating task schedule:', error);
+      console.error('Error scheduling task:', error);
     }
     
     // Close the modal
@@ -190,22 +234,26 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
   };
   
   // Handle pause reason submission
-  const handlePauseReasonSubmit = (reason: string, description: string) => {
+  const handlePauseReasonSubmit = async (reason: string, description: string) => {
     const pauseInfo = {
       pauseTime: new Date(),
       reason,
       description
     };
     
-    setPauseData(prev => [...prev, pauseInfo]);
+    const updatedPauseData = [...pauseData, pauseInfo];
+    setPauseData(updatedPauseData);
     setShowPauseReasonModal(false);
     
     // Update task with pause information in Firestore
     try {
+      if (!task.id) return;
+      
       const taskRef = doc(db, 'tasks', task.id);
-      updateDoc(taskRef, {
-        pauseData: arrayUnion(pauseInfo),
-        status: 'paused'
+      await updateDoc(taskRef, {
+        pauseData: updatedPauseData,
+        status: 'paused',
+        timeSpent: timeSpent
       });
       
       setTaskStatus('paused');
@@ -215,10 +263,10 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
   };
   
   // Resume timer
-  const resumeTimer = () => {
+  const resumeTimer = async () => {
     // Update the last pause entry with resume time
-    const updatedPauseData = [...pauseData];
-    if (updatedPauseData.length > 0) {
+    if (pauseData.length > 0) {
+      const updatedPauseData = [...pauseData];
       const lastIndex = updatedPauseData.length - 1;
       updatedPauseData[lastIndex] = {
         ...updatedPauseData[lastIndex],
@@ -229,8 +277,10 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
       
       // Update in Firestore
       try {
+        if (!task.id) return;
+        
         const taskRef = doc(db, 'tasks', task.id);
-        updateDoc(taskRef, {
+        await updateDoc(taskRef, {
           pauseData: updatedPauseData,
           status: 'in-progress'
         });
@@ -253,17 +303,6 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
       }
     };
   }, [timerIntervalId]);
-  
-  // Check if start timer should be enabled
-  const isStartTimerEnabled = () => {
-    if (!scheduledDateTime) return false;
-    
-    const now = new Date();
-    const timeDiff = now.getTime() - scheduledDateTime.getTime();
-    
-    // Enable if scheduled time has passed but not more than 10 minutes ago
-    return timeDiff >= 0 && timeDiff <= 10 * 60 * 1000;
-  };
 
   return (
     <>
@@ -314,40 +353,12 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
                     </div>
                   </div>
                   
-                  <div className="relative">
-                    <button
-                      onClick={handleScheduleTask}
-                      className="mt-3 w-full py-2 bg-purple-600 hover:bg-purple-700 hover:cursor-pointer text-white rounded-md text-sm group"
-                    >
-                      Schedule Task
-                    </button>
-                    <div className="hidden group-hover:flex absolute top-full left-0 right-0 mt-1 bg-white shadow-lg rounded-md p-2 z-10 justify-around">
-                      <button 
-                        onClick={() => handleCalendarSelect('google')}
-                        className="px-2 py-1 text-xs text-gray-700 hover:bg-gray-100 rounded"
-                      >
-                        Google
-                      </button>
-                      <button 
-                        onClick={() => handleCalendarSelect('outlook')}
-                        className="px-2 py-1 text-xs text-gray-700 hover:bg-gray-100 rounded"
-                      >
-                        Outlook
-                      </button>
-                      <button 
-                        onClick={() => handleCalendarSelect('ical')}
-                        className="px-2 py-1 text-xs text-gray-700 hover:bg-gray-100 rounded"
-                      >
-                        iCal
-                      </button>
-                      <button 
-                        onClick={() => handleCalendarSelect('office365')}
-                        className="px-2 py-1 text-xs text-gray-700 hover:bg-gray-100 rounded"
-                      >
-                        Office365
-                      </button>
-                    </div>
-                  </div>
+                  <button
+                    onClick={handleScheduleTask}
+                    className="mt-3 w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md text-sm"
+                  >
+                    Schedule Task
+                  </button>
                 </div>
                 
                 <div className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
@@ -370,8 +381,12 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
                       startTimer();
                       onClose();
                     }}
-                    disabled={!isStartTimerEnabled()}
-                    className={`mt-3 w-full py-2 ${isStartTimerEnabled() ? 'bg-blue-600 hover:bg-blue-700 hover:cursor-pointer' : 'bg-blue-300 cursor-not-allowed'} text-white rounded-md text-sm`}
+                    disabled={taskStatus !== 'scheduled' || !isTimerEnabled()}
+                    className={`mt-3 w-full py-2 ${
+                      taskStatus === 'scheduled' && isTimerEnabled() 
+                        ? 'bg-blue-600 hover:bg-blue-700 cursor-pointer' 
+                        : 'bg-blue-300 cursor-not-allowed'
+                    } text-white rounded-md text-sm`}
                   >
                     Start Timer
                   </button>
@@ -393,8 +408,12 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
                   </div>
                   <button
                     onClick={completeTaskNow}
-                    disabled={!isStartTimerEnabled()}
-                    className={`mt-3 w-full py-2 ${isStartTimerEnabled() ? 'bg-green-600 hover:bg-green-700 hover:cursor-pointer' : 'bg-green-300 cursor-not-allowed'} text-white rounded-md text-sm`}
+                    disabled={taskStatus !== 'scheduled' || !isTimerEnabled()}
+                    className={`mt-3 w-full py-2 ${
+                      taskStatus === 'scheduled' && isTimerEnabled() 
+                        ? 'bg-green-600 hover:bg-green-700 cursor-pointer' 
+                        : 'bg-green-300 cursor-not-allowed'
+                    } text-white rounded-md text-sm`}
                   >
                     Complete Now
                   </button>
@@ -421,7 +440,7 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
             <div className="mt-6 flex justify-end">
               <button
                 onClick={onClose}
-                className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50 hover:cursor-pointer"
+                className="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50"
               >
                 Close
               </button>
@@ -463,14 +482,14 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowScheduleModal(false)}
-                className="px-4 py-2 border rounded-md text-gray-700 hover:cursor-pointer"
+                className="px-4 py-2 border rounded-md text-gray-700"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={!scheduledDate || !scheduledTime}
-                className={`px-4 py-2 ${!scheduledDate || !scheduledTime ? 'bg-gray-300 text-gray-500' : 'bg-green-600 text-white hover:bg-green-700 hover:cursor-pointer'} rounded-md`}
+                className={`px-4 py-2 ${!scheduledDate || !scheduledTime ? 'bg-gray-300 text-gray-500' : 'bg-green-600 text-white hover:bg-green-700'} rounded-md`}
               >
                 Schedule
               </button>
@@ -492,14 +511,14 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
             <div className="flex justify-between space-x-4 mb-6">
               <button
                 onClick={() => handleConfirmation(true)}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 hover:cursor-pointer"
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
               >
                 Yes, add to calendar
               </button>
               
               <button
                 onClick={() => handleConfirmation(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 hover:cursor-pointer"
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
               >
                 No, thanks
               </button>
@@ -594,7 +613,7 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
             <div className="mt-1 flex items-center">
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className={`text-xs ${timerActive ? 'text-blue-600 hover:underline hover:cursor-pointer' : 'text-gray-400 cursor-not-allowed'}`}
+                className={`text-xs ${timerActive ? 'text-blue-600 hover:underline cursor-pointer' : 'text-gray-400 cursor-not-allowed'}`}
                 disabled={!timerActive}
               >
                 Upload Image
@@ -611,10 +630,34 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
             </div>
           </div>
           
+          {/* Uploaded Images Preview */}
+          {uploadedImages.length > 0 && (
+            <div className="flex space-x-1 overflow-x-auto max-w-xs">
+              {uploadedImages.map((img, index) => (
+                <div key={index} className="relative flex-shrink-0">
+                  <img
+                    src={img}
+                    alt={`Upload ${index + 1}`}
+                    className="h-10 w-10 object-cover rounded-md"
+                  />
+                  <button
+                    onClick={() => handleRemoveImage(index)}
+                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 shadow-sm"
+                    title="Remove image"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          
           {timerActive ? (
             <button
               onClick={stopTimer}
-              className="ml-2 p-2 bg-yellow-500 text-white rounded-full h-8 w-8 flex items-center justify-center hover:bg-yellow-600 hover:cursor-pointer"
+              className="ml-2 p-2 bg-yellow-500 text-white rounded-full h-8 w-8 flex items-center justify-center hover:bg-yellow-600"
               title="Pause Timer"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -624,7 +667,7 @@ const TaskCompletionModal: React.FC<TaskCompletionModalProps> = ({
           ) : (
             <button
               onClick={resumeTimer}
-              className="ml-2 p-2 bg-green-500 text-white rounded-full h-8 w-8 flex items-center justify-center hover:bg-green-600 hover:cursor-pointer"
+              className="ml-2 p-2 bg-green-500 text-white rounded-full h-8 w-8 flex items-center justify-center hover:bg-green-600"
               title="Resume Timer"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

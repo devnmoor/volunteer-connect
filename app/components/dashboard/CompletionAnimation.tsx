@@ -50,7 +50,10 @@ const CompletionAnimation: React.FC<CompletionAnimationProps> = ({ mysteryReward
                   top: `${Math.random() * 100}%`,
                   animationDelay: `${Math.random() * 1}s`,
                   animationDuration: `${1 + Math.random() * 3}s`,
-                }}
+                  // Set random direction for each seed
+                  '--random-x': `${(Math.random() * 200 - 100)}px`,
+                  '--random-y': `${(Math.random() * 200 - 100)}px`
+                } as React.CSSProperties}
               >
                 <div
                   className="h-4 w-4 rounded-full"
