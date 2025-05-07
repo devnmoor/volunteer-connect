@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* In your global CSS or in the relevant components */
+.modal-overlay {
+  z-index: 1000 !important; /* Higher than the map */
+}
+
+.map-container {
+  z-index: 10; /* Lower than modals */
+}
+
+/* In your global.css file */
+
+/* Seed flying animation */
+@keyframes fly-seed {
+  0% {
+    transform: translate(0, 0) scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--random-x, 100px), var(--random-y, -100px)) scale(1);
+    opacity: 0;
+  }
+}
+
+.animate-fly-seed {
+  animation: fly-seed 3s ease-out forwards;
+}
+
+/* Seed pulse grow animation */
+@keyframes pulse-grow {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.3;
+  }
+  70% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pulse-grow {
+  animation: pulse-grow 1.5s ease-out forwards;
+}
+
+/* Z-index fixes for modals and map */
+.modal-overlay {
+  z-index: 1000 !important;
+}
+
+.map-container {
+  z-index: 10;
+}
