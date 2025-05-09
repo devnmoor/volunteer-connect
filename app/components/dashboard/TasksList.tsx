@@ -4,31 +4,33 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import TaskCard from './TaskCard';
-import TaskCompletionModal from './TaskCompletionModal';
 import { VolunteerTask } from '@/app/lib/firebase/firestore';
-import { doc, updateDoc, arrayUnion, serverTimestamp, increment, collection, addDoc } from 'firebase/firestore';
-import { db } from '@/app/lib/firebase/config';
 import Link from 'next/link';
-import CompletionAnimation from './CompletionAnimation';
 
 interface TasksListProps {
   tasks: VolunteerTask[];
   userId: string;
+  onTaskClick: (task: VolunteerTask) => void;
+  activeTaskId: string | null;
+  onTaskStart: (taskId: string) => void;
+  onTaskPause: () => void;
 }
 
-const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
+const TasksList: React.FC<TasksListProps> = ({ 
+  tasks, 
+  userId, 
+  onTaskClick,
+  activeTaskId,
+  onTaskStart,
+  onTaskPause
+}) => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('open');
-  const [selectedTask, setSelectedTask] = useState<VolunteerTask | null>(null);
-  const [showCompletionModal, setShowCompletionModal] = useState(false);
-  const [showCompletionAnimation, setShowCompletionAnimation] = useState(false);
   const [scheduledTasks, setScheduledTasks] = useState<{
     task: VolunteerTask;
     scheduledTime: Date;
   }[]>([]);
-  const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
-  const [mysteryRewardReceived, setMysteryRewardReceived] = useState<string | null>(null);
-
+  
   // Group tasks by status
   const openTasks = tasks.filter(task => 
     !task.completedBy?.includes(userId) && 
@@ -58,103 +60,6 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
     setScheduledTasks(scheduledTasksData);
   }, [tasks, userId]);
 
-  // Handle complete task action
-  const handleCompleteTask = async (task: VolunteerTask) => {
-    try {
-      if (!task || !task.id) {
-        console.error('Invalid task or missing task ID');
-        return;
-      }
-      
-      const taskRef = doc(db, 'tasks', task.id);
-      
-      // Create a basic update object without any undefined values
-      const updateData: Record<string, any> = {
-        completionDate: serverTimestamp(),
-        status: 'completed'
-      };
-      
-      // Only add completedBy if userId exists
-      if (userId) {
-        updateData.completedBy = arrayUnion(userId);
-      }
-      
-      // Update the task in Firestore
-      await updateDoc(taskRef, updateData);
-      
-      // Add a seed to the user
-      const userRef = doc(db, 'users', userId);
-      await updateDoc(userRef, {
-        seeds: increment(1),
-        completedTasks: increment(1)
-      });
-      
-      // Check for mystery seed
-      const mysteryReward = checkForMysteryReward();
-      if (mysteryReward) {
-        setMysteryRewardReceived(mysteryReward);
-        
-        // Add the mystery seed to user's collection
-        await updateDoc(userRef, {
-          [`mysterySeeds.${mysteryReward}`]: increment(1)
-        });
-        
-        // Add a public shoutout
-        await addDoc(collection(db, 'shoutouts'), {
-          userId: userId,
-          seedType: mysteryReward,
-          timestamp: serverTimestamp()
-        });
-      }
-      
-      // Show completion animation
-      setShowCompletionAnimation(true);
-      
-      // After animation finishes, close it
-      setTimeout(() => {
-        setShowCompletionAnimation(false);
-        setMysteryRewardReceived(null);
-      }, 5000);
-      
-    } catch (error) {
-      console.error('Error completing task:', error);
-    }
-  };
-  
-  // Check for mystery seed based on probabilities
-  const checkForMysteryReward = (): string | null => {
-    const random = Math.random() * 100; // Percentage
-    
-    if (random <= 0.001) return 'mystery'; // 0.001% chance for X mystery seed
-    if (random <= 0.01) return 'eternity'; // 0.01% chance for Eternity seed
-    if (random <= 0.1) return 'diamond'; // 0.1% chance for Diamond seed
-    if (random <= 5) return 'gold'; // 5% chance for Gold seed
-    if (random <= 10) return 'silver'; // 10% chance for Silver seed
-    
-    return null; // No mystery seed
-  };
-
-  const handleTaskCardClick = (task: VolunteerTask) => {
-    // Only allow interaction if no task is active or if this is the active task
-    if (!activeTaskId || activeTaskId === task.id) {
-      setSelectedTask(task);
-      setShowCompletionModal(true);
-    }
-  };
-
-  const closeCompletionModal = () => {
-    setShowCompletionModal(false);
-    setSelectedTask(null);
-  };
-  
-  const handleTaskStart = (taskId: string) => {
-    setActiveTaskId(taskId);
-  };
-  
-  const handleTaskPause = () => {
-    setActiveTaskId(null);
-  };
-
   // Get current time to check for scheduled tasks that should start
   const now = new Date();
   const tasksStartingSoon = scheduledTasks.filter(
@@ -183,7 +88,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
         <div className="flex items-center">
           <div className="h-3 flex-grow bg-gray-200 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-green-500 rounded-full" 
+              className="h-full bg-green-500 rounded-full transition-all duration-300" 
               style={{ width: `${(completedTasks.length / tasks.length) * 100}%` }}
             ></div>
           </div>
@@ -206,15 +111,9 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
                 {tasks.find(t => t.id === activeTaskId)?.title} in progress
               </p>
               <p className="text-xs text-gray-500">
-                Started at {new Date().toLocaleTimeString()}
+                Task timer is running
               </p>
             </div>
-            <button className="p-1 bg-green-100 rounded-full text-green-600">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
           </div>
         )}
       </div>
@@ -267,7 +166,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
 
       {/* Scheduled Task Reminders */}
       {tasksStartingSoon.length > 0 && (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-20 right-4 z-50">
           {tasksStartingSoon.map((scheduled, index) => (
             <div key={index} className="bg-white rounded-lg shadow-lg p-3 mb-2 flex items-center">
               <div className="bg-green-100 rounded-full p-2 mr-3">
@@ -281,9 +180,13 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
                   {`Starts in ${Math.ceil((scheduled.scheduledTime.getTime() - now.getTime()) / 60000)} minutes`}
                 </p>
               </div>
-              <button className="ml-3 text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <button 
+                onClick={() => onTaskClick(scheduled.task)}
+                className="ml-3 text-gray-500 hover:text-green-700 p-1 hover:bg-green-50 rounded"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </button>
             </div>
@@ -316,33 +219,12 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
               key={task.id}
               task={task}
               isCompleted={task.completedBy?.includes(userId) || task.status === 'completed'}
-              onComplete={() => handleTaskCardClick(task)}
+              onComplete={() => onTaskClick(task)}
               userId={userId}
               isDisabled={activeTaskId !== null && activeTaskId !== task.id}
-              onTaskStart={() => handleTaskStart(task.id!)}
-              onTaskPause={handleTaskPause}
             />
           ))}
         </div>
-      )}
-
-      {/* Task Completion Modal */}
-      {showCompletionModal && selectedTask && (
-        <TaskCompletionModal
-          task={selectedTask}
-          userId={userId}
-          onClose={closeCompletionModal}
-          onComplete={() => handleCompleteTask(selectedTask)}
-          onTaskStart={handleTaskStart}
-          onTaskPause={handleTaskPause}
-        />
-      )}
-
-      {/* Completion Animation */}
-      {showCompletionAnimation && (
-        <CompletionAnimation 
-          mysteryReward={mysteryRewardReceived}
-        />
       )}
     </div>
   );

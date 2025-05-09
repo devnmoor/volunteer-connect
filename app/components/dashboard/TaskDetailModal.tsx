@@ -108,7 +108,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
-        <div className="p-6 border-b">
+        <div className="p-4 border-t">
           <div className="flex justify-between items-start">
             <h2 className="text-2xl font-bold text-gray-900 pr-8">{task.title}</h2>
             <button

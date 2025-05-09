@@ -12,8 +12,6 @@ interface TaskCardProps {
   onComplete: (task: VolunteerTask) => void;
   userId: string;
   isDisabled?: boolean;
-  onTaskStart?: (taskId: string) => void;
-  onTaskPause?: () => void;
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ 
@@ -21,9 +19,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   isCompleted, 
   onComplete, 
   userId,
-  isDisabled = false,
-  onTaskStart,
-  onTaskPause
+  isDisabled = false
 }) => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -91,11 +87,18 @@ const TaskCard: React.FC<TaskCardProps> = ({
   };
 
   return (
-    <div className={`border rounded-lg overflow-hidden relative ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`}>
+    <div className={`border rounded-lg overflow-hidden relative transition-all duration-300 ${
+      isDisabled 
+        ? 'opacity-50 pointer-events-none' 
+        : 'hover:shadow-md'
+    }`}>
       {/* Expand button */}
       <button 
-        onClick={() => setShowDetailModal(true)}
-        className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white"
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowDetailModal(true);
+        }}
+        className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white z-10"
         title="View details"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -105,7 +108,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
       {/* Scheduled indicator */}
       {task.scheduledTime && timeRemaining !== null && (
-        <div className="absolute top-2 left-2 bg-white/90 rounded-full px-2 py-1 text-xs font-medium flex items-center">
+        <div className="absolute top-2 left-2 bg-white/90 rounded-full px-2 py-1 text-xs font-medium flex items-center z-10">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -122,7 +125,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
       </div>
       
       {/* Card Content */}
-      <div className="p-4 bg-white">
+      <div 
+        className="p-4 bg-white cursor-pointer" 
+        onClick={() => !isDisabled && onComplete(task)}
+      >
         <h3 className="text-lg font-semibold mb-2 pr-6">{task.title}</h3>
         
         <div className="mb-3">
@@ -134,7 +140,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
           
           {isDescriptionLong && (
             <button 
-              onClick={() => setShowFullDescription(!showFullDescription)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowFullDescription(!showFullDescription);
+              }}
               className="text-xs text-green-600 mt-1 hover:underline"
             >
               {showFullDescription ? 'View Less' : 'View More'}
@@ -192,13 +201,17 @@ const TaskCard: React.FC<TaskCardProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-green-600 hover:underline"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   {resource.title}{index < Math.min(resources.length, 2) - 1 ? ', ' : ''}
                 </a>
               ))}
               {resources.length > 2 && (
                 <button 
-                  onClick={() => setShowDetailModal(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDetailModal(true);
+                  }}
                   className="text-xs text-green-600 hover:underline"
                 >
                   +{resources.length - 2} more
@@ -215,14 +228,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
         ) : isInProgress ? (
           <button
             onClick={() => onComplete(task)}
-            className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium text-sm transition-colors"
           >
             View Progress
           </button>
         ) : (
           <button
             onClick={() => onComplete(task)}
-            className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+            className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium text-sm transition-colors"
           >
             Start Task
           </button>
