@@ -1,4 +1,4 @@
-// app/lib/firebase/firestore.ts - UPDATED VERSION
+// app/lib/firebase/firestore.ts - Updated VolunteerTask interface
 import { db } from './config';
 import {
   collection,
@@ -12,13 +12,28 @@ import {
   deleteDoc,
   serverTimestamp,
   GeoPoint,
-  Timestamp,
-  writeBatch
+  Timestamp
 } from 'firebase/firestore';
 import { UserLevel } from './auth';
 
+// Helper function to get current week key for task assignment
+export const getCurrentWeekKey = (): string => {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const pastDaysOfYear = (now.getTime() - startOfYear.getTime()) / 86400000;
+  const weekNumber = Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7);
+  return `${now.getFullYear()}-W${weekNumber}`;
+};
+
+export interface ProgressEntry {
+  timestamp: Date;
+  title: string;
+  description: string;
+  images: string[];
+}
+
 export interface VolunteerTask {
-  id?: string;
+  id: string;
   title: string;
   description: string;
   category: 'communityService' | 'environmentalAction' | 'educationYouthSupport' | 'healthWellness';
@@ -32,14 +47,21 @@ export interface VolunteerTask {
     };
   };
   completedBy?: string[];
-  completionDate?: any;
-  createdAt?: any;
-  updatedAt?: any;
+  completionDate?: any; // Firestore timestamp
+  createdAt?: any; // Firestore timestamp
+  updatedAt?: any; // Firestore timestamp
   createdBy?: string;
   isCustom?: boolean;
+  
+  // Timer and progress tracking properties
   status?: 'open' | 'scheduled' | 'in-progress' | 'paused' | 'completed';
-  scheduledTime?: any;
-  timeSpent?: number;
+  scheduledTime?: any; // Firestore timestamp
+  startTime?: any; // Firestore timestamp when timer was started
+  timeSpent?: number; // Total time spent in seconds
+  lastProgressUpdate?: any; // Firestore timestamp
+  progressEntries?: ProgressEntry[]; // Array of progress entries
+  
+  // Additional properties
   impact?: string;
   requirements?: string;
   pauseData?: Array<{
@@ -50,7 +72,6 @@ export interface VolunteerTask {
   }>;
   assignedTo?: string;
   isAssigned?: boolean;
-  weekAssigned?: string; // Format: "YYYY-WW" (year-week)
   images?: string[];
   achievements?: string;
   feedback?: string;
@@ -67,14 +88,15 @@ export interface TaskCompletion {
   userId: string;
   completionDate: any;
   imageUrl: string;
-  rating: number;
+  rating: number; // 1-5 stars
   feedback?: string;
   createdAt: any;
 }
 
-// Create a new volunteer task
+// Create a new volunteer task (for Bloom users)
 export const createTask = async (taskData: Omit<VolunteerTask, 'id' | 'createdAt' | 'updatedAt' | 'completedBy'>, userId: string) => {
   try {
+    // Define the task data without isAssigned (since it doesn't exist in the interface)
     const task = {
       ...taskData,
       createdBy: userId,
@@ -83,9 +105,67 @@ export const createTask = async (taskData: Omit<VolunteerTask, 'id' | 'createdAt
       updatedAt: serverTimestamp()
     };
 
-    const docRef = await addDoc(collection(db, 'tasks'), task);
+    // If you need isAssigned for functionality, add it to the firestore document
+    // but not to the typed object
+    const firestoreData = {
+      ...task,
+      // Add any additional fields needed for Firestore but not in the interface
+      assignedTo: null, // If needed
+    };
+
+    const docRef = await addDoc(collection(db, 'tasks'), firestoreData);
     return { id: docRef.id, ...task };
   } catch (error) {
+    throw error;
+  }
+};
+
+// Add this to app/lib/firebase/firestore.ts
+export const resetWeeklyTasks = async (userId: string) => {
+  try {
+    // Get user's current tasks
+    const userTasks = await getUserTasks(userId);
+
+    // For each task, unassign it
+    for (const task of userTasks) {
+      if (task.id) {
+        const taskRef = doc(db, 'tasks', task.id);
+        await updateDoc(taskRef, {
+          assignedTo: null,
+          isAssigned: false,
+          updatedAt: serverTimestamp()
+        });
+      }
+    }
+
+    // Get new tasks to assign based on user's preferences
+    // You can modify this based on your application's requirement
+    // For example, you can get 3 new tasks per week
+    const availableTasksQuery = query(
+      collection(db, 'tasks'),
+      where('isAssigned', '==', false),
+      where('requiredLevel', '==', 'Sapling') // Adjust as needed for the user's level
+    );
+
+    const availableTasksSnapshot = await getDocs(availableTasksQuery);
+    const availableTasks: VolunteerTask[] = [];
+
+    availableTasksSnapshot.forEach((doc) => {
+      availableTasks.push({ id: doc.id, ...doc.data() } as VolunteerTask);
+    });
+
+    // Assign up to 3 new tasks
+    const tasksToAssign = availableTasks.slice(0, 3);
+
+    for (const task of tasksToAssign) {
+      if (task.id) {
+        await assignTaskToUser(task.id, userId);
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error resetting weekly tasks:', error);
     throw error;
   }
 };
@@ -96,12 +176,12 @@ export const getTasks = async (filters: {
   locationType?: VolunteerTask['locationType'];
   requiredLevel?: UserLevel;
   isAssigned?: boolean;
-  weekAssigned?: string;
 }) => {
   try {
     const tasksCollection = collection(db, 'tasks');
     let q = query(tasksCollection);
 
+    // Build query based on filters
     const constraints = [];
 
     if (filters.category) {
@@ -112,12 +192,12 @@ export const getTasks = async (filters: {
       constraints.push(where('locationType', '==', filters.locationType));
     }
 
-    if (filters.isAssigned !== undefined) {
-      constraints.push(where('isAssigned', '==', filters.isAssigned));
+    if (filters.requiredLevel) {
+      constraints.push(where('requiredLevel', '==', filters.requiredLevel));
     }
 
-    if (filters.weekAssigned) {
-      constraints.push(where('weekAssigned', '==', filters.weekAssigned));
+    if (filters.isAssigned !== undefined) {
+      constraints.push(where('isAssigned', '==', filters.isAssigned));
     }
 
     if (constraints.length > 0) {
@@ -137,17 +217,10 @@ export const getTasks = async (filters: {
   }
 };
 
-// Get tasks assigned to a specific user for current week
-export const getUserTasks = async (userId: string, weekKey?: string) => {
+// Get tasks assigned to a specific user
+export const getUserTasks = async (userId: string) => {
   try {
-    const currentWeek = weekKey || getCurrentWeekKey();
-    
-    const q = query(
-      collection(db, 'tasks'), 
-      where('assignedTo', '==', userId),
-      where('weekAssigned', '==', currentWeek)
-    );
-    
+    const q = query(collection(db, 'tasks'), where('assignedTo', '==', userId));
     const querySnapshot = await getDocs(q);
     const tasks: VolunteerTask[] = [];
 
@@ -162,13 +235,13 @@ export const getUserTasks = async (userId: string, weekKey?: string) => {
 };
 
 // Assign a task to a user
-export const assignTaskToUser = async (taskId: string, userId: string, weekKey: string) => {
+export const assignTaskToUser = async (taskId: string, userId: string) => {
   try {
     const taskRef = doc(db, 'tasks', taskId);
     await updateDoc(taskRef, {
+      completionDate: serverTimestamp(),
       assignedTo: userId,
       isAssigned: true,
-      weekAssigned: weekKey,
       updatedAt: serverTimestamp()
     });
   } catch (error) {
@@ -177,6 +250,7 @@ export const assignTaskToUser = async (taskId: string, userId: string, weekKey: 
 };
 
 // Mark a task as completed
+// Update the completeTask function in firestore.ts
 export const completeTask = async (taskId: string, userId: string, completionData: {
   imageUrl: string;
   summary: string;
@@ -186,6 +260,7 @@ export const completeTask = async (taskId: string, userId: string, completionDat
   timeSpent: number;
 }) => {
   try {
+    // Update the task document
     const taskRef = doc(db, 'tasks', taskId);
     const taskDoc = await getDoc(taskRef);
 
@@ -202,7 +277,6 @@ export const completeTask = async (taskId: string, userId: string, completionDat
 
     await updateDoc(taskRef, {
       completedBy,
-      status: 'completed',
       updatedAt: serverTimestamp()
     });
 
@@ -227,7 +301,7 @@ export const completeTask = async (taskId: string, userId: string, completionDat
   }
 };
 
-// Get nearby volunteer opportunities
+// Get nearby volunteer opportunities (for Bud and Bloom users)
 export const getNearbyOpportunities = async (
   latitude: number,
   longitude: number,
@@ -235,15 +309,21 @@ export const getNearbyOpportunities = async (
   userLevel: UserLevel
 ) => {
   try {
+    // In a real implementation, we would use a spatial query
+    // For simplicity, we'll get all tasks and filter them manually
     const tasks = await getTasks({
-      isAssigned: false
+      isAssigned: false,
+      requiredLevel: userLevel === 'Bloom' ? undefined : userLevel // Bloom users can see all opportunities
     });
 
+    // Filter tasks by distance
     const nearbyTasks = tasks.filter(task => {
+      // Check if task has coordinates
       if (!task.location?.coordinates?.latitude || !task.location?.coordinates?.longitude) {
         return false;
       }
 
+      // Calculate distance using Haversine formula
       const distance = calculateDistance(
         latitude,
         longitude,
@@ -262,7 +342,7 @@ export const getNearbyOpportunities = async (
 
 // Calculate distance between two points using Haversine formula
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-  const R = 6371;
+  const R = 6371; // Radius of the Earth in km
   const dLat = degToRad(lat2 - lat1);
   const dLon = degToRad(lon2 - lon1);
 
@@ -281,20 +361,59 @@ const degToRad = (deg: number): number => {
   return deg * (Math.PI / 180);
 };
 
-// Helper function to get current week key (YYYY-WW format)
-export const getCurrentWeekKey = (): string => {
-  const now = new Date();
-  const year = now.getFullYear();
-  
-  // Get week number (simple calculation)
-  const startOfYear = new Date(year, 0, 1);
-  const pastDaysOfYear = (now.getTime() - startOfYear.getTime()) / 86400000;
-  const weekNumber = Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7);
-  
-  return `${year}-${weekNumber.toString().padStart(2, '0')}`;
+// Get weekly tasks for a user based on their commitment level
+export const getWeeklyTasks = async (userId: string, weeklyCommitment: number) => {
+  try {
+    // Get user profile to determine level and preferences
+    const userDoc = await getDoc(doc(db, 'users', userId));
+
+    if (!userDoc.exists()) {
+      throw new Error('User not found');
+    }
+
+    const userData = userDoc.data();
+    const userLevel = userData.level as UserLevel;
+    const preferences = userData.rankingPreferences;
+
+    // Sort categories by user preference
+    const sortedCategories = [
+      { category: 'communityService', rank: preferences.communityService },
+      { category: 'environmentalAction', rank: preferences.environmentalAction },
+      { category: 'educationYouthSupport', rank: preferences.educationYouthSupport },
+      { category: 'healthWellness', rank: preferences.healthWellness }
+    ].sort((a, b) => a.rank - b.rank)
+      .map(item => item.category);
+
+    // Get unassigned tasks suitable for user's level
+    const availableTasks = await getTasks({
+      isAssigned: false,
+      requiredLevel: userLevel
+    });
+
+    // Prioritize tasks based on user preferences
+    const prioritizedTasks = availableTasks.sort((a, b) => {
+      const categoryIndexA = sortedCategories.indexOf(a.category);
+      const categoryIndexB = sortedCategories.indexOf(b.category);
+      return categoryIndexA - categoryIndexB;
+    });
+
+    // Limit to weekly commitment number
+    const tasksToAssign = prioritizedTasks.slice(0, weeklyCommitment);
+
+    // Assign tasks to user
+    for (const task of tasksToAssign) {
+      if (task.id) {
+        await assignTaskToUser(task.id, userId);
+      }
+    }
+
+    return tasksToAssign;
+  } catch (error) {
+    throw error;
+  }
 };
 
-// Add seeds to user account
+// Add this function to app/lib/firebase/firestore.ts
 export const addSeeds = async (userId: string, amount: number) => {
   try {
     const userRef = doc(db, 'users', userId);
@@ -322,21 +441,28 @@ export const addSeeds = async (userId: string, amount: number) => {
 // Check weekly task completion and award seeds
 export const checkWeeklyCompletion = async (userId: string) => {
   try {
+    // Get user's assigned tasks
     const userTasks = await getUserTasks(userId);
+
+    // Get user's completed tasks
     const completedTasks = userTasks.filter(task =>
       task.completedBy && task.completedBy.includes(userId)
     );
 
+    // Calculate seeds based on completion ratio
     const completionRatio = userTasks.length > 0 ? completedTasks.length / userTasks.length : 0;
     let seedsEarned = 0;
 
     if (completionRatio === 1) {
+      // All tasks completed, award 5 seeds
       seedsEarned = 5;
     } else if (completionRatio > 0) {
+      // Partial completion, award proportional seeds (rounded down)
       seedsEarned = Math.floor(completionRatio * 5);
     }
 
     if (seedsEarned > 0) {
+      // Add seeds to user's account
       await addSeeds(userId, seedsEarned);
     }
 

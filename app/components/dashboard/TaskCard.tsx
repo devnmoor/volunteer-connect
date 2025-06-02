@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { VolunteerTask } from '@/app/lib/firebase/firestore';
 import { generateTaskResources, TaskResource } from '@/app/lib/tasks/taskResources';
 import TaskDetailModal from './TaskDetailModal';
+import TaskTimeDisplay from './TaskTimeDisplay';
 
 interface TaskCardProps {
   task: VolunteerTask;
@@ -12,6 +13,9 @@ interface TaskCardProps {
   onComplete: (task: VolunteerTask) => void;
   userId: string;
   isDisabled?: boolean;
+  onTaskStart?: (taskId: string) => void;
+  onTaskPause?: (taskId: string) => void;
+  activeTaskId?: string | null;
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ 
@@ -19,13 +23,19 @@ const TaskCard: React.FC<TaskCardProps> = ({
   isCompleted, 
   onComplete, 
   userId,
-  isDisabled = false
+  isDisabled = false,
+  onTaskStart,
+  onTaskPause,
+  activeTaskId
 }) => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const resources = generateTaskResources(task);
 
+  // Check if this task is currently active (timer running)
+  const isActiveTask = activeTaskId === task.id;
+  
   // Check if description is too long
   const isDescriptionLong = task.description.length > 120;
   const truncatedDescription = isDescriptionLong 
@@ -34,6 +44,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
   // Check if task is in progress
   const isInProgress = task.status === 'in-progress' || task.status === 'paused';
+  
+  // Check if task has any time tracking data
+  const hasTimeData = (task.timeSpent && task.timeSpent > 0) || task.status === 'in-progress' || task.status === 'paused';
   
   // Get time since scheduled (if applicable)
   useEffect(() => {
@@ -69,7 +82,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     }
   };
   
-  // Format time remaining
+  // Format time remaining for scheduled tasks
   const formatTimeRemaining = () => {
     if (timeRemaining === null) return '';
     
@@ -86,19 +99,104 @@ const TaskCard: React.FC<TaskCardProps> = ({
     }
   };
 
+  // Handle button click based on task state
+  const handleButtonClick = () => {
+    if (isCompleted) return;
+    
+    if (isActiveTask) {
+      // Task is currently active, pause it
+      onTaskPause?.(task.id!);
+    } else if (isInProgress) {
+      // Task is in progress but not active, view progress
+      onComplete(task);
+    } else {
+      // Task is not started, show start task modal
+      onComplete(task);
+    }
+  };
+
+  // Get button text and style based on task state
+  const getButtonInfo = () => {
+    if (isCompleted) {
+      return {
+        text: 'Task Completed',
+        className: 'bg-green-100 text-green-800 cursor-default',
+        disabled: true
+      };
+    }
+    
+    if (isActiveTask) {
+      return {
+        text: 'Pause Timer',
+        className: 'bg-yellow-600 hover:bg-yellow-700 text-white',
+        disabled: false
+      };
+    }
+    
+    if (isInProgress) {
+      return {
+        text: 'View Progress',
+        className: 'bg-blue-600 hover:bg-blue-700 text-white',
+        disabled: false
+      };
+    }
+    
+    // Check if task is scheduled and show countdown
+    if (task.scheduledTime && task.status === 'scheduled') {
+      const scheduledTime = task.scheduledTime.toDate ? task.scheduledTime.toDate() : new Date(task.scheduledTime);
+      const now = new Date();
+      const timeDiff = scheduledTime.getTime() - now.getTime();
+      
+      if (timeDiff > 0) {
+        // Task is scheduled for the future
+        const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+        
+        if (hours > 0) {
+          return {
+            text: `Starts in ${hours}h ${minutes}m`,
+            className: 'bg-purple-100 text-purple-800 cursor-default',
+            disabled: true
+          };
+        } else if (minutes > 0) {
+          return {
+            text: `Starts in ${minutes}m`,
+            className: 'bg-purple-100 text-purple-800 cursor-default',
+            disabled: true
+          };
+        } else {
+          return {
+            text: 'Ready to Start',
+            className: 'bg-green-600 hover:bg-green-700 text-white animate-pulse',
+            disabled: false
+          };
+        }
+      }
+    }
+    
+    return {
+      text: 'Start Task',
+      className: 'bg-green-600 hover:bg-green-700 text-white',
+      disabled: false
+    };
+  };
+
+  const buttonInfo = getButtonInfo();
+
   return (
-    <div className={`border rounded-lg overflow-hidden relative transition-all duration-300 ${
-      isDisabled 
-        ? 'opacity-50 pointer-events-none' 
-        : 'hover:shadow-md'
-    }`}>
+    <div className={`border rounded-lg overflow-hidden relative ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`}>
+      {/* Active timer indicator */}
+      {isActiveTask && (
+        <div className="absolute top-2 left-2 bg-yellow-500 text-white rounded-full px-2 py-1 text-xs font-medium flex items-center animate-pulse">
+          <div className="w-2 h-2 bg-white rounded-full mr-1 animate-ping"></div>
+          Timer Active
+        </div>
+      )}
+
       {/* Expand button */}
       <button 
-        onClick={(e) => {
-          e.stopPropagation();
-          setShowDetailModal(true);
-        }}
-        className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white z-10"
+        onClick={() => setShowDetailModal(true)}
+        className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white"
         title="View details"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,8 +205,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
       </button>
 
       {/* Scheduled indicator */}
-      {task.scheduledTime && timeRemaining !== null && (
-        <div className="absolute top-2 left-2 bg-white/90 rounded-full px-2 py-1 text-xs font-medium flex items-center z-10">
+      {task.scheduledTime && timeRemaining !== null && !isActiveTask && (
+        <div className="absolute top-2 left-2 bg-white/90 rounded-full px-2 py-1 text-xs font-medium flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -125,10 +223,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       </div>
       
       {/* Card Content */}
-      <div 
-        className="p-4 bg-white cursor-pointer" 
-        onClick={() => !isDisabled && onComplete(task)}
-      >
+      <div className="p-4 bg-white">
         <h3 className="text-lg font-semibold mb-2 pr-6">{task.title}</h3>
         
         <div className="mb-3">
@@ -140,16 +235,24 @@ const TaskCard: React.FC<TaskCardProps> = ({
           
           {isDescriptionLong && (
             <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowFullDescription(!showFullDescription);
-              }}
+              onClick={() => setShowFullDescription(!showFullDescription)}
               className="text-xs text-green-600 mt-1 hover:underline"
             >
               {showFullDescription ? 'View Less' : 'View More'}
             </button>
           )}
         </div>
+        
+        {/* Time Tracking Display */}
+        {hasTimeData && (
+          <div className="mb-4 flex justify-center">
+            <TaskTimeDisplay 
+              task={task} 
+              isActive={isActiveTask}
+              size="medium"
+            />
+          </div>
+        )}
         
         <div className="flex flex-wrap gap-2 mb-4">
           <div className="text-xs bg-gray-100 rounded-full px-2 py-1 flex items-center">
@@ -201,17 +304,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-green-600 hover:underline"
-                  onClick={(e) => e.stopPropagation()}
                 >
                   {resource.title}{index < Math.min(resources.length, 2) - 1 ? ', ' : ''}
                 </a>
               ))}
               {resources.length > 2 && (
                 <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowDetailModal(true);
-                  }}
+                  onClick={() => setShowDetailModal(true)}
                   className="text-xs text-green-600 hover:underline"
                 >
                   +{resources.length - 2} more
@@ -221,25 +320,16 @@ const TaskCard: React.FC<TaskCardProps> = ({
           </div>
         )}
         
-        {isCompleted ? (
-          <div className="bg-green-100 text-green-800 text-center py-2 px-4 rounded-md font-medium text-sm">
-            Task Completed
-          </div>
-        ) : isInProgress ? (
-          <button
-            onClick={() => onComplete(task)}
-            className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium text-sm transition-colors"
-          >
-            View Progress
-          </button>
-        ) : (
-          <button
-            onClick={() => onComplete(task)}
-            className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium text-sm transition-colors"
-          >
-            Start Task
-          </button>
-        )}
+        {/* Action Button */}
+        <button
+          onClick={handleButtonClick}
+          disabled={buttonInfo.disabled}
+          className={`w-full py-2 ${buttonInfo.className} rounded-md font-medium text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 ${
+            !buttonInfo.disabled ? 'hover:cursor-pointer' : 'cursor-not-allowed'
+          }`}
+        >
+          {buttonInfo.text}
+        </button>
       </div>
 
       {/* Detail Modal */}
@@ -251,7 +341,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
           isInProgress={isInProgress}
           onStartTask={() => {
             setShowDetailModal(false);
-            onComplete(task);
+            handleButtonClick();
           }}
           onClose={() => setShowDetailModal(false)}
           userId={userId}

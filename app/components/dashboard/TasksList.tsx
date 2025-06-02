@@ -4,37 +4,52 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import TaskCard from './TaskCard';
+import TaskCompletionModal from './TaskCompletionModal';
+import ProgressRecordingModal from './ProgressRecordingModal';
+import TaskStartModal from './TaskStartModal';
+import PauseConfirmationModal from './PauseConfirmationModal';
+import TaskTimeDisplay from './TaskTimeDisplay';
 import { VolunteerTask } from '@/app/lib/firebase/firestore';
+import { doc, updateDoc, arrayUnion, serverTimestamp, increment, collection, addDoc } from 'firebase/firestore';
+import { db } from '@/app/lib/firebase/config';
 import Link from 'next/link';
+import CompletionAnimation from './CompletionAnimation';
 
 interface TasksListProps {
   tasks: VolunteerTask[];
   userId: string;
-  onTaskClick: (task: VolunteerTask) => void;
-  activeTaskId: string | null;
-  onTaskStart: (taskId: string) => void;
-  onTaskPause: () => void;
 }
 
-const TasksList: React.FC<TasksListProps> = ({ 
-  tasks, 
-  userId, 
-  onTaskClick,
-  activeTaskId,
-  onTaskStart,
-  onTaskPause
-}) => {
+const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('open');
+  const [selectedTask, setSelectedTask] = useState<VolunteerTask | null>(null);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [showProgressModal, setShowProgressModal] = useState(false);
+  const [showStartModal, setShowStartModal] = useState(false);
+  const [showPauseConfirmation, setShowPauseConfirmation] = useState(false);
+  const [showCompletionAnimation, setShowCompletionAnimation] = useState(false);
   const [scheduledTasks, setScheduledTasks] = useState<{
     task: VolunteerTask;
     scheduledTime: Date;
   }[]>([]);
-  
+  const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+  const [mysteryRewardReceived, setMysteryRewardReceived] = useState<string | null>(null);
+  const [pausedTaskData, setPausedTaskData] = useState<{
+    taskId: string;
+    pauseTime: Date;
+    elapsedAtPause: number;
+  } | null>(null);
+
   // Group tasks by status
   const openTasks = tasks.filter(task => 
     !task.completedBy?.includes(userId) && 
-    (!task.status || task.status === 'open' || task.status === 'scheduled')
+    (!task.status || task.status === 'open')
+  );
+  
+  const scheduledTasksList = tasks.filter(task =>
+    !task.completedBy?.includes(userId) && 
+    task.status === 'scheduled'
   );
   
   const inProgressTasks = tasks.filter(task => 
@@ -46,6 +61,9 @@ const TasksList: React.FC<TasksListProps> = ({
     task.completedBy?.includes(userId) || 
     task.status === 'completed'
   );
+
+  // Combine open and scheduled tasks for the "Open Tasks" tab
+  const allOpenTasks = [...openTasks, ...scheduledTasksList];
 
   // Effect to update scheduled tasks
   useEffect(() => {
@@ -60,6 +78,213 @@ const TasksList: React.FC<TasksListProps> = ({
     setScheduledTasks(scheduledTasksData);
   }, [tasks, userId]);
 
+  // Handle complete task action
+  const handleCompleteTask = async (task: VolunteerTask) => {
+    try {
+      if (!task || !task.id) {
+        console.error('Invalid task or missing task ID');
+        return;
+      }
+      
+      const taskRef = doc(db, 'tasks', task.id);
+      
+      // Create a basic update object without any undefined values
+      const updateData: Record<string, any> = {
+        completionDate: serverTimestamp(),
+        status: 'completed'
+      };
+      
+      // Only add completedBy if userId exists
+      if (userId) {
+        updateData.completedBy = arrayUnion(userId);
+      }
+      
+      // Update the task in Firestore
+      await updateDoc(taskRef, updateData);
+      
+      // Add a seed to the user
+      const userRef = doc(db, 'users', userId);
+      await updateDoc(userRef, {
+        seeds: increment(1),
+        completedTasks: increment(1)
+      });
+      
+      // Check for mystery seed
+      const mysteryReward = checkForMysteryReward();
+      if (mysteryReward) {
+        setMysteryRewardReceived(mysteryReward);
+        
+        // Add the mystery seed to user's collection
+        await updateDoc(userRef, {
+          [`mysterySeeds.${mysteryReward}`]: increment(1)
+        });
+        
+        // Add a public shoutout
+        await addDoc(collection(db, 'shoutouts'), {
+          userId: userId,
+          seedType: mysteryReward,
+          timestamp: serverTimestamp()
+        });
+      }
+      
+      // Show completion animation
+      setShowCompletionAnimation(true);
+      
+      // After animation finishes, close it
+      setTimeout(() => {
+        setShowCompletionAnimation(false);
+        setMysteryRewardReceived(null);
+      }, 5000);
+      
+    } catch (error) {
+      console.error('Error completing task:', error);
+    }
+  };
+  
+  // Check for mystery seed based on probabilities
+  const checkForMysteryReward = (): string | null => {
+    const random = Math.random() * 100; // Percentage
+    
+    if (random <= 0.001) return 'mystery'; // 0.001% chance for X mystery seed
+    if (random <= 0.01) return 'eternity'; // 0.01% chance for Eternity seed
+    if (random <= 0.1) return 'diamond'; // 0.1% chance for Diamond seed
+    if (random <= 5) return 'gold'; // 5% chance for Gold seed
+    if (random <= 10) return 'silver'; // 10% chance for Silver seed
+    
+    return null; // No mystery seed
+  };
+
+  const handleTaskCardClick = (task: VolunteerTask) => {
+    setSelectedTask(task);
+    
+    // Determine which modal to show based on task state
+    if (task.status === 'in-progress' || task.status === 'paused') {
+      // Show completion modal for in-progress tasks
+      setShowCompletionModal(true);
+    } else if (task.completedBy?.includes(userId)) {
+      // Show completion modal for completed tasks (view only)
+      setShowCompletionModal(true);
+    } else {
+      // Show start modal for open/scheduled tasks
+      setShowStartModal(true);
+    }
+  };
+
+  const closeAllModals = () => {
+    setShowCompletionModal(false);
+    setShowProgressModal(false);
+    setShowStartModal(false);
+    setShowPauseConfirmation(false);
+    setSelectedTask(null);
+    setPausedTaskData(null);
+  };
+  
+  const handleTaskStart = async (taskId: string) => {
+    try {
+      // Update task status to in-progress and record start time
+      const taskRef = doc(db, 'tasks', taskId);
+      await updateDoc(taskRef, {
+        status: 'in-progress',
+        startTime: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      
+      setActiveTaskId(taskId);
+    } catch (error) {
+      console.error('Error starting task:', error);
+    }
+  };
+  
+  const handleTaskPause = async (taskId: string) => {
+    try {
+      // Find the task
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+      
+      // Calculate elapsed time up to this point
+      let currentElapsed = task.timeSpent || 0;
+      if (task.startTime) {
+        const startTime = task.startTime.toDate ? task.startTime.toDate() : new Date(task.startTime);
+        const sessionElapsed = Math.floor((new Date().getTime() - startTime.getTime()) / 1000);
+        currentElapsed += Math.max(sessionElapsed, 0);
+      }
+      
+      // Immediately pause the timer in the database
+      const taskRef = doc(db, 'tasks', taskId);
+      await updateDoc(taskRef, {
+        status: 'paused',
+        timeSpent: currentElapsed,
+        lastPauseTime: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      
+      // Stop the active timer immediately
+      setActiveTaskId(null);
+      
+      // Store pause data for potential resume
+      setPausedTaskData({
+        taskId,
+        pauseTime: new Date(),
+        elapsedAtPause: currentElapsed
+      });
+      
+      // Set selected task and show confirmation modal
+      setSelectedTask(task);
+      setShowPauseConfirmation(true);
+      
+    } catch (error) {
+      console.error('Error pausing task:', error);
+    }
+  };
+
+  const handlePauseConfirm = () => {
+    // User confirmed pause - show progress recording modal
+    setShowPauseConfirmation(false);
+    setShowProgressModal(true);
+  };
+
+  const handlePauseCancel = async () => {
+    // User wants to continue - resume the timer
+    if (pausedTaskData && selectedTask) {
+      try {
+        const taskRef = doc(db, 'tasks', pausedTaskData.taskId);
+        await updateDoc(taskRef, {
+          status: 'in-progress',
+          startTime: serverTimestamp(), // Reset start time for new session
+          updatedAt: serverTimestamp()
+        });
+        
+        // Resume the active timer
+        setActiveTaskId(pausedTaskData.taskId);
+        
+      } catch (error) {
+        console.error('Error resuming task:', error);
+      }
+    }
+    
+    // Close modals and clear state
+    setShowPauseConfirmation(false);
+    setSelectedTask(null);
+    setPausedTaskData(null);
+  };
+
+  const handleProgressSubmit = () => {
+    // Clear active task and refresh
+    setActiveTaskId(null);
+    setSelectedTask(null);
+    setShowProgressModal(false);
+    setPausedTaskData(null);
+    
+    // The task status will be updated to 'paused' by the modal
+    // and will appear in the in-progress section
+  };
+
+  const handleTaskScheduled = () => {
+    // Task has been scheduled, refresh the UI
+    setSelectedTask(null);
+    setShowStartModal(false);
+  };
+
   // Get current time to check for scheduled tasks that should start
   const now = new Date();
   const tasksStartingSoon = scheduledTasks.filter(
@@ -71,7 +296,7 @@ const TasksList: React.FC<TasksListProps> = ({
 
   // Determine which tasks to display based on active tab
   const displayedTasks = 
-    activeTab === 'open' ? openTasks :
+    activeTab === 'open' ? allOpenTasks :
     activeTab === 'in-progress' ? inProgressTasks :
     completedTasks;
 
@@ -88,7 +313,7 @@ const TasksList: React.FC<TasksListProps> = ({
         <div className="flex items-center">
           <div className="h-3 flex-grow bg-gray-200 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-green-500 rounded-full transition-all duration-300" 
+              className="h-full bg-green-500 rounded-full" 
               style={{ width: `${(completedTasks.length / tasks.length) * 100}%` }}
             ></div>
           </div>
@@ -101,18 +326,22 @@ const TasksList: React.FC<TasksListProps> = ({
         {activeTaskId && (
           <div className="mt-4 bg-white p-3 rounded-md shadow-sm border border-green-200 flex items-center">
             <div className="mr-3">
-              <svg width="32" height="32" viewBox="0 0 48 48" className="animate-pulse">
-                <circle cx="24" cy="24" r="22" fill="white" stroke="#10B981" strokeWidth="2" />
-                <circle cx="24" cy="24" r="1.5" fill="#065F46" />
-              </svg>
+              <TaskTimeDisplay 
+                task={tasks.find(t => t.id === activeTaskId)!}
+                isActive={true}
+                size="small"
+              />
             </div>
             <div className="flex-grow">
               <p className="text-sm font-medium text-gray-700">
                 {tasks.find(t => t.id === activeTaskId)?.title} in progress
               </p>
               <p className="text-xs text-gray-500">
-                Task timer is running
+                Timer started at {new Date().toLocaleTimeString()}
               </p>
+            </div>
+            <div className="text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full text-xs font-medium">
+              Active Timer
             </div>
           </div>
         )}
@@ -129,7 +358,7 @@ const TasksList: React.FC<TasksListProps> = ({
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            Open Tasks
+            Open Tasks ({allOpenTasks.length})
           </button>
           <button
             onClick={() => setActiveTab('in-progress')}
@@ -139,7 +368,7 @@ const TasksList: React.FC<TasksListProps> = ({
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            In-Progress Tasks
+            In-Progress Tasks ({inProgressTasks.length})
           </button>
           <button
             onClick={() => setActiveTab('completed')}
@@ -149,7 +378,7 @@ const TasksList: React.FC<TasksListProps> = ({
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            Completed Tasks
+            Completed Tasks ({completedTasks.length})
           </button>
         </div>
         
@@ -166,11 +395,11 @@ const TasksList: React.FC<TasksListProps> = ({
 
       {/* Scheduled Task Reminders */}
       {tasksStartingSoon.length > 0 && (
-        <div className="fixed top-20 right-4 z-50">
+        <div className="fixed top-4 right-4 z-50">
           {tasksStartingSoon.map((scheduled, index) => (
             <div key={index} className="bg-white rounded-lg shadow-lg p-3 mb-2 flex items-center">
-              <div className="bg-green-100 rounded-full p-2 mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="bg-purple-100 rounded-full p-2 mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -180,13 +409,9 @@ const TasksList: React.FC<TasksListProps> = ({
                   {`Starts in ${Math.ceil((scheduled.scheduledTime.getTime() - now.getTime()) / 60000)} minutes`}
                 </p>
               </div>
-              <button 
-                onClick={() => onTaskClick(scheduled.task)}
-                className="ml-3 text-gray-500 hover:text-green-700 p-1 hover:bg-green-50 rounded"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              <button className="ml-3 text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
@@ -219,12 +444,63 @@ const TasksList: React.FC<TasksListProps> = ({
               key={task.id}
               task={task}
               isCompleted={task.completedBy?.includes(userId) || task.status === 'completed'}
-              onComplete={() => onTaskClick(task)}
+              onComplete={() => handleTaskCardClick(task)}
               userId={userId}
               isDisabled={activeTaskId !== null && activeTaskId !== task.id}
+              onTaskStart={handleTaskStart}
+              onTaskPause={handleTaskPause}
+              activeTaskId={activeTaskId}
             />
           ))}
         </div>
+      )}
+
+      {/* Pause Confirmation Modal */}
+      {showPauseConfirmation && selectedTask && (
+        <PauseConfirmationModal
+          task={selectedTask}
+          onConfirm={handlePauseConfirm}
+          onCancel={handlePauseCancel}
+        />
+      )}
+
+      {/* Task Start Modal */}
+      {showStartModal && selectedTask && (
+        <TaskStartModal
+          task={selectedTask}
+          onClose={closeAllModals}
+          onStartTimer={handleTaskStart}
+          onScheduled={handleTaskScheduled}
+        />
+      )}
+
+      {/* Task Completion Modal */}
+      {showCompletionModal && selectedTask && (
+        <TaskCompletionModal
+          task={selectedTask}
+          userId={userId}
+          onClose={closeAllModals}
+          onComplete={() => handleCompleteTask(selectedTask)}
+          onTaskStart={handleTaskStart}
+          onTaskPause={handleTaskPause}
+        />
+      )}
+
+      {/* Progress Recording Modal */}
+      {showProgressModal && selectedTask && (
+        <ProgressRecordingModal
+          task={selectedTask}
+          userId={userId}
+          onClose={() => setShowProgressModal(false)}
+          onSubmit={handleProgressSubmit}
+        />
+      )}
+
+      {/* Completion Animation */}
+      {showCompletionAnimation && (
+        <CompletionAnimation 
+          mysteryReward={mysteryRewardReceived}
+        />
       )}
     </div>
   );
