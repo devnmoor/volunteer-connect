@@ -5,18 +5,17 @@
 
 var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
 {
-// app/lib/firebase/firestore.ts
+// app/lib/firebase/firestore.ts - UPDATED VERSION
 __turbopack_context__.s({
     "addSeeds": (()=>addSeeds),
     "assignTaskToUser": (()=>assignTaskToUser),
     "checkWeeklyCompletion": (()=>checkWeeklyCompletion),
     "completeTask": (()=>completeTask),
     "createTask": (()=>createTask),
+    "getCurrentWeekKey": (()=>getCurrentWeekKey),
     "getNearbyOpportunities": (()=>getNearbyOpportunities),
     "getTasks": (()=>getTasks),
-    "getUserTasks": (()=>getUserTasks),
-    "getWeeklyTasks": (()=>getWeeklyTasks),
-    "resetWeeklyTasks": (()=>resetWeeklyTasks)
+    "getUserTasks": (()=>getUserTasks)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/lib/firebase/config.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$firestore$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/firebase/firestore/dist/esm/index.esm.js [app-client] (ecmascript) <module evaluation>");
@@ -25,7 +24,6 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2
 ;
 const createTask = async (taskData, userId)=>{
     try {
-        // Define the task data without isAssigned (since it doesn't exist in the interface)
         const task = {
             ...taskData,
             createdBy: userId,
@@ -33,14 +31,7 @@ const createTask = async (taskData, userId)=>{
             createdAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
             updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
         };
-        // If you need isAssigned for functionality, add it to the firestore document
-        // but not to the typed object
-        const firestoreData = {
-            ...task,
-            // Add any additional fields needed for Firestore but not in the interface
-            assignedTo: null
-        };
-        const docRef = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["addDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), firestoreData);
+        const docRef = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["addDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), task);
         return {
             id: docRef.id,
             ...task
@@ -49,52 +40,10 @@ const createTask = async (taskData, userId)=>{
         throw error;
     }
 };
-const resetWeeklyTasks = async (userId)=>{
-    try {
-        // Get user's current tasks
-        const userTasks = await getUserTasks(userId);
-        // For each task, unassign it
-        for (const task of userTasks){
-            if (task.id) {
-                const taskRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks', task.id);
-                await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["updateDoc"])(taskRef, {
-                    assignedTo: null,
-                    isAssigned: false,
-                    updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
-                });
-            }
-        }
-        // Get new tasks to assign based on user's preferences
-        // You can modify this based on your application's requirement
-        // For example, you can get 3 new tasks per week
-        const availableTasksQuery = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('isAssigned', '==', false), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('requiredLevel', '==', 'Sapling') // Adjust as needed for the user's level
-        );
-        const availableTasksSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDocs"])(availableTasksQuery);
-        const availableTasks = [];
-        availableTasksSnapshot.forEach((doc)=>{
-            availableTasks.push({
-                id: doc.id,
-                ...doc.data()
-            });
-        });
-        // Assign up to 3 new tasks
-        const tasksToAssign = availableTasks.slice(0, 3);
-        for (const task of tasksToAssign){
-            if (task.id) {
-                await assignTaskToUser(task.id, userId);
-            }
-        }
-        return true;
-    } catch (error) {
-        console.error('Error resetting weekly tasks:', error);
-        throw error;
-    }
-};
 const getTasks = async (filters)=>{
     try {
         const tasksCollection = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks');
         let q = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["query"])(tasksCollection);
-        // Build query based on filters
         const constraints = [];
         if (filters.category) {
             constraints.push((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('category', '==', filters.category));
@@ -102,11 +51,11 @@ const getTasks = async (filters)=>{
         if (filters.locationType) {
             constraints.push((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('locationType', '==', filters.locationType));
         }
-        if (filters.requiredLevel) {
-            constraints.push((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('requiredLevel', '==', filters.requiredLevel));
-        }
         if (filters.isAssigned !== undefined) {
             constraints.push((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('isAssigned', '==', filters.isAssigned));
+        }
+        if (filters.weekAssigned) {
+            constraints.push((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('weekAssigned', '==', filters.weekAssigned));
         }
         if (constraints.length > 0) {
             q = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["query"])(tasksCollection, ...constraints);
@@ -124,9 +73,10 @@ const getTasks = async (filters)=>{
         throw error;
     }
 };
-const getUserTasks = async (userId)=>{
+const getUserTasks = async (userId, weekKey)=>{
     try {
-        const q = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('assignedTo', '==', userId));
+        const currentWeek = weekKey || getCurrentWeekKey();
+        const q = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('assignedTo', '==', userId), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('weekAssigned', '==', currentWeek));
         const querySnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDocs"])(q);
         const tasks = [];
         querySnapshot.forEach((doc)=>{
@@ -140,13 +90,13 @@ const getUserTasks = async (userId)=>{
         throw error;
     }
 };
-const assignTaskToUser = async (taskId, userId)=>{
+const assignTaskToUser = async (taskId, userId, weekKey)=>{
     try {
         const taskRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks', taskId);
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["updateDoc"])(taskRef, {
-            completionDate: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
             assignedTo: userId,
             isAssigned: true,
+            weekAssigned: weekKey,
             updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
         });
     } catch (error) {
@@ -155,7 +105,6 @@ const assignTaskToUser = async (taskId, userId)=>{
 };
 const completeTask = async (taskId, userId, completionData)=>{
     try {
-        // Update the task document
         const taskRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks', taskId);
         const taskDoc = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDoc"])(taskRef);
         if (!taskDoc.exists()) {
@@ -168,6 +117,7 @@ const completeTask = async (taskId, userId, completionData)=>{
         }
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["updateDoc"])(taskRef, {
             completedBy,
+            status: 'completed',
             updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
         });
         // Create a completion record
@@ -194,19 +144,13 @@ const completeTask = async (taskId, userId, completionData)=>{
 };
 const getNearbyOpportunities = async (latitude, longitude, radiusInKm = 10, userLevel)=>{
     try {
-        // In a real implementation, we would use a spatial query
-        // For simplicity, we'll get all tasks and filter them manually
         const tasks = await getTasks({
-            isAssigned: false,
-            requiredLevel: userLevel === 'Bloom' ? undefined : userLevel // Bloom users can see all opportunities
+            isAssigned: false
         });
-        // Filter tasks by distance
         const nearbyTasks = tasks.filter((task)=>{
-            // Check if task has coordinates
             if (!task.location?.coordinates?.latitude || !task.location?.coordinates?.longitude) {
                 return false;
             }
-            // Calculate distance using Haversine formula
             const distance = calculateDistance(latitude, longitude, task.location.coordinates.latitude, task.location.coordinates.longitude);
             return distance <= radiusInKm;
         });
@@ -217,7 +161,7 @@ const getNearbyOpportunities = async (latitude, longitude, radiusInKm = 10, user
 };
 // Calculate distance between two points using Haversine formula
 const calculateDistance = (lat1, lon1, lat2, lon2)=>{
-    const R = 6371; // Radius of the Earth in km
+    const R = 6371;
     const dLat = degToRad(lat2 - lat1);
     const dLon = degToRad(lon2 - lon1);
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
@@ -228,58 +172,14 @@ const calculateDistance = (lat1, lon1, lat2, lon2)=>{
 const degToRad = (deg)=>{
     return deg * (Math.PI / 180);
 };
-const getWeeklyTasks = async (userId, weeklyCommitment)=>{
-    try {
-        // Get user profile to determine level and preferences
-        const userDoc = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'users', userId));
-        if (!userDoc.exists()) {
-            throw new Error('User not found');
-        }
-        const userData = userDoc.data();
-        const userLevel = userData.level;
-        const preferences = userData.rankingPreferences;
-        // Sort categories by user preference
-        const sortedCategories = [
-            {
-                category: 'communityService',
-                rank: preferences.communityService
-            },
-            {
-                category: 'environmentalAction',
-                rank: preferences.environmentalAction
-            },
-            {
-                category: 'educationYouthSupport',
-                rank: preferences.educationYouthSupport
-            },
-            {
-                category: 'healthWellness',
-                rank: preferences.healthWellness
-            }
-        ].sort((a, b)=>a.rank - b.rank).map((item)=>item.category);
-        // Get unassigned tasks suitable for user's level
-        const availableTasks = await getTasks({
-            isAssigned: false,
-            requiredLevel: userLevel
-        });
-        // Prioritize tasks based on user preferences
-        const prioritizedTasks = availableTasks.sort((a, b)=>{
-            const categoryIndexA = sortedCategories.indexOf(a.category);
-            const categoryIndexB = sortedCategories.indexOf(b.category);
-            return categoryIndexA - categoryIndexB;
-        });
-        // Limit to weekly commitment number
-        const tasksToAssign = prioritizedTasks.slice(0, weeklyCommitment);
-        // Assign tasks to user
-        for (const task of tasksToAssign){
-            if (task.id) {
-                await assignTaskToUser(task.id, userId);
-            }
-        }
-        return tasksToAssign;
-    } catch (error) {
-        throw error;
-    }
+const getCurrentWeekKey = ()=>{
+    const now = new Date();
+    const year = now.getFullYear();
+    // Get week number (simple calculation)
+    const startOfYear = new Date(year, 0, 1);
+    const pastDaysOfYear = (now.getTime() - startOfYear.getTime()) / 86400000;
+    const weekNumber = Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7);
+    return `${year}-${weekNumber.toString().padStart(2, '0')}`;
 };
 const addSeeds = async (userId, amount)=>{
     try {
@@ -302,22 +202,16 @@ const addSeeds = async (userId, amount)=>{
 };
 const checkWeeklyCompletion = async (userId)=>{
     try {
-        // Get user's assigned tasks
         const userTasks = await getUserTasks(userId);
-        // Get user's completed tasks
         const completedTasks = userTasks.filter((task)=>task.completedBy && task.completedBy.includes(userId));
-        // Calculate seeds based on completion ratio
         const completionRatio = userTasks.length > 0 ? completedTasks.length / userTasks.length : 0;
         let seedsEarned = 0;
         if (completionRatio === 1) {
-            // All tasks completed, award 5 seeds
             seedsEarned = 5;
         } else if (completionRatio > 0) {
-            // Partial completion, award proportional seeds (rounded down)
             seedsEarned = Math.floor(completionRatio * 5);
         }
         if (seedsEarned > 0) {
-            // Add seeds to user's account
             await addSeeds(userId, seedsEarned);
         }
         return {
@@ -338,16 +232,13 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 
 var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
 {
-// app/lib/tasks/taskGenerator.ts
+// app/lib/tasks/taskGenerator.ts - FIXED VERSION (No undefined values)
 __turbopack_context__.s({
     "generateNearbyBusinessTask": (()=>generateNearbyBusinessTask),
     "generateRandomTasks": (()=>generateRandomTasks),
     "generateWeeklyTasks": (()=>generateWeeklyTasks)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/lib/firebase/auth.ts [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$firestore$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/firebase/firestore/dist/esm/index.esm.js [app-client] (ecmascript) <module evaluation>");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@firebase/firestore/dist/index.esm2017.js [app-client] (ecmascript)");
-;
 ;
 // Sample locations to use when precise location isn't available
 const fallbackLocations = [
@@ -650,7 +541,6 @@ const getRandomTaskTemplate = (category)=>{
 };
 // Helper function to generate a variation of a task description
 const generateTaskVariation = (description)=>{
-    // Simple variations to make tasks feel more unique
     const introductions = [
         '',
         'We need your help to ',
@@ -669,41 +559,60 @@ const generateTaskVariation = (description)=>{
     ];
     return `${getRandomElement(introductions)}${description.replace(/\.$/, '')}${getRandomElement(conclusion)}`;
 };
+// Helper function to create clean task data (no undefined values)
+const createTaskData = (baseTask)=>{
+    // Start with required fields only
+    const cleanTask = {
+        title: baseTask.title,
+        description: baseTask.description,
+        category: baseTask.category,
+        estimatedTime: baseTask.estimatedTime,
+        locationType: baseTask.locationType,
+        isAssigned: false,
+        completedBy: [],
+        status: 'open'
+    };
+    // Only add optional fields if they have valid values
+    if (baseTask.location && baseTask.location.address && baseTask.location.coordinates && typeof baseTask.location.coordinates.latitude === 'number' && typeof baseTask.location.coordinates.longitude === 'number') {
+        cleanTask.location = baseTask.location;
+    }
+    if (baseTask.impact) {
+        cleanTask.impact = baseTask.impact;
+    }
+    if (baseTask.requirements) {
+        cleanTask.requirements = baseTask.requirements;
+    }
+    return cleanTask;
+};
 const generateNearbyBusinessTask = (businessName, businessType, location, userLevel)=>{
-    // Find matching business type or use default
     const businessTemplate = businessTaskTemplates.find((template)=>businessType.toLowerCase().includes(template.businessType)) || getRandomElement(businessTaskTemplates);
     if (!businessTemplate) return null;
-    // Get a random task for this business type
     const taskTemplate = getRandomElement(businessTemplate.tasks);
-    // Only include location for Bud and Bloom levels
-    const taskLocation = userLevel !== __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["UserLevel"].Sprout && location ? {
-        address: businessName,
-        latitude: location.latitude,
-        longitude: location.longitude
-    } : null; // Use null instead of undefined
-    // Create the task with location null check
-    return {
+    const baseTask = {
         title: taskTemplate.title.replace('a local', businessName),
         description: generateTaskVariation(taskTemplate.description.replace('a local', businessName)),
         category: taskTemplate.category,
         estimatedTime: taskTemplate.estimatedTime,
         locationType: taskTemplate.locationType,
-        // Only include location if it exists
-        ...taskLocation ? {
-            location: taskLocation
-        } : {},
-        requiredLevel: userLevel,
         isAssigned: false,
         completedBy: [],
-        createdAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
-        updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
+        status: 'open'
     };
+    // Only add location for non-Sprout users with valid coordinates
+    if (userLevel !== __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["UserLevel"].Sprout && location && typeof location.latitude === 'number' && typeof location.longitude === 'number' && !isNaN(location.latitude) && !isNaN(location.longitude)) {
+        baseTask.location = {
+            address: businessName,
+            coordinates: {
+                latitude: location.latitude,
+                longitude: location.longitude
+            }
+        };
+    }
+    return createTaskData(baseTask);
 };
-const generateRandomTasks = (count, userLevel, userLocation, preferences // Lower number = higher preference
-)=>{
+const generateRandomTasks = (count, userLevel, userLocation, preferences)=>{
     const tasks = [];
     const categories = Object.keys(taskTemplates);
-    // Sort categories by preference if provided
     let sortedCategories = [
         ...categories
     ];
@@ -711,49 +620,36 @@ const generateRandomTasks = (count, userLevel, userLocation, preferences // Lowe
         sortedCategories.sort((a, b)=>(preferences[a] || 5) - (preferences[b] || 5));
     }
     for(let i = 0; i < count; i++){
-        // Bias toward preferred categories, but still include some variety
-        const usePreference = Math.random() < 0.7; // 70% chance to use preference
+        const usePreference = Math.random() < 0.7;
         const category = usePreference ? sortedCategories[i % sortedCategories.length] : getRandomElement(categories);
-        // Get a random task template from the selected category
         const template = getRandomTaskTemplate(category);
-        // Determine if this should be a location-based task
-        const isLocationBased = template.locationType === 'inPerson' && userLevel !== 'Bud' && userLocation && userLocation.latitude !== 0;
-        // Create location data if applicable
-        let location;
-        if (isLocationBased) {
-            // Add some randomness to the location to distribute tasks around the user
-            const radiusKm = 5; // 5km radius
-            const randomAngle = Math.random() * 2 * Math.PI;
-            const randomDistance = Math.random() * radiusKm;
-            // Convert distance and angle to lat/lng offset
-            // Rough approximation (1 degree latitude ≈ 111km)
-            const latOffset = randomDistance * Math.cos(randomAngle) / 111;
-            const lngOffset = randomDistance * Math.sin(randomAngle) / (111 * Math.cos(userLocation.latitude * Math.PI / 180));
-            location = {
-                address: getRandomElement(fallbackLocations).name,
-                latitude: userLocation.latitude + latOffset,
-                longitude: userLocation.longitude + lngOffset
-            };
-        }
-        // Create the task
-        // Create the task
-        // Create the task with null check for location
-        tasks.push({
+        const baseTask = {
             title: template.title,
             description: generateTaskVariation(template.description),
             category: category,
             estimatedTime: template.estimatedTime,
             locationType: template.locationType,
-            // If location is undefined, remove the field completely
-            ...location ? {
-                location
-            } : {},
-            requiredLevel: userLevel,
             isAssigned: false,
             completedBy: [],
-            createdAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
-            updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
-        });
+            status: 'open'
+        };
+        // Only add location for in-person tasks with valid user location
+        const shouldHaveLocation = template.locationType === 'inPerson' && userLevel !== 'Sprout' && userLocation && typeof userLocation.latitude === 'number' && typeof userLocation.longitude === 'number' && !isNaN(userLocation.latitude) && !isNaN(userLocation.longitude) && userLocation.latitude !== 0;
+        if (shouldHaveLocation) {
+            const radiusKm = 5;
+            const randomAngle = Math.random() * 2 * Math.PI;
+            const randomDistance = Math.random() * radiusKm;
+            const latOffset = randomDistance * Math.cos(randomAngle) / 111;
+            const lngOffset = randomDistance * Math.sin(randomAngle) / (111 * Math.cos(userLocation.latitude * Math.PI / 180));
+            baseTask.location = {
+                address: getRandomElement(fallbackLocations).name,
+                coordinates: {
+                    latitude: userLocation.latitude + latOffset,
+                    longitude: userLocation.longitude + lngOffset
+                }
+            };
+        }
+        tasks.push(createTaskData(baseTask));
     }
     return tasks;
 };
@@ -954,76 +850,77 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 
 var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
 {
-// app/lib/firebase/tasksService.ts
+// app/lib/firebase/tasksService.ts - SAFER VERSION with better error handling
 __turbopack_context__.s({
     "assignWeeklyTasks": (()=>assignWeeklyTasks),
     "checkAndAssignWeeklyTasks": (()=>checkAndAssignWeeklyTasks),
+    "forceResetUserTasks": (()=>forceResetUserTasks),
     "getSuggestedTasks": (()=>getSuggestedTasks),
-    "resetWeeklyTasks": (()=>resetWeeklyTasks)
+    "resetWeeklyTasksForAllUsers": (()=>resetWeeklyTasksForAllUsers)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$firestore$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/firebase/firestore/dist/esm/index.esm.js [app-client] (ecmascript) <module evaluation>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@firebase/firestore/dist/index.esm2017.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/lib/firebase/config.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$firestore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/lib/firebase/firestore.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$tasks$2f$taskGenerator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/lib/tasks/taskGenerator.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$location$2f$locationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/lib/location/locationService.ts [app-client] (ecmascript)");
 ;
 ;
 ;
 ;
+;
+// Helper function to clean task data before saving to Firestore
+const cleanTaskData = (task)=>{
+    const cleanedTask = {
+        title: task.title || 'Untitled Task',
+        description: task.description || 'No description provided',
+        category: task.category || 'communityService',
+        estimatedTime: task.estimatedTime || 60,
+        locationType: task.locationType || 'remote',
+        isAssigned: Boolean(task.isAssigned),
+        completedBy: Array.isArray(task.completedBy) ? task.completedBy : [],
+        status: task.status || 'open'
+    };
+    // Only add optional fields if they exist and are not undefined/null
+    if (task.location && task.location.address && task.location.coordinates && typeof task.location.coordinates.latitude === 'number' && typeof task.location.coordinates.longitude === 'number' && !isNaN(task.location.coordinates.latitude) && !isNaN(task.location.coordinates.longitude)) {
+        cleanedTask.location = {
+            address: String(task.location.address),
+            coordinates: {
+                latitude: Number(task.location.coordinates.latitude),
+                longitude: Number(task.location.coordinates.longitude)
+            }
+        };
+    }
+    if (task.impact && typeof task.impact === 'string') {
+        cleanedTask.impact = task.impact;
+    }
+    if (task.requirements && typeof task.requirements === 'string') {
+        cleanedTask.requirements = task.requirements;
+    }
+    if (task.assignedTo && typeof task.assignedTo === 'string') {
+        cleanedTask.assignedTo = task.assignedTo;
+    }
+    if (task.weekAssigned && typeof task.weekAssigned === 'string') {
+        cleanedTask.weekAssigned = task.weekAssigned;
+    }
+    if (task.createdBy && typeof task.createdBy === 'string') {
+        cleanedTask.createdBy = task.createdBy;
+    }
+    if (task.isCustom === true) {
+        cleanedTask.isCustom = true;
+    }
+    return cleanedTask;
+};
 const checkAndAssignWeeklyTasks = async (userId)=>{
     try {
-        // Get user profile
-        const userDoc = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'users', userId));
-        if (!userDoc.exists()) {
-            throw new Error('User not found');
+        if (!userId || typeof userId !== 'string') {
+            throw new Error('Invalid user ID provided');
         }
-        const userProfile = userDoc.data();
-        // Check if it's time for new tasks
-        const lastTaskAssignment = userProfile.lastTaskAssignment ? userProfile.lastTaskAssignment.toDate() : null;
-        const now = new Date();
-        // If never assigned tasks, or it's been more than a week since last assignment
-        if (!lastTaskAssignment || daysSince(lastTaskAssignment) >= 7) {
-            await assignWeeklyTasks(userId);
-            // Update last task assignment time
-            await updateLastTaskAssignment(userId);
-            return true;
-        }
-        return false;
-    } catch (error) {
-        console.error('Error checking weekly tasks:', error);
-        throw error;
-    }
-};
-// Calculate days since a date
-const daysSince = (date)=>{
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
-};
-// Update the last task assignment timestamp
-const updateLastTaskAssignment = async (userId)=>{
-    try {
-        await updateDoc((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'users', userId), {
-            lastTaskAssignment: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
-        });
-    } catch (error) {
-        console.error('Error updating last task assignment:', error);
-        throw error;
-    }
-};
-const assignWeeklyTasks = async (userId)=>{
-    try {
-        // Get user profile
-        const userDoc = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'users', userId));
-        if (!userDoc.exists()) {
-            throw new Error('User not found');
-        }
-        const userProfile = userDoc.data();
-        const { weeklyCommitment, level: userLevel, rankingPreferences, location } = userProfile;
-        // Check if user already has active tasks for this week
-        const existingTasksQuery = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('assignedTo', '==', userId), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('isAssigned', '==', true));
+        const currentWeek = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$firestore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getCurrentWeekKey"])();
+        // Check if user already has tasks for this week
+        const existingTasksQuery = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('assignedTo', '==', userId), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('weekAssigned', '==', currentWeek));
         const existingTasksSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDocs"])(existingTasksQuery);
-        // If user already has tasks, return them
+        // If user already has tasks for this week, return them
         if (!existingTasksSnapshot.empty) {
             const existingTasks = [];
             existingTasksSnapshot.forEach((doc)=>{
@@ -1032,82 +929,152 @@ const assignWeeklyTasks = async (userId)=>{
                     ...doc.data()
                 });
             });
+            console.log(`User ${userId} already has ${existingTasks.length} tasks for week ${currentWeek}`);
             return existingTasks;
         }
+        console.log(`No tasks found for user ${userId} for week ${currentWeek}. Assigning new tasks...`);
+        // If no tasks for current week, assign new ones
+        return await assignWeeklyTasks(userId);
+    } catch (error) {
+        console.error('Error checking and assigning weekly tasks:', error);
+        throw error;
+    }
+};
+const assignWeeklyTasks = async (userId)=>{
+    try {
+        console.log(`Starting task assignment for user: ${userId}`);
+        // Get user profile
+        const userDoc = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'users', userId));
+        if (!userDoc.exists()) {
+            throw new Error('User not found');
+        }
+        const userProfile = userDoc.data();
+        const { weeklyCommitment = 1, level: userLevel = 'Sprout', rankingPreferences = {}, location } = userProfile;
+        const currentWeek = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$firestore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getCurrentWeekKey"])();
+        console.log(`Assigning ${weeklyCommitment} tasks for user level ${userLevel} for week ${currentWeek}`);
         // Create tasks based on user preferences
         let tasksToAssign = [];
         // First, try to generate location-based tasks if the user has location data
-        if (userLevel !== 'Sprout' && location && location.latitude !== 0) {
-            // Get nearby places
-            const nearbyPlaces = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$location$2f$locationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getNearbyPlaces"])(location, 2000, 10);
-            // Generate tasks for some of the nearby places
-            for (const place of nearbyPlaces.slice(0, 2)){
-                const businessTask = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$tasks$2f$taskGenerator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["generateNearbyBusinessTask"])(place.name, place.type, place.location, userLevel);
-                if (businessTask) {
-                    tasksToAssign.push(businessTask);
+        if (userLevel !== 'Sprout' && location && typeof location.latitude === 'number' && typeof location.longitude === 'number' && !isNaN(location.latitude) && !isNaN(location.longitude) && location.latitude !== 0) {
+            try {
+                console.log(`Generating location-based tasks for coordinates: ${location.latitude}, ${location.longitude}`);
+                // Get nearby places
+                const nearbyPlaces = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$location$2f$locationService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getNearbyPlaces"])(location, 2000, 10);
+                console.log(`Found ${nearbyPlaces.length} nearby places`);
+                // Generate tasks for some of the nearby places
+                for (const place of nearbyPlaces.slice(0, Math.min(2, weeklyCommitment))){
+                    const businessTask = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$tasks$2f$taskGenerator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["generateNearbyBusinessTask"])(place.name, place.type, place.location, userLevel);
+                    if (businessTask) {
+                        tasksToAssign.push(businessTask);
+                        console.log(`Generated location-based task: ${businessTask.title}`);
+                    }
                 }
+            } catch (locationError) {
+                console.warn('Could not generate location-based tasks:', locationError);
+            // Continue with random tasks if location-based generation fails
             }
         }
         // Generate additional random tasks to fulfill the user's weekly commitment
         const additionalTasksNeeded = weeklyCommitment - tasksToAssign.length;
+        console.log(`Need ${additionalTasksNeeded} additional tasks`);
         if (additionalTasksNeeded > 0) {
             const randomTasks = (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$tasks$2f$taskGenerator$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["generateWeeklyTasks"])(additionalTasksNeeded, userLevel, location, rankingPreferences);
             tasksToAssign = [
                 ...tasksToAssign,
                 ...randomTasks
             ];
+            console.log(`Generated ${randomTasks.length} random tasks`);
         }
-        // Save tasks to Firestore and assign to user
-        const batch = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["writeBatch"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"]);
+        console.log(`Total tasks to assign: ${tasksToAssign.length}`);
+        // Save tasks to Firestore using individual addDoc calls instead of batch
+        // This avoids potential batch write issues
         const assignedTasks = [];
-        for (const task of tasksToAssign){
-            // Add the task to Firestore
-            const taskRef = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["addDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), {
-                ...task,
-                assignedTo: userId,
-                isAssigned: true,
-                updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
-                createdAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
-                status: 'open'
-            });
-            // Add the id to the task object
-            assignedTasks.push({
-                id: taskRef.id,
-                ...task,
-                assignedTo: userId,
-                isAssigned: true,
-                status: 'open'
-            });
+        for(let i = 0; i < tasksToAssign.length; i++){
+            const task = tasksToAssign[i];
+            try {
+                // Clean the task data to remove any undefined values
+                const cleanedTask = cleanTaskData({
+                    ...task,
+                    assignedTo: userId,
+                    isAssigned: true,
+                    weekAssigned: currentWeek,
+                    createdAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
+                    updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
+                });
+                console.log(`Saving task ${i + 1}: ${cleanedTask.title}`);
+                // Use addDoc for individual task creation
+                const taskRef = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["addDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), cleanedTask);
+                // Add the id to the task object for return
+                assignedTasks.push({
+                    id: taskRef.id,
+                    ...cleanedTask
+                });
+                console.log(`Successfully saved task with ID: ${taskRef.id}`);
+            } catch (taskError) {
+                console.error(`Error saving task ${i + 1}:`, taskError);
+            // Continue with other tasks even if one fails
+            }
         }
-        // Commit all the changes
-        await batch.commit();
+        console.log(`Successfully assigned ${assignedTasks.length} tasks to user ${userId} for week ${currentWeek}`);
         return assignedTasks;
     } catch (error) {
         console.error('Error assigning weekly tasks:', error);
         throw error;
     }
 };
-const resetWeeklyTasks = async ()=>{
+const resetWeeklyTasksForAllUsers = async ()=>{
     try {
-        // This would typically be called by a scheduled function
-        // Get all assigned tasks
-        const tasksQuery = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('isAssigned', '==', true));
-        const tasksSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDocs"])(tasksQuery);
-        // Batch delete/update the tasks
-        const batch = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["writeBatch"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"]);
-        tasksSnapshot.forEach((taskDoc)=>{
-            // Option 1: Delete the task
-            // batch.delete(taskDoc.ref);
-            // Option 2: Archive the task
-            batch.update(taskDoc.ref, {
-                isAssigned: false,
-                isArchived: true,
-                updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
-            });
-        });
-        await batch.commit();
+        console.log('Starting weekly task reset for all users...');
+        // Get all users
+        const usersSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDocs"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'users'));
+        console.log(`Found ${usersSnapshot.docs.length} users to process`);
+        // Process users in smaller batches to avoid timeout
+        const batchSize = 10;
+        const userBatches = [];
+        for(let i = 0; i < usersSnapshot.docs.length; i += batchSize){
+            userBatches.push(usersSnapshot.docs.slice(i, i + batchSize));
+        }
+        let totalUsersProcessed = 0;
+        for (const userBatch of userBatches){
+            console.log(`Processing batch of ${userBatch.length} users...`);
+            // Archive old tasks for this batch
+            for (const userDoc of userBatch){
+                const userId = userDoc.id;
+                try {
+                    // Archive old tasks for this user
+                    const oldTasksQuery = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('assignedTo', '==', userId), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('isAssigned', '==', true));
+                    const oldTasksSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDocs"])(oldTasksQuery);
+                    // Update old tasks individually
+                    for (const taskDoc of oldTasksSnapshot.docs){
+                        try {
+                            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["updateDoc"])(taskDoc.ref, {
+                                isAssigned: false,
+                                isArchived: true,
+                                updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
+                            });
+                        } catch (updateError) {
+                            console.error(`Error archiving task ${taskDoc.id}:`, updateError);
+                        }
+                    }
+                    console.log(`Archived ${oldTasksSnapshot.docs.length} tasks for user ${userId}`);
+                } catch (archiveError) {
+                    console.error(`Error archiving tasks for user ${userId}:`, archiveError);
+                }
+            }
+            // Assign new tasks for this batch
+            for (const userDoc of userBatch){
+                try {
+                    await assignWeeklyTasks(userDoc.id);
+                    totalUsersProcessed++;
+                } catch (error) {
+                    console.error(`Failed to assign tasks to user ${userDoc.id}:`, error);
+                // Continue with other users
+                }
+            }
+        }
+        console.log(`Successfully processed ${totalUsersProcessed} users for weekly task assignment`);
     } catch (error) {
-        console.error('Error resetting weekly tasks:', error);
+        console.error('Error in weekly task reset:', error);
         throw error;
     }
 };
@@ -1121,8 +1088,7 @@ const getSuggestedTasks = async (userId, limit = 10)=>{
         const userProfile = userDoc.data();
         const { level: userLevel, rankingPreferences } = userProfile;
         // Convert ranking preferences to categories sorted by preference
-        const categories = Object.entries(rankingPreferences).sort(([, rankA], [, rankB])=>rankA - rankB).map(([category])=>{
-            // Convert from camelCase to the category format in the database
+        const categories = Object.entries(rankingPreferences || {}).sort(([, rankA], [, rankB])=>rankA - rankB).map(([category])=>{
             switch(category){
                 case 'communityService':
                     return 'communityService';
@@ -1137,12 +1103,11 @@ const getSuggestedTasks = async (userId, limit = 10)=>{
             }
         });
         // Query for unassigned tasks suitable for the user's level
-        // Prioritize the user's preferred categories
         let suggestedTasks = [];
         // Try to get tasks from each category in order of preference
         for (const category of categories){
             if (suggestedTasks.length >= limit) break;
-            const categoryQuery = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('category', '==', category), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('isAssigned', '==', false), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('requiredLevel', '==', userLevel));
+            const categoryQuery = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('category', '==', category), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('isAssigned', '==', false));
             const categorySnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDocs"])(categoryQuery);
             categorySnapshot.forEach((doc)=>{
                 if (suggestedTasks.length < limit) {
@@ -1169,6 +1134,32 @@ const getSuggestedTasks = async (userId, limit = 10)=>{
         return suggestedTasks;
     } catch (error) {
         console.error('Error getting suggested tasks:', error);
+        throw error;
+    }
+};
+const forceResetUserTasks = async (userId)=>{
+    try {
+        console.log(`Force resetting tasks for user: ${userId}`);
+        // Archive current tasks
+        const currentTasksQuery = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'tasks'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('assignedTo', '==', userId), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["where"])('isAssigned', '==', true));
+        const currentTasksSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDocs"])(currentTasksQuery);
+        // Update tasks individually instead of using batch
+        for (const taskDoc of currentTasksSnapshot.docs){
+            try {
+                await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["updateDoc"])(taskDoc.ref, {
+                    isAssigned: false,
+                    isArchived: true,
+                    updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
+                });
+            } catch (updateError) {
+                console.error(`Error archiving task ${taskDoc.id}:`, updateError);
+            }
+        }
+        console.log(`Archived ${currentTasksSnapshot.docs.length} existing tasks`);
+        // Assign new tasks
+        return await assignWeeklyTasks(userId);
+    } catch (error) {
+        console.error('Error force resetting user tasks:', error);
         throw error;
     }
 };

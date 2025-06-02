@@ -2708,6 +2708,14 @@
     outline-style: none;
   }
 
+  .disabled\:cursor-not-allowed:disabled {
+    cursor: not-allowed;
+  }
+
+  .disabled\:opacity-50:disabled {
+    opacity: .5;
+  }
+
   @media (width >= 40rem) {
     .sm\:mx-auto {
       margin-inline: auto;
