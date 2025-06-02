@@ -1,18 +1,18 @@
 // app/lib/firebase/auth.ts
 import { auth, db } from './config';
-import { 
-  createUserWithEmailAndPassword, 
+import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   User
 } from 'firebase/auth';
-import { 
-  doc, 
-  setDoc, 
-  getDoc, 
+import {
+  doc,
+  setDoc,
+  getDoc,
   updateDoc,
-  serverTimestamp 
+  serverTimestamp
 } from 'firebase/firestore';
 
 // Define user level types
@@ -48,6 +48,25 @@ export interface UserProfile {
   completedTasks: number;
   createdAt: any;
   updatedAt: any;
+  photoURL?: string;
+
+  // Add ownedItems property
+  ownedItems?: {
+    plants: string[];
+    accessories: string[];
+    specials: string[];
+  };
+
+  // Add itemPlacements property for greenhouse locations
+  itemPlacements?: {
+    [itemId: string]: {
+      room: string;
+      position: {
+        x: number;
+        y: number;
+      };
+    };
+  };
 }
 
 // Create a new user with email and password
@@ -141,14 +160,14 @@ export const determineUserLevel = (age: number, hasGuardian: boolean = false): U
   } else {
     return UserLevel.Bloom;
   }
-}; 
+};
 
 // Add seeds to a user's account
 export const addSeeds = async (uid: string, seeds: number) => {
   try {
     const userRef = doc(db, 'users', uid);
     const userDoc = await getDoc(userRef);
-    
+
     if (userDoc.exists()) {
       const userData = userDoc.data() as UserProfile;
       await updateDoc(userRef, {

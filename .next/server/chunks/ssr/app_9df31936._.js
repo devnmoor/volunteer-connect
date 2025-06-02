@@ -948,6 +948,7 @@ var { g: global, __dirname } = __turbopack_context__;
 // app/lib/firebase/tasksService.ts
 __turbopack_context__.s({
     "assignWeeklyTasks": (()=>assignWeeklyTasks),
+    "checkAndAssignWeeklyTasks": (()=>checkAndAssignWeeklyTasks),
     "getSuggestedTasks": (()=>getSuggestedTasks),
     "resetWeeklyTasks": (()=>resetWeeklyTasks)
 });
@@ -960,6 +961,47 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$location$2f$lo
 ;
 ;
 ;
+const checkAndAssignWeeklyTasks = async (userId)=>{
+    try {
+        // Get user profile
+        const userDoc = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["db"], 'users', userId));
+        if (!userDoc.exists()) {
+            throw new Error('User not found');
+        }
+        const userProfile = userDoc.data();
+        // Check if it's time for new tasks
+        const lastTaskAssignment = userProfile.lastTaskAssignment ? userProfile.lastTaskAssignment.toDate() : null;
+        const now = new Date();
+        // If never assigned tasks, or it's been more than a week since last assignment
+        if (!lastTaskAssignment || daysSince(lastTaskAssignment) >= 7) {
+            await assignWeeklyTasks(userId);
+            // Update last task assignment time
+            await updateLastTaskAssignment(userId);
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Error checking weekly tasks:', error);
+        throw error;
+    }
+};
+// Calculate days since a date
+const daysSince = (date)=>{
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+};
+// Update the last task assignment timestamp
+const updateLastTaskAssignment = async (userId)=>{
+    try {
+        await updateDoc((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["db"], 'users', userId), {
+            lastTaskAssignment: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["serverTimestamp"])()
+        });
+    } catch (error) {
+        console.error('Error updating last task assignment:', error);
+        throw error;
+    }
+};
 const assignWeeklyTasks = async (userId)=>{
     try {
         // Get user profile
@@ -1015,14 +1057,17 @@ const assignWeeklyTasks = async (userId)=>{
                 ...task,
                 assignedTo: userId,
                 isAssigned: true,
-                updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["serverTimestamp"])()
+                updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
+                createdAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
+                status: 'open'
             });
             // Add the id to the task object
             assignedTasks.push({
                 id: taskRef.id,
                 ...task,
                 assignedTo: userId,
-                isAssigned: true
+                isAssigned: true,
+                status: 'open'
             });
         }
         // Commit all the changes

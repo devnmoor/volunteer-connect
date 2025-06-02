@@ -8,6 +8,7 @@ import { getUserProfile, UserProfile } from '@/app/lib/firebase/auth';
 import { db } from '@/app/lib/firebase/config';
 import { doc, updateDoc, arrayUnion, increment, serverTimestamp } from 'firebase/firestore';
 
+
 // Updated StoreItem interface to include special type
 interface StoreItem {
   id: string;
@@ -399,6 +400,13 @@ const StorePage = () => {
   useEffect(() => {
     setStoreItems(getSortedAndFilteredItems());
   }, [activeFilter, sortDirection]);
+  // Updated handlePurchase function for app/store/page.tsx
+
+  // Updated handlePurchase function for the app/store/page.tsx file
+
+  // Import necessary functions
+
+  // Add this function to the store page component
   const handlePurchase = async () => {
     if (!user || !profile || !selectedItem) return;
 
@@ -411,17 +419,46 @@ const StorePage = () => {
         return;
       }
 
-      // Update user's profile
-      await updateDoc(doc(db, 'users', user.uid), {
-        seeds: increment(-selectedItem.seedCost),
-        [`ownedItems.${selectedItem.type}s`]: arrayUnion(selectedItem.id),
-        updatedAt: serverTimestamp()
-      });
+      // Determine which array to update based on the item type
+      const itemTypeField = `${selectedItem.type}s`; // converts 'plant' to 'plants', etc.
 
-      // Update local profile
+      // Create a structure for the owned items if it doesn't exist yet
+      const ownedItems = profile.ownedItems || {
+        plants: [],
+        accessories: [],
+        specials: []
+      };
+
+      // Check if user already owns this item
+      if (ownedItems[itemTypeField]?.includes(selectedItem.id)) {
+        setError('You already own this item');
+        setLoading(false);
+        return;
+      }
+
+      // Prepare update data for Firestore
+      const updateData = {
+        // Decrement seeds by the item cost
+        seeds: increment(-selectedItem.seedCost),
+        // Add the item to the appropriate array using arrayUnion
+        [`ownedItems.${itemTypeField}`]: arrayUnion(selectedItem.id),
+        // Update the timestamp
+        updatedAt: serverTimestamp()
+      };
+
+      // Update Firestore
+      await updateDoc(doc(db, 'users', user.uid), updateData);
+
+      // Update the local profile state
+      const updatedOwnedItems = {
+        ...ownedItems,
+        [itemTypeField]: [...(ownedItems[itemTypeField] || []), selectedItem.id]
+      };
+
       setProfile({
         ...profile,
-        seeds: profile.seeds - selectedItem.seedCost
+        seeds: profile.seeds - selectedItem.seedCost,
+        ownedItems: updatedOwnedItems
       });
 
       setPurchaseSuccess(true);
@@ -432,12 +469,14 @@ const StorePage = () => {
       }, 3000);
 
     } catch (err: any) {
-      setError(err.message);
+      console.error('Error purchasing item:', err);
+      setError(err.message || 'Failed to purchase item');
     } finally {
       setLoading(false);
     }
   };
 
+  // Replace the old handlePurchase function with this new one
   // Handle filter selection
   const handleFilterChange = (filter: string) => {
     setActiveFilter(filter);
@@ -594,11 +633,15 @@ const StorePage = () => {
 
         {purchaseSuccess && (
           <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">
-            {selectedItem ?
-              `Successfully purchased ${selectedItem.name}!` :
-              selectedSeedPackage ?
-                `Successfully purchased ${selectedSeedPackage.amount} seeds!` :
-                'Purchase successful!'}
+            {selectedItem ? (
+              <>
+                Successfully purchased {selectedItem.name}!
+              </>
+            ) : selectedSeedPackage ? (
+              `Successfully purchased ${selectedSeedPackage.amount} seeds!`
+            ) : (
+              'Purchase successful!'
+            )}
           </div>
         )}
 
@@ -754,7 +797,7 @@ const StorePage = () => {
                 <button
                   onClick={handlePurchase}
                   disabled={loading || (profile?.seeds || 0) < selectedItem.seedCost}
-                  className={`w-full py-2 px-4 rounded-md ${(profile?.seeds || 0) < selectedItem.seedCost
+                  className={`w-full py-2 px-4 rounded-md hover:cursor-pointer ${(profile?.seeds || 0) < selectedItem.seedCost
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-green-600 hover:bg-green-700 text-white'
                     }`}

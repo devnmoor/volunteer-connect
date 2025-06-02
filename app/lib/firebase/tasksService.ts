@@ -8,13 +8,67 @@ import {
     query,
     where,
     writeBatch,
-    serverTimestamp
+    serverTimestamp,
+    Timestamp
 } from 'firebase/firestore';
 import { db } from '@/app/lib/firebase/config';
 import { UserProfile } from '@/app/lib/firebase/auth';
 import { VolunteerTask } from '@/app/lib/firebase/firestore';
 import { generateWeeklyTasks, generateNearbyBusinessTask } from '@/app/lib/tasks/taskGenerator';
 import { getNearbyPlaces } from '@/app/lib/location/locationService';
+
+// Check if a user needs new weekly tasks
+export const checkAndAssignWeeklyTasks = async (userId: string): Promise<boolean> => {
+    try {
+        // Get user profile
+        const userDoc = await getDoc(doc(db, 'users', userId));
+        if (!userDoc.exists()) {
+            throw new Error('User not found');
+        }
+
+        const userProfile = userDoc.data() as UserProfile;
+        
+        // Check if it's time for new tasks
+        const lastTaskAssignment = userProfile.lastTaskAssignment 
+            ? (userProfile.lastTaskAssignment as Timestamp).toDate()
+            : null;
+        
+        const now = new Date();
+        
+        // If never assigned tasks, or it's been more than a week since last assignment
+        if (!lastTaskAssignment || daysSince(lastTaskAssignment) >= 7) {
+            await assignWeeklyTasks(userId);
+            
+            // Update last task assignment time
+            await updateLastTaskAssignment(userId);
+            return true;
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('Error checking weekly tasks:', error);
+        throw error;
+    }
+};
+
+// Calculate days since a date
+const daysSince = (date: Date): number => {
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+};
+
+// Update the last task assignment timestamp
+const updateLastTaskAssignment = async (userId: string): Promise<void> => {
+    try {
+        await updateDoc(doc(db, 'users', userId), {
+            lastTaskAssignment: serverTimestamp()
+        });
+    } catch (error) {
+        console.error('Error updating last task assignment:', error);
+        throw error;
+    }
+};
 
 // Assign weekly tasks to a user based on their profile
 export const assignWeeklyTasks = async (userId: string): Promise<VolunteerTask[]> => {
@@ -98,7 +152,9 @@ export const assignWeeklyTasks = async (userId: string): Promise<VolunteerTask[]
                 ...task,
                 assignedTo: userId,
                 isAssigned: true,
-                updatedAt: serverTimestamp()
+                updatedAt: serverTimestamp(),
+                createdAt: serverTimestamp(),
+                status: 'open'
             });
 
             // Add the id to the task object
@@ -106,7 +162,8 @@ export const assignWeeklyTasks = async (userId: string): Promise<VolunteerTask[]
                 id: taskRef.id,
                 ...task,
                 assignedTo: userId,
-                isAssigned: true
+                isAssigned: true,
+                status: 'open'
             });
         }
 
