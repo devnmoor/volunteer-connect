@@ -47,30 +47,14 @@ const StorePage = ()=>{
         cvv: ''
     });
     const [paymentProcessing, setPaymentProcessing] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    // Get sorted and filtered items
-    const getSortedAndFilteredItems = ()=>{
-        // First, filter items
-        let filteredItems = sampleStoreItems;
-        if (activeFilter !== 'all') {
-            filteredItems = sampleStoreItems.filter((item)=>item.type === activeFilter);
-        }
-        // Then, sort items by price
-        let sortedItems = [
-            ...filteredItems
-        ];
-        if (sortDirection === 'asc') {
-            sortedItems.sort((a, b)=>a.seedCost - b.seedCost);
-        } else {
-            sortedItems.sort((a, b)=>b.seedCost - a.seedCost);
-        }
-        return sortedItems;
-    };
-    const handleSort = (direction)=>{
-        setSortDirection(direction);
-    };
-    // Sample store data
+    const [ownedItems, setOwnedItems] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
+        plants: [],
+        accessories: [],
+        specials: []
+    });
+    // Sample store data - comprehensive list
     const sampleStoreItems = [
-        // Original Plants
+        // Plants
         {
             id: 'plant1',
             name: 'Sunflower',
@@ -111,7 +95,6 @@ const StorePage = ()=>{
             seedCost: 100,
             type: 'plant'
         },
-        // New Plants (with image assignments based on the provided images)
         {
             id: 'plant6',
             name: 'Lavender Bush',
@@ -168,39 +151,7 @@ const StorePage = ()=>{
             seedCost: 60,
             type: 'plant'
         },
-        {
-            id: 'plant13',
-            name: 'Tomato Plant',
-            image: '/images/plants/tomato.png',
-            description: 'A vibrant tomato plant with bright red fruits. Adds a splash of color to your greenhouse and symbolizes abundance and harvest.',
-            seedCost: 60,
-            type: 'plant'
-        },
-        {
-            id: 'plant14',
-            name: 'Cucumber Plant',
-            image: '/images/plants/cucumber.png',
-            description: 'A climbing vine with delicate tendrils and bright green cucumbers. Represents refreshment and cool summer gardens.',
-            seedCost: 60,
-            type: 'plant'
-        },
-        {
-            id: 'plant15',
-            name: 'Cabbage Plant',
-            image: '/images/plants/cabbage.png',
-            description: 'A hardy cabbage with a tight round head of crisp leaves. Symbolizes prosperity and health in many cultures.',
-            seedCost: 60,
-            type: 'plant'
-        },
-        {
-            id: 'magic-flower',
-            name: 'Magic Flower',
-            seedCost: 500,
-            type: 'plant',
-            image: '/images/plants/magic-flower.png',
-            description: 'A legendary bloom with glowing petals and mystical energy. Said to grant luck and beauty to any greenhouse it touches.'
-        },
-        // Original Accessories
+        // Accessories
         {
             id: 'accessory1',
             name: 'Watering Can',
@@ -225,7 +176,6 @@ const StorePage = ()=>{
             seedCost: 35,
             type: 'accessory'
         },
-        // New Accessories (with image assignments)
         {
             id: 'accessory4',
             name: 'Compost Bin',
@@ -264,22 +214,6 @@ const StorePage = ()=>{
             image: '/images/accessories/solar-lamp.png',
             description: 'Environmentally friendly lighting that glows softly at night.',
             seedCost: 22,
-            type: 'accessory'
-        },
-        {
-            id: 'accessory9',
-            name: 'Greenhouse Upgrade Kit',
-            image: '/images/accessories/greenhouse-kit.png',
-            description: 'Expands your greenhouse floor space, allowing you to add more plants and accessories.',
-            seedCost: 100,
-            type: 'accessory'
-        },
-        {
-            id: 'accessory10',
-            name: 'Misting System',
-            image: '/images/accessories/misting-system.png',
-            description: 'Adds a visual mist effect and provides a growth bonus to nearby plants.',
-            seedCost: 50,
             type: 'accessory'
         },
         // Special Items
@@ -324,10 +258,18 @@ const StorePage = ()=>{
             type: 'special'
         },
         {
+            id: 'magic-flower',
+            name: 'Magic Flower',
+            seedCost: 500,
+            type: 'special',
+            image: '/images/plants/magic-flower.png',
+            description: 'A legendary bloom with glowing petals and mystical energy. Said to grant luck and beauty to any greenhouse it touches.'
+        },
+        {
             id: 'special-magic-pollinator',
             name: 'Magic Pollinator',
             image: '/images/accessories/magic-pollinator.png',
-            description: 'A rare and mystical garden enhancement that creates a shimmering cloud of magical pollen. When activated, it instantly advances all plants in your greenhouse to their next growth stage and enhances their visual appearance with a subtle, magical glow. The pollen cloud attracts ethereal butterflies and hummingbirds that will visit your greenhouse periodically. This legendary item is the pinnacle of greenhouse mastery, representing your dedication to volunteering and community service.',
+            description: 'A rare and mystical garden enhancement that creates a shimmering cloud of magical pollen.',
             seedCost: 1000,
             type: 'special'
         }
@@ -363,6 +305,31 @@ const StorePage = ()=>{
             image: '/images/seed-pack-xl.png'
         }
     ];
+    // Get sorted and filtered items
+    const getSortedAndFilteredItems = ()=>{
+        // First, filter items
+        let filteredItems = sampleStoreItems;
+        if (activeFilter !== 'all') {
+            filteredItems = sampleStoreItems.filter((item)=>item.type === activeFilter);
+        }
+        // Then, sort items by price
+        let sortedItems = [
+            ...filteredItems
+        ];
+        if (sortDirection === 'asc') {
+            sortedItems.sort((a, b)=>a.seedCost - b.seedCost);
+        } else {
+            sortedItems.sort((a, b)=>b.seedCost - a.seedCost);
+        }
+        return sortedItems;
+    };
+    // Check if item is owned
+    const isItemOwned = (item)=>{
+        if (item.type === 'plant') return ownedItems.plants.includes(item.id);
+        if (item.type === 'accessory') return ownedItems.accessories.includes(item.id);
+        if (item.type === 'special') return ownedItems.specials.includes(item.id);
+        return false;
+    };
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "StorePage.useEffect": ()=>{
             const unsubscribe = __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["auth"].onAuthStateChanged({
@@ -374,6 +341,13 @@ const StorePage = ()=>{
                             const userProfile = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getUserProfile"])(user.uid);
                             if (userProfile) {
                                 setProfile(userProfile);
+                                // Extract owned items from profile
+                                const profileWithItems = userProfile;
+                                setOwnedItems({
+                                    plants: profileWithItems.ownedItems?.plants || [],
+                                    accessories: profileWithItems.ownedItems?.accessories || [],
+                                    specials: profileWithItems.ownedItems?.specials || []
+                                });
                             } else {
                                 router.push('/auth/onboarding');
                             }
@@ -387,8 +361,6 @@ const StorePage = ()=>{
                     }
                 }
             }["StorePage.useEffect.unsubscribe"]);
-            // Set store items
-            setStoreItems(sampleStoreItems);
             return ({
                 "StorePage.useEffect": ()=>unsubscribe()
             })["StorePage.useEffect"];
@@ -402,14 +374,16 @@ const StorePage = ()=>{
         }
     }["StorePage.useEffect"], [
         activeFilter,
-        sortDirection
+        sortDirection,
+        ownedItems
     ]);
-    // Updated handlePurchase function for app/store/page.tsx
-    // Updated handlePurchase function for the app/store/page.tsx file
-    // Import necessary functions
-    // Add this function to the store page component
     const handlePurchase = async ()=>{
         if (!user || !profile || !selectedItem) return;
+        // Check if item is already owned
+        if (isItemOwned(selectedItem)) {
+            setError('You already own this item');
+            return;
+        }
         try {
             setLoading(true);
             // Check if user has enough seeds
@@ -417,65 +391,57 @@ const StorePage = ()=>{
                 setError('Not enough seeds to purchase this item');
                 return;
             }
-            // Determine which array to update based on the item type
-            const itemTypeField = `${selectedItem.type}s`; // converts 'plant' to 'plants', etc.
-            // Create a structure for the owned items if it doesn't exist yet
-            const ownedItems = profile.ownedItems || {
-                plants: [],
-                accessories: [],
-                specials: []
+            // Determine which array to update based on item type
+            let updateField = '';
+            let newOwnedItems = {
+                ...ownedItems
             };
-            // Check if user already owns this item
-            if (ownedItems[itemTypeField]?.includes(selectedItem.id)) {
-                setError('You already own this item');
-                setLoading(false);
-                return;
-            }
-            // Prepare update data for Firestore
-            const updateData = {
-                // Decrement seeds by the item cost
-                seeds: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["increment"])(-selectedItem.seedCost),
-                // Add the item to the appropriate array using arrayUnion
-                [`ownedItems.${itemTypeField}`]: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["arrayUnion"])(selectedItem.id),
-                // Update the timestamp
-                updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
-            };
-            // Update Firestore
-            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["updateDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'users', user.uid), updateData);
-            // Update the local profile state
-            const updatedOwnedItems = {
-                ...ownedItems,
-                [itemTypeField]: [
-                    ...ownedItems[itemTypeField] || [],
+            if (selectedItem.type === 'plant') {
+                updateField = 'ownedItems.plants';
+                newOwnedItems.plants = [
+                    ...ownedItems.plants,
                     selectedItem.id
-                ]
-            };
+                ];
+            } else if (selectedItem.type === 'accessory') {
+                updateField = 'ownedItems.accessories';
+                newOwnedItems.accessories = [
+                    ...ownedItems.accessories,
+                    selectedItem.id
+                ];
+            } else if (selectedItem.type === 'special') {
+                updateField = 'ownedItems.specials';
+                newOwnedItems.specials = [
+                    ...ownedItems.specials,
+                    selectedItem.id
+                ];
+            }
+            // Update user's profile in Firestore
+            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["updateDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'users', user.uid), {
+                seeds: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["increment"])(-selectedItem.seedCost),
+                [updateField]: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["arrayUnion"])(selectedItem.id),
+                updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
+            });
+            // Update local state
             setProfile({
                 ...profile,
-                seeds: profile.seeds - selectedItem.seedCost,
-                ownedItems: updatedOwnedItems
+                seeds: profile.seeds - selectedItem.seedCost
             });
+            setOwnedItems(newOwnedItems);
             setPurchaseSuccess(true);
+            setSelectedItem(null); // Clear selection
             // Reset purchase success message after 3 seconds
             setTimeout(()=>{
                 setPurchaseSuccess(false);
             }, 3000);
         } catch (err) {
-            console.error('Error purchasing item:', err);
-            setError(err.message || 'Failed to purchase item');
+            setError(err.message);
         } finally{
             setLoading(false);
         }
     };
-    // Replace the old handlePurchase function with this new one
     // Handle filter selection
     const handleFilterChange = (filter)=>{
         setActiveFilter(filter);
-        if (filter === 'all') {
-            setStoreItems(sampleStoreItems);
-        } else {
-            setStoreItems(sampleStoreItems.filter((item)=>item.type === filter));
-        }
     };
     // Open payment modal
     const handleBuySeeds = (seedPackage)=>{
@@ -534,12 +500,12 @@ const StorePage = ()=>{
                 className: "animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"
             }, void 0, false, {
                 fileName: "[project]/app/store/page.tsx",
-                lineNumber: 554,
+                lineNumber: 515,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/app/store/page.tsx",
-            lineNumber: 553,
+            lineNumber: 514,
             columnNumber: 7
         }, this);
     }
@@ -559,7 +525,7 @@ const StorePage = ()=>{
                                         children: "Buy Seeds"
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 565,
+                                        lineNumber: 526,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -567,13 +533,13 @@ const StorePage = ()=>{
                                         children: "Get more seeds to expand your virtual greenhouse"
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 566,
+                                        lineNumber: 527,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/store/page.tsx",
-                                lineNumber: 564,
+                                lineNumber: 525,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -585,7 +551,7 @@ const StorePage = ()=>{
                                         className: "w-6 h-6 mr-2"
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 569,
+                                        lineNumber: 530,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -593,19 +559,19 @@ const StorePage = ()=>{
                                         children: profile?.seeds || 0
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 574,
+                                        lineNumber: 535,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/store/page.tsx",
-                                lineNumber: 568,
+                                lineNumber: 529,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/store/page.tsx",
-                        lineNumber: 563,
+                        lineNumber: 524,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -621,12 +587,12 @@ const StorePage = ()=>{
                                             className: "w-16 h-16"
                                         }, void 0, false, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 582,
+                                            lineNumber: 543,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 581,
+                                        lineNumber: 542,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -634,7 +600,7 @@ const StorePage = ()=>{
                                         children: pack.name
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 588,
+                                        lineNumber: 549,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -648,7 +614,7 @@ const StorePage = ()=>{
                                                     className: "w-4 h-4 mr-1"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/store/page.tsx",
-                                                    lineNumber: 591,
+                                                    lineNumber: 552,
                                                     columnNumber: 19
                                                 }, this),
                                                 pack.amount,
@@ -656,12 +622,12 @@ const StorePage = ()=>{
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 590,
+                                            lineNumber: 551,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 589,
+                                        lineNumber: 550,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -672,7 +638,7 @@ const StorePage = ()=>{
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 599,
+                                        lineNumber: 560,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -681,24 +647,24 @@ const StorePage = ()=>{
                                         children: "Buy Now"
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 600,
+                                        lineNumber: 561,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, pack.id, true, {
                                 fileName: "[project]/app/store/page.tsx",
-                                lineNumber: 580,
+                                lineNumber: 541,
                                 columnNumber: 13
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/app/store/page.tsx",
-                        lineNumber: 578,
+                        lineNumber: 539,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/store/page.tsx",
-                lineNumber: 562,
+                lineNumber: 523,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -714,7 +680,7 @@ const StorePage = ()=>{
                                         children: "Volunteer Connect Store"
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 615,
+                                        lineNumber: 576,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -722,45 +688,63 @@ const StorePage = ()=>{
                                         children: "Use your seeds to purchase plants and accessories for your greenhouse"
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 616,
+                                        lineNumber: 577,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/store/page.tsx",
-                                lineNumber: 614,
+                                lineNumber: 575,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "flex items-center",
+                                className: "flex items-center space-x-4",
                                 children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                                        src: "/images/seed-icon.png",
-                                        alt: "Seeds",
-                                        className: "w-6 h-6 mr-2"
-                                    }, void 0, false, {
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex items-center",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                src: "/images/seed-icon.png",
+                                                alt: "Seeds",
+                                                className: "w-6 h-6 mr-2"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/store/page.tsx",
+                                                lineNumber: 581,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "font-bold text-green-800",
+                                                children: profile?.seeds || 0
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/store/page.tsx",
+                                                lineNumber: 586,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 619,
+                                        lineNumber: 580,
                                         columnNumber: 13
                                     }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "font-bold text-green-800",
-                                        children: profile?.seeds || 0
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        onClick: ()=>router.push('/greenhouse'),
+                                        className: "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm",
+                                        children: "Visit Greenhouse"
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 624,
+                                        lineNumber: 588,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/store/page.tsx",
-                                lineNumber: 618,
+                                lineNumber: 579,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/store/page.tsx",
-                        lineNumber: 613,
+                        lineNumber: 574,
                         columnNumber: 9
                     }, this),
                     error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -768,21 +752,15 @@ const StorePage = ()=>{
                         children: error
                     }, void 0, false, {
                         fileName: "[project]/app/store/page.tsx",
-                        lineNumber: 629,
+                        lineNumber: 598,
                         columnNumber: 11
                     }, this),
                     purchaseSuccess && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mb-4 p-3 bg-green-100 text-green-700 rounded",
-                        children: selectedItem ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
-                            children: [
-                                "Successfully purchased ",
-                                selectedItem.name,
-                                "!"
-                            ]
-                        }, void 0, true) : selectedSeedPackage ? `Successfully purchased ${selectedSeedPackage.amount} seeds!` : 'Purchase successful!'
+                        children: selectedItem ? `Successfully purchased ${selectedItem.name}! Check your greenhouse inventory.` : selectedSeedPackage ? `Successfully purchased ${selectedSeedPackage.amount} seeds!` : 'Purchase successful!'
                     }, void 0, false, {
                         fileName: "[project]/app/store/page.tsx",
-                        lineNumber: 635,
+                        lineNumber: 604,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -791,12 +769,33 @@ const StorePage = ()=>{
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "md:col-span-2",
                                 children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                        className: "text-lg font-semibold mb-4",
-                                        children: "Available Items"
-                                    }, void 0, false, {
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex justify-between items-center mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                className: "text-lg font-semibold",
+                                                children: "Available Items"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/store/page.tsx",
+                                                lineNumber: 617,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "text-sm text-gray-600",
+                                                children: [
+                                                    "Owned: ",
+                                                    ownedItems.plants.length + ownedItems.accessories.length + ownedItems.specials.length,
+                                                    " items"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/store/page.tsx",
+                                                lineNumber: 618,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 651,
+                                        lineNumber: 616,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -811,40 +810,52 @@ const StorePage = ()=>{
                                                         children: "All"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/store/page.tsx",
-                                                        lineNumber: 655,
+                                                        lineNumber: 625,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                         className: `px-4 py-2 rounded-md ${activeFilter === 'plant' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-800 hover:bg-green-600 hover:text-white hover:cursor-pointer'}`,
                                                         onClick: ()=>handleFilterChange('plant'),
-                                                        children: "Plants"
-                                                    }, void 0, false, {
+                                                        children: [
+                                                            "Plants (",
+                                                            ownedItems.plants.length,
+                                                            ")"
+                                                        ]
+                                                    }, void 0, true, {
                                                         fileName: "[project]/app/store/page.tsx",
-                                                        lineNumber: 664,
+                                                        lineNumber: 634,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                         className: `px-4 py-2 rounded-md ${activeFilter === 'accessory' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-800 hover:bg-green-600 hover:text-white hover:cursor-pointer'}`,
                                                         onClick: ()=>handleFilterChange('accessory'),
-                                                        children: "Accessories"
-                                                    }, void 0, false, {
+                                                        children: [
+                                                            "Accessories (",
+                                                            ownedItems.accessories.length,
+                                                            ")"
+                                                        ]
+                                                    }, void 0, true, {
                                                         fileName: "[project]/app/store/page.tsx",
-                                                        lineNumber: 673,
+                                                        lineNumber: 643,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                         className: `px-4 py-2 rounded-md ${activeFilter === 'special' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-800 hover:bg-green-600 hover:text-white hover:cursor-pointer'}`,
                                                         onClick: ()=>handleFilterChange('special'),
-                                                        children: "Special Items"
-                                                    }, void 0, false, {
+                                                        children: [
+                                                            "Special Items (",
+                                                            ownedItems.specials.length,
+                                                            ")"
+                                                        ]
+                                                    }, void 0, true, {
                                                         fileName: "[project]/app/store/page.tsx",
-                                                        lineNumber: 682,
+                                                        lineNumber: 652,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/store/page.tsx",
-                                                lineNumber: 654,
+                                                lineNumber: 624,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -857,7 +868,7 @@ const StorePage = ()=>{
                                                         children: "Price"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/store/page.tsx",
-                                                        lineNumber: 699,
+                                                        lineNumber: 669,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -874,12 +885,12 @@ const StorePage = ()=>{
                                                                     clipRule: "evenodd"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/store/page.tsx",
-                                                                    lineNumber: 709,
+                                                                    lineNumber: 679,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/store/page.tsx",
-                                                                lineNumber: 702,
+                                                                lineNumber: 672,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
@@ -893,129 +904,159 @@ const StorePage = ()=>{
                                                                     clipRule: "evenodd"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/store/page.tsx",
-                                                                    lineNumber: 724,
+                                                                    lineNumber: 694,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/store/page.tsx",
-                                                                lineNumber: 717,
+                                                                lineNumber: 687,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/store/page.tsx",
-                                                        lineNumber: 700,
+                                                        lineNumber: 670,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/store/page.tsx",
-                                                lineNumber: 694,
+                                                lineNumber: 664,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 653,
+                                        lineNumber: 623,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto max-h-[600px] pb-2",
-                                        children: storeItems.map((item)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: `border rounded-lg overflow-hidden hover:shadow-md cursor-pointer transition-shadow ${selectedItem?.id === item.id ? 'border-green-500 ring-2 ring-green-200' : 'border-gray-200'}`,
+                                        children: storeItems.map((item)=>{
+                                            const itemOwned = isItemOwned(item);
+                                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: `border rounded-lg overflow-hidden hover:shadow-md cursor-pointer transition-shadow relative ${selectedItem?.id === item.id ? 'border-green-500 ring-2 ring-green-200' : 'border-gray-200'} ${itemOwned ? 'bg-green-50 border-green-300' : ''}`,
                                                 onClick: ()=>setSelectedItem(item),
-                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "p-4",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "flex justify-center mb-3",
-                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "w-20 h-20 bg-green-100 rounded-full flex items-center justify-center",
-                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                                                                    src: item.image,
-                                                                    alt: item.name,
-                                                                    className: "w-16 h-16"
+                                                children: [
+                                                    itemOwned && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full",
+                                                        children: "Owned"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/store/page.tsx",
+                                                        lineNumber: 717,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "p-4",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "flex justify-center mb-3",
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: `w-20 h-20 rounded-full flex items-center justify-center ${itemOwned ? 'bg-green-200' : 'bg-green-100'}`,
+                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                                        src: item.image,
+                                                                        alt: item.name,
+                                                                        className: "w-16 h-16"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/store/page.tsx",
+                                                                        lineNumber: 727,
+                                                                        columnNumber: 27
+                                                                    }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/store/page.tsx",
-                                                                    lineNumber: 745,
+                                                                    lineNumber: 724,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/store/page.tsx",
-                                                                lineNumber: 744,
+                                                                lineNumber: 723,
                                                                 columnNumber: 23
-                                                            }, this)
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/store/page.tsx",
-                                                            lineNumber: 743,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
-                                                            className: "font-medium text-center",
-                                                            children: item.name
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/store/page.tsx",
-                                                            lineNumber: 752,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "flex justify-center mt-2",
-                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: "flex items-center text-sm font-medium text-green-800 bg-green-50 px-2 py-1 rounded-full",
-                                                                children: [
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
-                                                                        src: "/images/seed-icon.png",
-                                                                        alt: "Seeds",
-                                                                        className: "w-4 h-4 mr-1"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/store/page.tsx",
-                                                                        lineNumber: 755,
-                                                                        columnNumber: 25
-                                                                    }, this),
-                                                                    item.seedCost
-                                                                ]
-                                                            }, void 0, true, {
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                                                                className: "font-medium text-center",
+                                                                children: item.name
+                                                            }, void 0, false, {
                                                                 fileName: "[project]/app/store/page.tsx",
-                                                                lineNumber: 754,
+                                                                lineNumber: 734,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "flex justify-center mt-2",
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: `flex items-center text-sm font-medium rounded-full px-2 py-1 ${itemOwned ? 'text-green-800 bg-green-100' : 'text-green-800 bg-green-50'}`,
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                                            src: "/images/seed-icon.png",
+                                                                            alt: "Seeds",
+                                                                            className: "w-4 h-4 mr-1"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/store/page.tsx",
+                                                                            lineNumber: 741,
+                                                                            columnNumber: 27
+                                                                        }, this),
+                                                                        item.seedCost
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/store/page.tsx",
+                                                                    lineNumber: 736,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/store/page.tsx",
+                                                                lineNumber: 735,
                                                                 columnNumber: 23
                                                             }, this)
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/store/page.tsx",
-                                                            lineNumber: 753,
-                                                            columnNumber: 21
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/app/store/page.tsx",
-                                                    lineNumber: 742,
-                                                    columnNumber: 19
-                                                }, this)
-                                            }, item.id, false, {
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/store/page.tsx",
+                                                        lineNumber: 722,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, item.id, true, {
                                                 fileName: "[project]/app/store/page.tsx",
-                                                lineNumber: 736,
-                                                columnNumber: 17
-                                            }, this))
+                                                lineNumber: 708,
+                                                columnNumber: 19
+                                            }, this);
+                                        })
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 734,
+                                        lineNumber: 704,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/store/page.tsx",
-                                lineNumber: 650,
+                                lineNumber: 615,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "bg-gray-50 rounded-lg p-4",
                                 children: selectedItem ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            className: "text-xl font-semibold mb-2",
-                                            children: selectedItem.name
-                                        }, void 0, false, {
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex justify-between items-start mb-2",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                    className: "text-xl font-semibold",
+                                                    children: selectedItem.name
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/store/page.tsx",
+                                                    lineNumber: 761,
+                                                    columnNumber: 19
+                                                }, this),
+                                                isItemOwned(selectedItem) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full",
+                                                    children: "Owned"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/store/page.tsx",
+                                                    lineNumber: 763,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 773,
+                                            lineNumber: 760,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1028,17 +1069,17 @@ const StorePage = ()=>{
                                                     className: "w-24 h-24"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/store/page.tsx",
-                                                    lineNumber: 776,
+                                                    lineNumber: 771,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/store/page.tsx",
-                                                lineNumber: 775,
+                                                lineNumber: 770,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 774,
+                                            lineNumber: 769,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1046,7 +1087,7 @@ const StorePage = ()=>{
                                             children: selectedItem.description
                                         }, void 0, false, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 783,
+                                            lineNumber: 779,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1059,7 +1100,7 @@ const StorePage = ()=>{
                                                         children: "Cost:"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/store/page.tsx",
-                                                        lineNumber: 786,
+                                                        lineNumber: 783,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1071,7 +1112,7 @@ const StorePage = ()=>{
                                                                 className: "w-4 h-4 mr-1"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/store/page.tsx",
-                                                                lineNumber: 788,
+                                                                lineNumber: 785,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1079,40 +1120,47 @@ const StorePage = ()=>{
                                                                 children: selectedItem.seedCost
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/store/page.tsx",
-                                                                lineNumber: 793,
+                                                                lineNumber: 790,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/store/page.tsx",
-                                                        lineNumber: 787,
+                                                        lineNumber: 784,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/store/page.tsx",
-                                                lineNumber: 785,
+                                                lineNumber: 782,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 784,
+                                            lineNumber: 781,
                                             columnNumber: 17
                                         }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        isItemOwned(selectedItem) ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "w-full py-2 px-4 bg-green-100 text-green-800 rounded-md text-center font-medium",
+                                            children: "Already Owned"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/store/page.tsx",
+                                            lineNumber: 796,
+                                            columnNumber: 19
+                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             onClick: handlePurchase,
                                             disabled: loading || (profile?.seeds || 0) < selectedItem.seedCost,
-                                            className: `w-full py-2 px-4 rounded-md hover:cursor-pointer ${(profile?.seeds || 0) < selectedItem.seedCost ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 text-white'}`,
+                                            className: `w-full py-2 px-4 rounded-md ${(profile?.seeds || 0) < selectedItem.seedCost ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 text-white'}`,
                                             children: loading ? 'Processing...' : (profile?.seeds || 0) < selectedItem.seedCost ? 'Not Enough Seeds' : 'Purchase'
                                         }, void 0, false, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 797,
-                                            columnNumber: 17
+                                            lineNumber: 800,
+                                            columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/store/page.tsx",
-                                    lineNumber: 772,
+                                    lineNumber: 759,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "text-center py-8 text-gray-500",
@@ -1120,29 +1168,29 @@ const StorePage = ()=>{
                                         children: "Select an item to view details"
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 814,
+                                        lineNumber: 819,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/store/page.tsx",
-                                    lineNumber: 813,
+                                    lineNumber: 818,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/store/page.tsx",
-                                lineNumber: 770,
+                                lineNumber: 757,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/store/page.tsx",
-                        lineNumber: 648,
+                        lineNumber: 613,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/store/page.tsx",
-                lineNumber: 612,
+                lineNumber: 573,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1153,7 +1201,7 @@ const StorePage = ()=>{
                         children: "How to Earn Seeds"
                     }, void 0, false, {
                         fileName: "[project]/app/store/page.tsx",
-                        lineNumber: 822,
+                        lineNumber: 828,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1161,7 +1209,7 @@ const StorePage = ()=>{
                         children: "Complete volunteering tasks to earn seeds that you can use to purchase plants and accessories for your greenhouse."
                     }, void 0, false, {
                         fileName: "[project]/app/store/page.tsx",
-                        lineNumber: 823,
+                        lineNumber: 829,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1175,7 +1223,7 @@ const StorePage = ()=>{
                                         children: "Complete Weekly Tasks"
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 829,
+                                        lineNumber: 835,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1183,13 +1231,13 @@ const StorePage = ()=>{
                                         children: "Earn 5 seeds for completing all your weekly volunteering tasks."
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 830,
+                                        lineNumber: 836,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/store/page.tsx",
-                                lineNumber: 828,
+                                lineNumber: 834,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1200,7 +1248,7 @@ const StorePage = ()=>{
                                         children: "Group Volunteering"
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 836,
+                                        lineNumber: 842,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1208,13 +1256,13 @@ const StorePage = ()=>{
                                         children: "Earn bonus seeds when you volunteer with other Volunteer Connect users."
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 837,
+                                        lineNumber: 843,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/store/page.tsx",
-                                lineNumber: 835,
+                                lineNumber: 841,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1225,7 +1273,7 @@ const StorePage = ()=>{
                                         children: "Special Events"
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 843,
+                                        lineNumber: 849,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1233,25 +1281,25 @@ const StorePage = ()=>{
                                         children: "Participate in special volunteering events to earn extra seeds."
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 844,
+                                        lineNumber: 850,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/store/page.tsx",
-                                lineNumber: 842,
+                                lineNumber: 848,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/store/page.tsx",
-                        lineNumber: 827,
+                        lineNumber: 833,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/store/page.tsx",
-                lineNumber: 821,
+                lineNumber: 827,
                 columnNumber: 7
             }, this),
             showPaymentModal && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1267,7 +1315,7 @@ const StorePage = ()=>{
                                     children: "Purchase Seeds"
                                 }, void 0, false, {
                                     fileName: "[project]/app/store/page.tsx",
-                                    lineNumber: 856,
+                                    lineNumber: 862,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1286,23 +1334,23 @@ const StorePage = ()=>{
                                             d: "M6 18L18 6M6 6l12 12"
                                         }, void 0, false, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 862,
+                                            lineNumber: 868,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 861,
+                                        lineNumber: 867,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/store/page.tsx",
-                                    lineNumber: 857,
+                                    lineNumber: 863,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/store/page.tsx",
-                            lineNumber: 855,
+                            lineNumber: 861,
                             columnNumber: 13
                         }, this),
                         selectedSeedPackage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1316,12 +1364,12 @@ const StorePage = ()=>{
                                         className: "w-20 h-20"
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 870,
+                                        lineNumber: 876,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/store/page.tsx",
-                                    lineNumber: 869,
+                                    lineNumber: 875,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1332,7 +1380,7 @@ const StorePage = ()=>{
                                             children: selectedSeedPackage.name
                                         }, void 0, false, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 877,
+                                            lineNumber: 883,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1344,7 +1392,7 @@ const StorePage = ()=>{
                                                     className: "w-4 h-4 mr-1"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/store/page.tsx",
-                                                    lineNumber: 879,
+                                                    lineNumber: 885,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1354,13 +1402,13 @@ const StorePage = ()=>{
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/store/page.tsx",
-                                                    lineNumber: 884,
+                                                    lineNumber: 890,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 878,
+                                            lineNumber: 884,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1371,19 +1419,19 @@ const StorePage = ()=>{
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 886,
+                                            lineNumber: 892,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/store/page.tsx",
-                                    lineNumber: 876,
+                                    lineNumber: 882,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/store/page.tsx",
-                            lineNumber: 868,
+                            lineNumber: 874,
                             columnNumber: 15
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -1399,7 +1447,7 @@ const StorePage = ()=>{
                                                     children: "Card Number"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/store/page.tsx",
-                                                    lineNumber: 894,
+                                                    lineNumber: 900,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1412,13 +1460,13 @@ const StorePage = ()=>{
                                                     required: true
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/store/page.tsx",
-                                                    lineNumber: 897,
+                                                    lineNumber: 903,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 893,
+                                            lineNumber: 899,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1428,7 +1476,7 @@ const StorePage = ()=>{
                                                     children: "Name on Card"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/store/page.tsx",
-                                                    lineNumber: 909,
+                                                    lineNumber: 915,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1441,13 +1489,13 @@ const StorePage = ()=>{
                                                     required: true
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/store/page.tsx",
-                                                    lineNumber: 912,
+                                                    lineNumber: 918,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 908,
+                                            lineNumber: 914,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1460,7 +1508,7 @@ const StorePage = ()=>{
                                                             children: "Expiry Date"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/store/page.tsx",
-                                                            lineNumber: 925,
+                                                            lineNumber: 931,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1473,13 +1521,13 @@ const StorePage = ()=>{
                                                             required: true
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/store/page.tsx",
-                                                            lineNumber: 928,
+                                                            lineNumber: 934,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/store/page.tsx",
-                                                    lineNumber: 924,
+                                                    lineNumber: 930,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1489,7 +1537,7 @@ const StorePage = ()=>{
                                                             children: "CVV"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/store/page.tsx",
-                                                            lineNumber: 940,
+                                                            lineNumber: 946,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1502,25 +1550,25 @@ const StorePage = ()=>{
                                                             required: true
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/store/page.tsx",
-                                                            lineNumber: 943,
+                                                            lineNumber: 949,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/store/page.tsx",
-                                                    lineNumber: 939,
+                                                    lineNumber: 945,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 923,
+                                            lineNumber: 929,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/store/page.tsx",
-                                    lineNumber: 892,
+                                    lineNumber: 898,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1536,24 +1584,24 @@ const StorePage = ()=>{
                                                     className: "animate-spin rounded-full h-5 w-5 border-2 border-b-0 border-white mr-2"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/store/page.tsx",
-                                                    lineNumber: 964,
+                                                    lineNumber: 970,
                                                     columnNumber: 23
                                                 }, this),
                                                 "Processing..."
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 963,
+                                            lineNumber: 969,
                                             columnNumber: 21
-                                        }, this) : `Pay $${selectedSeedPackage?.price.toFixed(2)}`
+                                        }, this) : `Pay ${selectedSeedPackage?.price.toFixed(2)}`
                                     }, void 0, false, {
                                         fileName: "[project]/app/store/page.tsx",
-                                        lineNumber: 957,
+                                        lineNumber: 963,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/store/page.tsx",
-                                    lineNumber: 956,
+                                    lineNumber: 962,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1563,7 +1611,7 @@ const StorePage = ()=>{
                                             children: "Your payment information is secure and encrypted."
                                         }, void 0, false, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 974,
+                                            lineNumber: 980,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1577,40 +1625,40 @@ const StorePage = ()=>{
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/store/page.tsx",
-                                            lineNumber: 975,
+                                            lineNumber: 981,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/store/page.tsx",
-                                    lineNumber: 973,
+                                    lineNumber: 979,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/store/page.tsx",
-                            lineNumber: 891,
+                            lineNumber: 897,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/store/page.tsx",
-                    lineNumber: 854,
+                    lineNumber: 860,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/store/page.tsx",
-                lineNumber: 853,
+                lineNumber: 859,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/store/page.tsx",
-        lineNumber: 560,
+        lineNumber: 521,
         columnNumber: 5
     }, this);
 };
-_s(StorePage, "kxmQ8qewQFDnNy+mGEyF0FgnAe4=", false, function() {
+_s(StorePage, "RihwdYaICmuGTXH5ebXYdhFafE0=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];

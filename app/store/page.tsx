@@ -8,7 +8,6 @@ import { getUserProfile, UserProfile } from '@/app/lib/firebase/auth';
 import { db } from '@/app/lib/firebase/config';
 import { doc, updateDoc, arrayUnion, increment, serverTimestamp } from 'firebase/firestore';
 
-
 // Updated StoreItem interface to include special type
 interface StoreItem {
   id: string;
@@ -48,30 +47,15 @@ const StorePage = () => {
     cvv: '',
   });
   const [paymentProcessing, setPaymentProcessing] = useState(false);
-  // Get sorted and filtered items
-  const getSortedAndFilteredItems = () => {
-    // First, filter items
-    let filteredItems = sampleStoreItems;
-    if (activeFilter !== 'all') {
-      filteredItems = sampleStoreItems.filter(item => item.type === activeFilter);
-    }
+  const [ownedItems, setOwnedItems] = useState<{plants: string[], accessories: string[], specials: string[]}>({
+    plants: [],
+    accessories: [],
+    specials: []
+  });
 
-    // Then, sort items by price
-    let sortedItems = [...filteredItems];
-    if (sortDirection === 'asc') {
-      sortedItems.sort((a, b) => a.seedCost - b.seedCost);
-    } else {
-      sortedItems.sort((a, b) => b.seedCost - a.seedCost);
-    }
-
-    return sortedItems;
-  };
-  const handleSort = (direction: 'asc' | 'desc') => {
-    setSortDirection(direction);
-  };
-  // Sample store data
+  // Sample store data - comprehensive list
   const sampleStoreItems: StoreItem[] = [
-    // Original Plants
+    // Plants
     {
       id: 'plant1',
       name: 'Sunflower',
@@ -112,12 +96,10 @@ const StorePage = () => {
       seedCost: 100,
       type: 'plant'
     },
-
-    // New Plants (with image assignments based on the provided images)
     {
       id: 'plant6',
       name: 'Lavender Bush',
-      image: '/images/plants/lavender.png', // Image 7 (purple flower)
+      image: '/images/plants/lavender.png',
       description: 'A calming purple plant known for its soothing aroma and beautiful blooms.',
       seedCost: 20,
       type: 'plant'
@@ -125,7 +107,7 @@ const StorePage = () => {
     {
       id: 'plant7',
       name: 'Apple Tree',
-      image: '/images/plants/apple-tree.png', // Image 1 (apple tree)
+      image: '/images/plants/apple-tree.png',
       description: 'A fruit-bearing tree that produces delicious apples. A symbol of abundance and nourishment.',
       seedCost: 75,
       type: 'plant'
@@ -133,7 +115,7 @@ const StorePage = () => {
     {
       id: 'plant8',
       name: 'Hanging Fern',
-      image: '/images/plants/hanging-fern.png', // Image 5 (hanging plant)
+      image: '/images/plants/hanging-fern.png',
       description: 'A lush green fern perfect for adding vertical interest to your greenhouse.',
       seedCost: 15,
       type: 'plant'
@@ -141,7 +123,7 @@ const StorePage = () => {
     {
       id: 'plant9',
       name: 'Succulent Tray',
-      image: '/images/plants/succulent.png', // Image 8 (succulent tray)
+      image: '/images/plants/succulent.png',
       description: 'A collection of small, low-maintenance succulents arranged in a decorative tray.',
       seedCost: 18,
       type: 'plant'
@@ -149,7 +131,7 @@ const StorePage = () => {
     {
       id: 'plant10',
       name: 'Vegetable Patch',
-      image: '/images/plants/vegetable-patch.png', // Image 9 (tomato plant)
+      image: '/images/plants/vegetable-patch.png',
       description: 'Grow your own virtual vegetables including tomatoes, carrots, and more!',
       seedCost: 40,
       type: 'plant'
@@ -157,7 +139,7 @@ const StorePage = () => {
     {
       id: 'plant11',
       name: 'Cherry Blossom Tree',
-      image: '/images/plants/cherry-blossom.png', // Image 3 (pink tree)
+      image: '/images/plants/cherry-blossom.png',
       description: 'A beautiful tree with delicate pink blossoms. Features a special seasonal bloom animation.',
       seedCost: 120,
       type: 'plant'
@@ -170,40 +152,8 @@ const StorePage = () => {
       seedCost: 60,
       type: 'plant'
     },
-    {
-      id: 'plant13',
-      name: 'Tomato Plant',
-      image: '/images/plants/tomato.png',
-      description: 'A vibrant tomato plant with bright red fruits. Adds a splash of color to your greenhouse and symbolizes abundance and harvest.',
-      seedCost: 60,
-      type: 'plant'
-    },
-    {
-      id: 'plant14',
-      name: 'Cucumber Plant',
-      image: '/images/plants/cucumber.png',
-      description: 'A climbing vine with delicate tendrils and bright green cucumbers. Represents refreshment and cool summer gardens.',
-      seedCost: 60,
-      type: 'plant'
-    },
-    {
-      id: 'plant15',
-      name: 'Cabbage Plant',
-      image: '/images/plants/cabbage.png',
-      description: 'A hardy cabbage with a tight round head of crisp leaves. Symbolizes prosperity and health in many cultures.',
-      seedCost: 60,
-      type: 'plant'
-    },
-    {
-      id: 'magic-flower',
-      name: 'Magic Flower',
-      seedCost: 500,
-      type: 'plant',
-      image: '/images/plants/magic-flower.png',
-      description: 'A legendary bloom with glowing petals and mystical energy. Said to grant luck and beauty to any greenhouse it touches.'
-    },
 
-    // Original Accessories
+    // Accessories
     {
       id: 'accessory1',
       name: 'Watering Can',
@@ -228,12 +178,10 @@ const StorePage = () => {
       seedCost: 35,
       type: 'accessory'
     },
-
-    // New Accessories (with image assignments)
     {
       id: 'accessory4',
       name: 'Compost Bin',
-      image: '/images/accessories/compost.png', // Image 10 (wooden bin)
+      image: '/images/accessories/compost.png',
       description: 'A natural way to recycle plant waste and boost your greenhouse\'s eco-friendly feel.',
       seedCost: 25,
       type: 'accessory'
@@ -241,7 +189,7 @@ const StorePage = () => {
     {
       id: 'accessory5',
       name: 'Plant Shelf',
-      image: '/images/accessories/plant-shelf.png', // Image 11 (plant shelf)
+      image: '/images/accessories/plant-shelf.png',
       description: 'An attractive wooden shelf perfect for organizing and displaying your smaller plants.',
       seedCost: 35,
       type: 'accessory'
@@ -249,7 +197,7 @@ const StorePage = () => {
     {
       id: 'accessory6',
       name: 'Wind Chime',
-      image: '/images/accessories/wind-chime.png', // Image 12 (wind chime)
+      image: '/images/accessories/wind-chime.png',
       description: 'Adds gentle visual and auditory ambiance to your greenhouse space.',
       seedCost: 15,
       type: 'accessory'
@@ -257,7 +205,7 @@ const StorePage = () => {
     {
       id: 'accessory7',
       name: 'Hummingbird Feeder',
-      image: '/images/accessories/hummingbird-feeder.png', // Image 6 (bird feeder)
+      image: '/images/accessories/hummingbird-feeder.png',
       description: 'Attracts colorful hummingbirds to your greenhouse with special animations.',
       seedCost: 30,
       type: 'accessory'
@@ -268,22 +216,6 @@ const StorePage = () => {
       image: '/images/accessories/solar-lamp.png',
       description: 'Environmentally friendly lighting that glows softly at night.',
       seedCost: 22,
-      type: 'accessory'
-    },
-    {
-      id: 'accessory9',
-      name: 'Greenhouse Upgrade Kit',
-      image: '/images/accessories/greenhouse-kit.png',
-      description: 'Expands your greenhouse floor space, allowing you to add more plants and accessories.',
-      seedCost: 100,
-      type: 'accessory'
-    },
-    {
-      id: 'accessory10',
-      name: 'Misting System',
-      image: '/images/accessories/misting-system.png',
-      description: 'Adds a visual mist effect and provides a growth bonus to nearby plants.',
-      seedCost: 50,
       type: 'accessory'
     },
 
@@ -323,16 +255,24 @@ const StorePage = () => {
     {
       id: 'special5',
       name: 'Community Tree',
-      image: '/images/plants/community-tree.png', // Image 2 (cabbage/community item)
+      image: '/images/plants/community-tree.png',
       description: 'A special tree that unlocks collaborative watering animations with other volunteers.',
       seedCost: 200,
       type: 'special'
     },
     {
+      id: 'magic-flower',
+      name: 'Magic Flower',
+      seedCost: 500,
+      type: 'special',
+      image: '/images/plants/magic-flower.png',
+      description: 'A legendary bloom with glowing petals and mystical energy. Said to grant luck and beauty to any greenhouse it touches.'
+    },
+    {
       id: 'special-magic-pollinator',
       name: 'Magic Pollinator',
       image: '/images/accessories/magic-pollinator.png',
-      description: 'A rare and mystical garden enhancement that creates a shimmering cloud of magical pollen. When activated, it instantly advances all plants in your greenhouse to their next growth stage and enhances their visual appearance with a subtle, magical glow. The pollen cloud attracts ethereal butterflies and hummingbirds that will visit your greenhouse periodically. This legendary item is the pinnacle of greenhouse mastery, representing your dedication to volunteering and community service.',
+      description: 'A rare and mystical garden enhancement that creates a shimmering cloud of magical pollen.',
       seedCost: 1000,
       type: 'special'
     }
@@ -370,6 +310,33 @@ const StorePage = () => {
     }
   ];
 
+  // Get sorted and filtered items
+  const getSortedAndFilteredItems = () => {
+    // First, filter items
+    let filteredItems = sampleStoreItems;
+    if (activeFilter !== 'all') {
+      filteredItems = sampleStoreItems.filter(item => item.type === activeFilter);
+    }
+
+    // Then, sort items by price
+    let sortedItems = [...filteredItems];
+    if (sortDirection === 'asc') {
+      sortedItems.sort((a, b) => a.seedCost - b.seedCost);
+    } else {
+      sortedItems.sort((a, b) => b.seedCost - a.seedCost);
+    }
+
+    return sortedItems;
+  };
+
+  // Check if item is owned
+  const isItemOwned = (item: StoreItem) => {
+    if (item.type === 'plant') return ownedItems.plants.includes(item.id);
+    if (item.type === 'accessory') return ownedItems.accessories.includes(item.id);
+    if (item.type === 'special') return ownedItems.specials.includes(item.id);
+    return false;
+  };
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -379,6 +346,21 @@ const StorePage = () => {
           const userProfile = await getUserProfile(user.uid);
           if (userProfile) {
             setProfile(userProfile);
+            
+            // Extract owned items from profile
+            const profileWithItems = userProfile as UserProfile & {
+              ownedItems?: {
+                plants?: string[];
+                accessories?: string[];
+                specials?: string[];
+              };
+            };
+            
+            setOwnedItems({
+              plants: profileWithItems.ownedItems?.plants || [],
+              accessories: profileWithItems.ownedItems?.accessories || [],
+              specials: profileWithItems.ownedItems?.specials || []
+            });
           } else {
             router.push('/auth/onboarding');
           }
@@ -392,23 +374,21 @@ const StorePage = () => {
       }
     });
 
-    // Set store items
-    setStoreItems(sampleStoreItems);
-
     return () => unsubscribe();
   }, [router]);
+
   useEffect(() => {
     setStoreItems(getSortedAndFilteredItems());
-  }, [activeFilter, sortDirection]);
-  // Updated handlePurchase function for app/store/page.tsx
+  }, [activeFilter, sortDirection, ownedItems]);
 
-  // Updated handlePurchase function for the app/store/page.tsx file
-
-  // Import necessary functions
-
-  // Add this function to the store page component
   const handlePurchase = async () => {
     if (!user || !profile || !selectedItem) return;
+
+    // Check if item is already owned
+    if (isItemOwned(selectedItem)) {
+      setError('You already own this item');
+      return;
+    }
 
     try {
       setLoading(true);
@@ -419,49 +399,38 @@ const StorePage = () => {
         return;
       }
 
-      // Determine which array to update based on the item type
-      const itemTypeField = `${selectedItem.type}s`; // converts 'plant' to 'plants', etc.
-
-      // Create a structure for the owned items if it doesn't exist yet
-      const ownedItems = profile.ownedItems || {
-        plants: [],
-        accessories: [],
-        specials: []
-      };
-
-      // Check if user already owns this item
-      if (ownedItems[itemTypeField]?.includes(selectedItem.id)) {
-        setError('You already own this item');
-        setLoading(false);
-        return;
+      // Determine which array to update based on item type
+      let updateField = '';
+      let newOwnedItems = { ...ownedItems };
+      
+      if (selectedItem.type === 'plant') {
+        updateField = 'ownedItems.plants';
+        newOwnedItems.plants = [...ownedItems.plants, selectedItem.id];
+      } else if (selectedItem.type === 'accessory') {
+        updateField = 'ownedItems.accessories';
+        newOwnedItems.accessories = [...ownedItems.accessories, selectedItem.id];
+      } else if (selectedItem.type === 'special') {
+        updateField = 'ownedItems.specials';
+        newOwnedItems.specials = [...ownedItems.specials, selectedItem.id];
       }
 
-      // Prepare update data for Firestore
-      const updateData = {
-        // Decrement seeds by the item cost
+      // Update user's profile in Firestore
+      await updateDoc(doc(db, 'users', user.uid), {
         seeds: increment(-selectedItem.seedCost),
-        // Add the item to the appropriate array using arrayUnion
-        [`ownedItems.${itemTypeField}`]: arrayUnion(selectedItem.id),
-        // Update the timestamp
+        [updateField]: arrayUnion(selectedItem.id),
         updatedAt: serverTimestamp()
-      };
-
-      // Update Firestore
-      await updateDoc(doc(db, 'users', user.uid), updateData);
-
-      // Update the local profile state
-      const updatedOwnedItems = {
-        ...ownedItems,
-        [itemTypeField]: [...(ownedItems[itemTypeField] || []), selectedItem.id]
-      };
-
-      setProfile({
-        ...profile,
-        seeds: profile.seeds - selectedItem.seedCost,
-        ownedItems: updatedOwnedItems
       });
 
+      // Update local state
+      setProfile({
+        ...profile,
+        seeds: profile.seeds - selectedItem.seedCost
+      });
+      
+      setOwnedItems(newOwnedItems);
+
       setPurchaseSuccess(true);
+      setSelectedItem(null); // Clear selection
 
       // Reset purchase success message after 3 seconds
       setTimeout(() => {
@@ -469,23 +438,15 @@ const StorePage = () => {
       }, 3000);
 
     } catch (err: any) {
-      console.error('Error purchasing item:', err);
-      setError(err.message || 'Failed to purchase item');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Replace the old handlePurchase function with this new one
   // Handle filter selection
   const handleFilterChange = (filter: string) => {
     setActiveFilter(filter);
-
-    if (filter === 'all') {
-      setStoreItems(sampleStoreItems);
-    } else {
-      setStoreItems(sampleStoreItems.filter(item => item.type === filter));
-    }
   };
 
   // Open payment modal
@@ -615,13 +576,21 @@ const StorePage = () => {
             <h2 className="text-2xl font-bold text-green-800">Volunteer Connect Store</h2>
             <p className="text-gray-600">Use your seeds to purchase plants and accessories for your greenhouse</p>
           </div>
-          <div className="flex items-center">
-            <img
-              src="/images/seed-icon.png"
-              alt="Seeds"
-              className="w-6 h-6 mr-2"
-            />
-            <span className="font-bold text-green-800">{profile?.seeds || 0}</span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              <img
+                src="/images/seed-icon.png"
+                alt="Seeds"
+                className="w-6 h-6 mr-2"
+              />
+              <span className="font-bold text-green-800">{profile?.seeds || 0}</span>
+            </div>
+            <button
+              onClick={() => router.push('/greenhouse')}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm"
+            >
+              Visit Greenhouse
+            </button>
           </div>
         </div>
 
@@ -633,22 +602,23 @@ const StorePage = () => {
 
         {purchaseSuccess && (
           <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">
-            {selectedItem ? (
-              <>
-                Successfully purchased {selectedItem.name}!
-              </>
-            ) : selectedSeedPackage ? (
-              `Successfully purchased ${selectedSeedPackage.amount} seeds!`
-            ) : (
-              'Purchase successful!'
-            )}
+            {selectedItem ?
+              `Successfully purchased ${selectedItem.name}! Check your greenhouse inventory.` :
+              selectedSeedPackage ?
+                `Successfully purchased ${selectedSeedPackage.amount} seeds!` :
+                'Purchase successful!'}
           </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Store Items */}
           <div className="md:col-span-2">
-            <h3 className="text-lg font-semibold mb-4">Available Items</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Available Items</h3>
+              <div className="text-sm text-gray-600">
+                Owned: {ownedItems.plants.length + ownedItems.accessories.length + ownedItems.specials.length} items
+              </div>
+            </div>
 
             <div className="flex flex-wrap justify-between items-center mb-4">
               <div className="flex flex-wrap space-x-2 mb-2 sm:mb-0">
@@ -668,7 +638,7 @@ const StorePage = () => {
                     }`}
                   onClick={() => handleFilterChange('plant')}
                 >
-                  Plants
+                  Plants ({ownedItems.plants.length})
                 </button>
                 <button
                   className={`px-4 py-2 rounded-md ${activeFilter === 'accessory'
@@ -677,7 +647,7 @@ const StorePage = () => {
                     }`}
                   onClick={() => handleFilterChange('accessory')}
                 >
-                  Accessories
+                  Accessories ({ownedItems.accessories.length})
                 </button>
                 <button
                   className={`px-4 py-2 rounded-md ${activeFilter === 'special'
@@ -686,7 +656,7 @@ const StorePage = () => {
                     }`}
                   onClick={() => handleFilterChange('special')}
                 >
-                  Special Items
+                  Special Items ({ownedItems.specials.length})
                 </button>
               </div>
 
@@ -732,37 +702,54 @@ const StorePage = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto max-h-[600px] pb-2">
-              {storeItems.map(item => (
-                <div
-                  key={item.id}
-                  className={`border rounded-lg overflow-hidden hover:shadow-md cursor-pointer transition-shadow ${selectedItem?.id === item.id ? 'border-green-500 ring-2 ring-green-200' : 'border-gray-200'
-                    }`}
-                  onClick={() => setSelectedItem(item)}
-                >
-                  <div className="p-4">
-                    <div className="flex justify-center mb-3">
-                      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-16 h-16"
-                        />
+              {storeItems.map(item => {
+                const itemOwned = isItemOwned(item);
+                return (
+                  <div
+                    key={item.id}
+                    className={`border rounded-lg overflow-hidden hover:shadow-md cursor-pointer transition-shadow relative ${
+                      selectedItem?.id === item.id ? 'border-green-500 ring-2 ring-green-200' : 'border-gray-200'
+                    } ${itemOwned ? 'bg-green-50 border-green-300' : ''}`}
+                    onClick={() => setSelectedItem(item)}
+                  >
+                    {/* Owned indicator */}
+                    {itemOwned && (
+                      <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                        Owned
                       </div>
-                    </div>
-                    <h4 className="font-medium text-center">{item.name}</h4>
-                    <div className="flex justify-center mt-2">
-                      <div className="flex items-center text-sm font-medium text-green-800 bg-green-50 px-2 py-1 rounded-full">
-                        <img
-                          src="/images/seed-icon.png"
-                          alt="Seeds"
-                          className="w-4 h-4 mr-1"
-                        />
-                        {item.seedCost}
+                    )}
+                    
+                    <div className="p-4">
+                      <div className="flex justify-center mb-3">
+                        <div className={`w-20 h-20 rounded-full flex items-center justify-center ${
+                          itemOwned ? 'bg-green-200' : 'bg-green-100'
+                        }`}>
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-16 h-16"
+                          />
+                        </div>
+                      </div>
+                      <h4 className="font-medium text-center">{item.name}</h4>
+                      <div className="flex justify-center mt-2">
+                        <div className={`flex items-center text-sm font-medium rounded-full px-2 py-1 ${
+                          itemOwned 
+                            ? 'text-green-800 bg-green-100' 
+                            : 'text-green-800 bg-green-50'
+                        }`}>
+                          <img
+                            src="/images/seed-icon.png"
+                            alt="Seeds"
+                            className="w-4 h-4 mr-1"
+                          />
+                          {item.seedCost}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -770,7 +757,15 @@ const StorePage = () => {
           <div className="bg-gray-50 rounded-lg p-4">
             {selectedItem ? (
               <div>
-                <h3 className="text-xl font-semibold mb-2">{selectedItem.name}</h3>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-xl font-semibold">{selectedItem.name}</h3>
+                  {isItemOwned(selectedItem) && (
+                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                      Owned
+                    </span>
+                  )}
+                </div>
+                
                 <div className="flex justify-center mb-4">
                   <div className="w-32 h-32 bg-green-100 rounded-full flex items-center justify-center">
                     <img
@@ -780,7 +775,9 @@ const StorePage = () => {
                     />
                   </div>
                 </div>
+                
                 <p className="text-gray-700 mb-4">{selectedItem.description}</p>
+                
                 <div className="bg-green-50 p-3 rounded-md mb-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium text-green-800">Cost:</span>
@@ -794,20 +791,28 @@ const StorePage = () => {
                     </div>
                   </div>
                 </div>
-                <button
-                  onClick={handlePurchase}
-                  disabled={loading || (profile?.seeds || 0) < selectedItem.seedCost}
-                  className={`w-full py-2 px-4 rounded-md hover:cursor-pointer ${(profile?.seeds || 0) < selectedItem.seedCost
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-green-600 hover:bg-green-700 text-white'
+                
+                {isItemOwned(selectedItem) ? (
+                  <div className="w-full py-2 px-4 bg-green-100 text-green-800 rounded-md text-center font-medium">
+                    Already Owned
+                  </div>
+                ) : (
+                  <button
+                    onClick={handlePurchase}
+                    disabled={loading || (profile?.seeds || 0) < selectedItem.seedCost}
+                    className={`w-full py-2 px-4 rounded-md ${
+                      (profile?.seeds || 0) < selectedItem.seedCost
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-green-600 hover:bg-green-700 text-white'
                     }`}
-                >
-                  {loading ? 'Processing...' : (
-                    (profile?.seeds || 0) < selectedItem.seedCost
-                      ? 'Not Enough Seeds'
-                      : 'Purchase'
-                  )}
-                </button>
+                  >
+                    {loading ? 'Processing...' : (
+                      (profile?.seeds || 0) < selectedItem.seedCost
+                        ? 'Not Enough Seeds'
+                        : 'Purchase'
+                    )}
+                  </button>
+                )}
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
@@ -818,6 +823,7 @@ const StorePage = () => {
         </div>
       </div>
 
+      {/* How to Earn Seeds Section */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-bold text-green-800 mb-4">How to Earn Seeds</h2>
         <p className="text-gray-600 mb-4">
@@ -965,7 +971,7 @@ const StorePage = () => {
                       Processing...
                     </div>
                   ) : (
-                    `Pay $${selectedSeedPackage?.price.toFixed(2)}`
+                    `Pay ${selectedSeedPackage?.price.toFixed(2)}`
                   )}
                 </button>
               </div>

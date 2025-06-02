@@ -230,187 +230,299 @@ const Navigation = ()=>{
         return pathname === path;
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
-        className: "bg-white shadow-sm py-3",
+        className: "bg-white shadow-md",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "max-w-6xl mx-auto px-4",
+                className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "flex justify-between items-center",
+                    className: "flex justify-between h-16",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex-shrink-0",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                href: "/",
-                                className: "flex items-center",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    className: "text-xl font-bold text-green-600",
-                                    children: "Volunteer Connect"
-                                }, void 0, false, {
-                                    fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                    lineNumber: 49,
-                                    columnNumber: 15
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                lineNumber: 48,
-                                columnNumber: 13
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                            lineNumber: 47,
-                            columnNumber: 11
-                        }, this),
-                        user && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "hidden md:flex items-center space-x-3",
+                            className: "flex",
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                    href: "/dashboard",
-                                    className: `rounded-full px-4 py-2 text-sm font-medium transition-colors ${isActive('/dashboard') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100 text-gray-700'}`,
-                                    children: "Dashboard"
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex-shrink-0 flex items-center",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                        href: "/",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "text-xl font-bold text-green-600",
+                                            children: "Volunteer Connect"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                            lineNumber: 49,
+                                            columnNumber: 17
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                        lineNumber: 48,
+                                        columnNumber: 15
+                                    }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                    lineNumber: 56,
-                                    columnNumber: 15
+                                    lineNumber: 47,
+                                    columnNumber: 13
                                 }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                    href: "/history",
-                                    className: `rounded-full px-4 py-2 text-sm font-medium transition-colors ${isActive('/history') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100 text-gray-700'}`,
-                                    children: "History"
-                                }, void 0, false, {
+                                user && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "hidden sm:ml-6 sm:flex sm:space-x-4",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                            href: "/dashboard",
+                                            className: `inline-flex items-center px-3 py-2 text-sm font-medium ${isActive('/dashboard') ? 'text-green-600 border-b-2 border-green-500' : 'text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-400'}`,
+                                            children: "Dashboard"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                            lineNumber: 55,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                            href: "/history",
+                                            className: `inline-flex items-center px-3 py-2 text-sm font-medium ${isActive('/history') ? 'text-green-600 border-b-2 border-green-500' : 'text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-400'}`,
+                                            children: "History"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                            lineNumber: 66,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                            href: "/greenhouse",
+                                            className: `inline-flex items-center px-3 py-2 text-sm font-medium ${isActive('/greenhouse') ? 'text-green-600 border-b-2 border-green-500' : 'text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-400'}`,
+                                            children: "Greenhouse"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                            lineNumber: 77,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                            href: "/store",
+                                            className: `inline-flex items-center px-3 py-2 text-sm font-medium ${isActive('/store') ? 'text-green-600 border-b-2 border-green-500' : 'text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-400'}`,
+                                            children: "Store"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                            lineNumber: 88,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                            href: "/profile",
+                                            className: `inline-flex items-center px-3 py-2 text-sm font-medium ${isActive('/profile') ? 'text-green-600 border-b-2 border-green-500' : 'text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-400'}`,
+                                            children: "Profile"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                            lineNumber: 99,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
                                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                    lineNumber: 67,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                    href: "/greenhouse",
-                                    className: `rounded-full px-4 py-2 text-sm font-medium transition-colors ${isActive('/greenhouse') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100 text-gray-700'}`,
-                                    children: "Greenhouse"
-                                }, void 0, false, {
-                                    fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                    lineNumber: 78,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                    href: "/store",
-                                    className: `rounded-full px-4 py-2 text-sm font-medium transition-colors ${isActive('/store') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100 text-gray-700'}`,
-                                    children: "Store"
-                                }, void 0, false, {
-                                    fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                    lineNumber: 89,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                    href: "/profile",
-                                    className: `rounded-full px-4 py-2 text-sm font-medium transition-colors ${isActive('/profile') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100 text-gray-700'}`,
-                                    children: "Profile"
-                                }, void 0, false, {
-                                    fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                    lineNumber: 100,
+                                    lineNumber: 54,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                            lineNumber: 55,
-                            columnNumber: 13
+                            lineNumber: 46,
+                            columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex items-center",
                             children: [
                                 user ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex items-center space-x-4",
+                                    className: "hidden sm:flex items-center",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "bg-green-50 rounded-full px-3 py-1 flex items-center",
+                                            className: "flex items-center",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
                                                     src: "/images/seed-icon.png",
                                                     alt: "Seeds",
-                                                    className: "w-4 h-4 mr-1"
+                                                    className: "w-5 h-5 mr-1"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                                    lineNumber: 119,
+                                                    lineNumber: 117,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "font-medium text-green-700",
+                                                    className: "font-medium text-green-600 mr-4",
                                                     children: profile?.seeds || 0
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                                    lineNumber: 124,
+                                                    lineNumber: 122,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                            lineNumber: 118,
+                                            lineNumber: 116,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "relative",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                    className: "flex items-center",
                                                     onClick: ()=>setIsOpen(!isOpen),
-                                                    className: "flex items-center rounded-full bg-gray-100 p-1 focus:outline-none",
-                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white font-medium",
-                                                        children: profile?.displayName?.charAt(0) || user.email?.charAt(0) || 'U'
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                                        lineNumber: 133,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                }, void 0, false, {
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "w-8 h-8 rounded-full overflow-hidden mr-2 border border-gray-200",
+                                                            children: profile?.photoURL ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                                src: profile.photoURL,
+                                                                alt: profile.displayName || 'Profile',
+                                                                className: "w-full h-full object-cover"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                                lineNumber: 133,
+                                                                columnNumber: 25
+                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: `w-full h-full flex items-center justify-center text-white font-bold text-sm ${profile?.level === 'Sprout' ? 'bg-green-400' : profile?.level === 'Bud' ? 'bg-green-600' : 'bg-green-800'}`,
+                                                                children: profile?.displayName?.charAt(0) || user.email?.charAt(0) || 'U'
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                                lineNumber: 139,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                            lineNumber: 131,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "text-left",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "text-sm font-medium text-gray-700 block",
+                                                                    children: profile?.displayName || user.email
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                                    lineNumber: 149,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                profile?.level && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "text-xs text-gray-500",
+                                                                    children: [
+                                                                        profile.level,
+                                                                        " Level"
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                                    lineNumber: 153,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                            lineNumber: 148,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                            xmlns: "http://www.w3.org/2000/svg",
+                                                            className: "h-4 w-4 ml-1 text-gray-400",
+                                                            fill: "none",
+                                                            viewBox: "0 0 24 24",
+                                                            stroke: "currentColor",
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                                strokeLinecap: "round",
+                                                                strokeLinejoin: "round",
+                                                                strokeWidth: 2,
+                                                                d: "M19 9l-7 7-7-7"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                                lineNumber: 167,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                            lineNumber: 160,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
                                                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                                    lineNumber: 129,
+                                                    lineNumber: 126,
                                                     columnNumber: 19
                                                 }, this),
                                                 isOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10",
+                                                    className: "absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             className: "px-4 py-2 border-b border-gray-100",
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                     className: "text-sm font-medium text-gray-900",
-                                                                    children: profile?.displayName
+                                                                    children: profile?.displayName || user.email
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                                                    lineNumber: 142,
+                                                                    lineNumber: 174,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                    className: "text-xs text-gray-500 truncate",
+                                                                    className: "text-xs text-gray-500",
                                                                     children: user.email
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                                                    lineNumber: 143,
+                                                                    lineNumber: 175,
                                                                     columnNumber: 25
+                                                                }, this),
+                                                                profile?.level && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                    className: "text-xs text-green-600 font-medium",
+                                                                    children: [
+                                                                        profile.level,
+                                                                        " Level"
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                                    lineNumber: 177,
+                                                                    columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                                            lineNumber: 141,
+                                                            lineNumber: 173,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                             href: "/profile",
-                                                            className: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50",
+                                                            className: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100",
                                                             onClick: ()=>setIsOpen(false),
                                                             children: "Your Profile"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                                            lineNumber: 146,
+                                                            lineNumber: 181,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                            href: "/greenhouse",
+                                                            className: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100",
+                                                            onClick: ()=>setIsOpen(false),
+                                                            children: "Greenhouse"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                            lineNumber: 189,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                            href: "/store",
+                                                            className: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100",
+                                                            onClick: ()=>setIsOpen(false),
+                                                            children: "Store"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                            lineNumber: 197,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                             href: "/settings",
-                                                            className: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50",
+                                                            className: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100",
                                                             onClick: ()=>setIsOpen(false),
                                                             children: "Settings"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                                            lineNumber: 154,
+                                                            lineNumber: 205,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "border-t border-gray-100 my-1"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                            lineNumber: 213,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -418,97 +530,120 @@ const Navigation = ()=>{
                                                                 __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["auth"].signOut();
                                                                 setIsOpen(false);
                                                             },
-                                                            className: "block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50",
+                                                            className: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100",
                                                             children: "Sign Out"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                                            lineNumber: 162,
+                                                            lineNumber: 215,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                                    lineNumber: 140,
+                                                    lineNumber: 172,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                            lineNumber: 128,
+                                            lineNumber: 125,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                    lineNumber: 116,
+                                    lineNumber: 115,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex space-x-2",
+                                    className: "hidden sm:flex space-x-4",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                             href: "/auth/sign-in",
-                                            className: "rounded-full px-4 py-2 text-sm font-medium text-green-600 border border-green-600 hover:bg-green-50",
+                                            className: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-green-600 bg-white hover:bg-gray-50",
                                             children: "Sign In"
                                         }, void 0, false, {
                                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                            lineNumber: 177,
+                                            lineNumber: 230,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                             href: "/auth/sign-up",
-                                            className: "rounded-full px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700",
+                                            className: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700",
                                             children: "Sign Up"
                                         }, void 0, false, {
                                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                            lineNumber: 184,
+                                            lineNumber: 237,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                    lineNumber: 176,
+                                    lineNumber: 229,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "md:hidden ml-4",
+                                    className: "flex items-center sm:hidden",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         onClick: ()=>setIsOpen(!isOpen),
-                                        className: "rounded-full p-2 text-gray-500 hover:bg-gray-100",
-                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                            className: "h-6 w-6",
-                                            xmlns: "http://www.w3.org/2000/svg",
-                                            fill: "none",
-                                            viewBox: "0 0 24 24",
-                                            stroke: "currentColor",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                                strokeLinecap: "round",
-                                                strokeLinejoin: "round",
-                                                strokeWidth: 2,
-                                                d: isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"
+                                        className: "inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                className: `h-6 w-6 ${isOpen ? 'hidden' : 'block'}`,
+                                                xmlns: "http://www.w3.org/2000/svg",
+                                                fill: "none",
+                                                viewBox: "0 0 24 24",
+                                                stroke: "currentColor",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                    strokeLinecap: "round",
+                                                    strokeLinejoin: "round",
+                                                    strokeWidth: 2,
+                                                    d: "M4 6h16M4 12h16M4 18h16"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                    lineNumber: 259,
+                                                    columnNumber: 19
+                                                }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                                lineNumber: 206,
-                                                columnNumber: 19
+                                                lineNumber: 252,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                                className: `h-6 w-6 ${isOpen ? 'block' : 'hidden'}`,
+                                                xmlns: "http://www.w3.org/2000/svg",
+                                                fill: "none",
+                                                viewBox: "0 0 24 24",
+                                                stroke: "currentColor",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                                    strokeLinecap: "round",
+                                                    strokeLinejoin: "round",
+                                                    strokeWidth: 2,
+                                                    d: "M6 18L18 6M6 6l12 12"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                    lineNumber: 268,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                lineNumber: 261,
+                                                columnNumber: 17
                                             }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                            lineNumber: 199,
-                                            columnNumber: 17
-                                        }, this)
-                                    }, void 0, false, {
+                                        ]
+                                    }, void 0, true, {
                                         fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                        lineNumber: 195,
+                                        lineNumber: 248,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                    lineNumber: 194,
+                                    lineNumber: 247,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                            lineNumber: 114,
+                            lineNumber: 113,
                             columnNumber: 11
                         }, this)
                     ]
@@ -522,118 +657,212 @@ const Navigation = ()=>{
                 lineNumber: 44,
                 columnNumber: 7
             }, this),
-            isOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "md:hidden mt-3 bg-white border-t border-gray-100",
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: `sm:hidden ${isOpen ? 'block' : 'hidden'}`,
                 children: user ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "px-4 py-3 space-y-1",
+                    className: "pt-2 pb-3 space-y-1",
                     children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "px-3 py-2 border-b border-gray-200",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex items-center",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-200",
+                                        children: profile?.photoURL ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                            src: profile.photoURL,
+                                            alt: profile.displayName || 'Profile',
+                                            className: "w-full h-full object-cover"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                            lineNumber: 285,
+                                            columnNumber: 21
+                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: `w-full h-full flex items-center justify-center text-white font-bold ${profile?.level === 'Sprout' ? 'bg-green-400' : profile?.level === 'Bud' ? 'bg-green-600' : 'bg-green-800'}`,
+                                            children: profile?.displayName?.charAt(0) || user.email?.charAt(0) || 'U'
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                            lineNumber: 291,
+                                            columnNumber: 21
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                        lineNumber: 283,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex-1",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-sm font-medium text-gray-900",
+                                                children: profile?.displayName || user.email
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                lineNumber: 300,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-xs text-gray-500",
+                                                children: user.email
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                lineNumber: 301,
+                                                columnNumber: 19
+                                            }, this),
+                                            profile?.level && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-xs text-green-600 font-medium",
+                                                children: [
+                                                    profile.level,
+                                                    " Level"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                lineNumber: 303,
+                                                columnNumber: 21
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                        lineNumber: 299,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex items-center ml-2",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                src: "/images/seed-icon.png",
+                                                alt: "Seeds",
+                                                className: "w-4 h-4 mr-1"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                lineNumber: 307,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "text-sm font-medium text-green-600",
+                                                children: profile?.seeds || 0
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                                lineNumber: 312,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                        lineNumber: 306,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                                lineNumber: 282,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
+                            lineNumber: 281,
+                            columnNumber: 13
+                        }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "/dashboard",
-                            className: `block rounded-full px-4 py-2 text-sm font-medium ${isActive('/dashboard') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100 text-gray-700'}`,
+                            className: `block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${isActive('/dashboard') ? 'border-green-500 text-green-700 bg-green-50' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'}`,
                             onClick: ()=>setIsOpen(false),
                             children: "Dashboard"
                         }, void 0, false, {
                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                            lineNumber: 224,
-                            columnNumber: 15
+                            lineNumber: 317,
+                            columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "/history",
-                            className: `block rounded-full px-4 py-2 text-sm font-medium ${isActive('/history') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100 text-gray-700'}`,
+                            className: `block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${isActive('/history') ? 'border-green-500 text-green-700 bg-green-50' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'}`,
                             onClick: ()=>setIsOpen(false),
                             children: "History"
                         }, void 0, false, {
                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                            lineNumber: 234,
-                            columnNumber: 15
+                            lineNumber: 329,
+                            columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "/greenhouse",
-                            className: `block rounded-full px-4 py-2 text-sm font-medium ${isActive('/greenhouse') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100 text-gray-700'}`,
+                            className: `block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${isActive('/greenhouse') ? 'border-green-500 text-green-700 bg-green-50' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'}`,
                             onClick: ()=>setIsOpen(false),
                             children: "Greenhouse"
                         }, void 0, false, {
                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                            lineNumber: 244,
-                            columnNumber: 15
+                            lineNumber: 341,
+                            columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "/store",
-                            className: `block rounded-full px-4 py-2 text-sm font-medium ${isActive('/store') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100 text-gray-700'}`,
+                            className: `block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${isActive('/store') ? 'border-green-500 text-green-700 bg-green-50' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'}`,
                             onClick: ()=>setIsOpen(false),
                             children: "Store"
                         }, void 0, false, {
                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                            lineNumber: 254,
-                            columnNumber: 15
+                            lineNumber: 353,
+                            columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "/profile",
-                            className: `block rounded-full px-4 py-2 text-sm font-medium ${isActive('/profile') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100 text-gray-700'}`,
+                            className: `block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${isActive('/profile') ? 'border-green-500 text-green-700 bg-green-50' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'}`,
                             onClick: ()=>setIsOpen(false),
                             children: "Profile"
                         }, void 0, false, {
                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                            lineNumber: 264,
-                            columnNumber: 15
+                            lineNumber: 365,
+                            columnNumber: 13
                         }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "pt-2 mt-2 border-t border-gray-100",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                onClick: ()=>{
-                                    __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["auth"].signOut();
-                                    setIsOpen(false);
-                                },
-                                className: "block w-full text-left rounded-full px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50",
-                                children: "Sign Out"
-                            }, void 0, false, {
-                                fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                                lineNumber: 275,
-                                columnNumber: 17
-                            }, this)
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            onClick: ()=>{
+                                __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["auth"].signOut();
+                                setIsOpen(false);
+                            },
+                            className: "block w-full text-left pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800",
+                            children: "Sign Out"
                         }, void 0, false, {
                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                            lineNumber: 274,
-                            columnNumber: 15
+                            lineNumber: 377,
+                            columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                    lineNumber: 223,
-                    columnNumber: 13
+                    lineNumber: 279,
+                    columnNumber: 11
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "px-4 py-3 flex flex-col space-y-2",
+                    className: "pt-2 pb-3 space-y-1",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "/auth/sign-in",
-                            className: "rounded-full px-4 py-2 text-sm font-medium text-center text-green-600 border border-green-600 hover:bg-green-50",
+                            className: "block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800",
                             onClick: ()=>setIsOpen(false),
                             children: "Sign In"
                         }, void 0, false, {
                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                            lineNumber: 288,
-                            columnNumber: 15
+                            lineNumber: 389,
+                            columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                             href: "/auth/sign-up",
-                            className: "rounded-full px-4 py-2 text-sm font-medium text-center text-white bg-green-600 hover:bg-green-700",
+                            className: "block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800",
                             onClick: ()=>setIsOpen(false),
                             children: "Sign Up"
                         }, void 0, false, {
                             fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                            lineNumber: 296,
-                            columnNumber: 15
+                            lineNumber: 397,
+                            columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                    lineNumber: 287,
-                    columnNumber: 13
+                    lineNumber: 388,
+                    columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/components/layout/EnhancedNavigation.tsx",
-                lineNumber: 221,
-                columnNumber: 9
+                lineNumber: 277,
+                columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
