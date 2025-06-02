@@ -1,4 +1,4 @@
-// app/components/dashboard/Dashboard.tsx
+// app/components/dashboard/Dashboard.tsx - COMPLETE VERSION
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { auth } from '@/app/lib/firebase/config';
 import { getUserProfile, UserProfile } from '@/app/lib/firebase/auth';
 import { getUserTasks, VolunteerTask } from '@/app/lib/firebase/firestore';
-import { assignWeeklyTasks } from '@/app/lib/firebase/tasksService';
+import { checkAndAssignWeeklyTasks } from '@/app/lib/firebase/tasksService';
 import { requestLocationPermission } from '@/app/lib/location/locationService';
 import TasksList from './TasksList';
 import ProgressStats from './ProgressStats';
@@ -18,20 +18,16 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/app/lib/firebase/config';
 
 // Upload image to Firebase Storage
-const uploadImageToStorage = async (file, userId) => {
+const uploadImageToStorage = async (file: File, userId: string) => {
   try {
-    // Create a storage reference
     const storage = getStorage();
     const storageRef = ref(storage, `profileImages/${userId}`);
     
-    // Upload the file
     const snapshot = await uploadBytes(storageRef, file);
     console.log('Image uploaded successfully');
     
-    // Get the download URL
     const downloadURL = await getDownloadURL(snapshot.ref);
     
-    // Update the user's profile with the new image URL
     await updateUserProfile(userId, { photoURL: downloadURL });
     
     return downloadURL;
@@ -42,7 +38,7 @@ const uploadImageToStorage = async (file, userId) => {
 };
 
 // Update user profile in Firestore
-const updateUserProfile = async (userId, updateData) => {
+const updateUserProfile = async (userId: string, updateData: any) => {
   try {
     const userRef = doc(db, 'users', userId);
     await updateDoc(userRef, updateData);
@@ -54,9 +50,8 @@ const updateUserProfile = async (userId, updateData) => {
 };
 
 // Remove profile image
-const removeProfileImage = async (userId) => {
+const removeProfileImage = async (userId: string) => {
   try {
-    // First, delete the image from Storage
     const storage = getStorage();
     const storageRef = ref(storage, `profileImages/${userId}`);
     
@@ -64,11 +59,9 @@ const removeProfileImage = async (userId) => {
       await deleteObject(storageRef);
       console.log('Profile image deleted from storage');
     } catch (storageError) {
-      // The file might not exist, which is fine
       console.log('No existing profile image to delete or error:', storageError);
     }
     
-    // Then update the user profile to remove the photoURL
     await updateUserProfile(userId, { photoURL: null });
     
     return true;
@@ -96,7 +89,6 @@ const Dashboard = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Check if user is authenticated
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         setUser(user);
@@ -107,9 +99,8 @@ const Dashboard = () => {
             setProfile(userProfile);
             setProfileImage(userProfile.photoURL || null);
             
-            // Get user's tasks
-            const userTasks = await getUserTasks(user.uid);
-            setTasks(userTasks);
+            // Check and assign weekly tasks
+            await loadUserTasks(user.uid);
             
             // Check if we need to request location
             if (
@@ -120,7 +111,6 @@ const Dashboard = () => {
               setLocationPromptShown(true);
             }
           } else {
-            // Profile not found, redirect to onboarding
             router.push('/auth/onboarding');
           }
         } catch (err: any) {
@@ -129,7 +119,6 @@ const Dashboard = () => {
           setLoading(false);
         }
       } else {
-        // Not authenticated, redirect to login
         router.push('/auth/sign-in');
       }
     });
@@ -137,8 +126,44 @@ const Dashboard = () => {
     return () => unsubscribe();
   }, [router]);
 
+  // Load user tasks (checks for weekly assignment automatically)
+  const loadUserTasks = async (userId: string) => {
+    try {
+      setAssigningTasks(true);
+      
+      // This function will check if user has tasks for current week
+      // If not, it will automatically assign new ones
+      const userTasks = await checkAndAssignWeeklyTasks(userId);
+      setTasks(userTasks);
+      
+    } catch (err: any) {
+      console.error('Error loading user tasks:', err);
+      setError(`Failed to load tasks: ${err.message}`);
+    } finally {
+      setAssigningTasks(false);
+    }
+  };
+
+  // Handle manual task refresh (for testing or if user wants new tasks)
+  const handleRefreshTasks = async () => {
+    if (!user) return;
+    
+    try {
+      setAssigningTasks(true);
+      setError('');
+      
+      // Force refresh tasks by calling the load function again
+      await loadUserTasks(user.uid);
+      
+    } catch (err: any) {
+      setError(`Failed to refresh tasks: ${err.message}`);
+    } finally {
+      setAssigningTasks(false);
+    }
+  };
+
   // Handle profile image upload
-  const handleImageUpload = async (event) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && user) {
       setIsUploading(true);
@@ -215,28 +240,6 @@ const Dashboard = () => {
       });
     }
   };
-
-  // Assign weekly tasks if user doesn't have any
-  const handleAssignTasks = async () => {
-    if (!user || !profile) return;
-    
-    try {
-      setAssigningTasks(true);
-      const assignedTasks = await assignWeeklyTasks(user.uid);
-      setTasks(assignedTasks);
-    } catch (err: any) {
-      setError(`Failed to assign tasks: ${err.message}`);
-    } finally {
-      setAssigningTasks(false);
-    }
-  };
-
-  useEffect(() => {
-    // Auto-assign tasks if user has none
-    if (user && profile && tasks.length === 0 && !loading && !assigningTasks) {
-      handleAssignTasks();
-    }
-  }, [user, profile, tasks, loading]);
 
   if (loading) {
     return (
@@ -384,14 +387,13 @@ const Dashboard = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Your Weekly Volunteering Tasks</h2>
           
-          {tasks.length === 0 && !assigningTasks && (
-            <button
-              onClick={handleAssignTasks}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 hover:cursor-pointer text-white text-sm font-medium rounded-md"
-            >
-              Get New Tasks
-            </button>
-          )}
+          <button
+            onClick={handleRefreshTasks}
+            disabled={assigningTasks}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 hover:cursor-pointer text-white text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {assigningTasks ? 'Loading...' : 'Refresh Tasks'}
+          </button>
         </div>
         
         {assigningTasks ? (

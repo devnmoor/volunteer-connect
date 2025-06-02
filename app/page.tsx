@@ -6,7 +6,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       <section className="flex-1 flex flex-col items-center justify-center px-4 py-16 bg-gradient-to-b from-green-50 to-white">
-        <div className="max-w-5xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center mt-20">
           <h1 className="text-4xl md:text-6xl font-bold text-green-800 mb-6">
             Volunteer Connect
           </h1>

@@ -1,4 +1,4 @@
-// app/lib/firebase/firestore.ts
+// app/lib/firebase/firestore.ts - Updated VolunteerTask interface
 import { db } from './config';
 import {
   collection,
@@ -15,6 +15,22 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { UserLevel } from './auth';
+
+// Helper function to get current week key for task assignment
+export const getCurrentWeekKey = (): string => {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const pastDaysOfYear = (now.getTime() - startOfYear.getTime()) / 86400000;
+  const weekNumber = Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7);
+  return `${now.getFullYear()}-W${weekNumber}`;
+};
+
+export interface ProgressEntry {
+  timestamp: Date;
+  title: string;
+  description: string;
+  images: string[];
+}
 
 export interface VolunteerTask {
   id: string;
@@ -37,10 +53,15 @@ export interface VolunteerTask {
   createdBy?: string;
   isCustom?: boolean;
   
-  // Add the missing properties that are causing TypeScript errors
+  // Timer and progress tracking properties
   status?: 'open' | 'scheduled' | 'in-progress' | 'paused' | 'completed';
   scheduledTime?: any; // Firestore timestamp
-  timeSpent?: number;
+  startTime?: any; // Firestore timestamp when timer was started
+  timeSpent?: number; // Total time spent in seconds
+  lastProgressUpdate?: any; // Firestore timestamp
+  progressEntries?: ProgressEntry[]; // Array of progress entries
+  
+  // Additional properties
   impact?: string;
   requirements?: string;
   pauseData?: Array<{
@@ -73,7 +94,6 @@ export interface TaskCompletion {
 }
 
 // Create a new volunteer task (for Bloom users)
-// Create a new volunteer task (for Bloom users)
 export const createTask = async (taskData: Omit<VolunteerTask, 'id' | 'createdAt' | 'updatedAt' | 'completedBy'>, userId: string) => {
   try {
     // Define the task data without isAssigned (since it doesn't exist in the interface)
@@ -99,6 +119,7 @@ export const createTask = async (taskData: Omit<VolunteerTask, 'id' | 'createdAt
     throw error;
   }
 };
+
 // Add this to app/lib/firebase/firestore.ts
 export const resetWeeklyTasks = async (userId: string) => {
   try {
@@ -281,7 +302,6 @@ export const completeTask = async (taskId: string, userId: string, completionDat
 };
 
 // Get nearby volunteer opportunities (for Bud and Bloom users)
-// Get nearby volunteer opportunities (for Bud and Bloom users)
 export const getNearbyOpportunities = async (
   latitude: number,
   longitude: number,
@@ -392,6 +412,7 @@ export const getWeeklyTasks = async (userId: string, weeklyCommitment: number) =
     throw error;
   }
 };
+
 // Add this function to app/lib/firebase/firestore.ts
 export const addSeeds = async (userId: string, amount: number) => {
   try {
@@ -416,6 +437,7 @@ export const addSeeds = async (userId: string, amount: number) => {
     throw error;
   }
 };
+
 // Check weekly task completion and award seeds
 export const checkWeeklyCompletion = async (userId: string) => {
   try {

@@ -1,4 +1,4 @@
-// app/lib/tasks/taskGenerator.ts
+// app/lib/tasks/taskGenerator.ts - FIXED VERSION (No undefined values)
 import { UserLevel } from '../firebase/auth';
 import { VolunteerTask } from '../firebase/firestore';
 import { serverTimestamp } from 'firebase/firestore';
@@ -277,7 +277,6 @@ const getRandomTaskTemplate = (category: keyof typeof taskTemplates) => {
 
 // Helper function to generate a variation of a task description
 const generateTaskVariation = (description: string): string => {
-  // Simple variations to make tasks feel more unique
   const introductions = [
     '',
     'We need your help to ',
@@ -299,6 +298,40 @@ const generateTaskVariation = (description: string): string => {
   return `${getRandomElement(introductions)}${description.replace(/\.$/, '')}${getRandomElement(conclusion)}`;
 };
 
+// Helper function to create clean task data (no undefined values)
+const createTaskData = (baseTask: any): any => {
+  // Start with required fields only
+  const cleanTask: any = {
+    title: baseTask.title,
+    description: baseTask.description,
+    category: baseTask.category,
+    estimatedTime: baseTask.estimatedTime,
+    locationType: baseTask.locationType,
+    isAssigned: false,
+    completedBy: [],
+    status: 'open'
+  };
+
+  // Only add optional fields if they have valid values
+  if (baseTask.location && 
+      baseTask.location.address && 
+      baseTask.location.coordinates &&
+      typeof baseTask.location.coordinates.latitude === 'number' &&
+      typeof baseTask.location.coordinates.longitude === 'number') {
+    cleanTask.location = baseTask.location;
+  }
+
+  if (baseTask.impact) {
+    cleanTask.impact = baseTask.impact;
+  }
+
+  if (baseTask.requirements) {
+    cleanTask.requirements = baseTask.requirements;
+  }
+
+  return cleanTask;
+};
+
 // Generate nearby business tasks based on location and business type
 export const generateNearbyBusinessTask = (
   businessName: string,
@@ -306,40 +339,42 @@ export const generateNearbyBusinessTask = (
   location: { latitude: number, longitude: number },
   userLevel: UserLevel
 ): VolunteerTask | null => {
-  // Find matching business type or use default
   const businessTemplate = businessTaskTemplates.find(template =>
     businessType.toLowerCase().includes(template.businessType)
   ) || getRandomElement(businessTaskTemplates);
 
   if (!businessTemplate) return null;
 
-  // Get a random task for this business type
   const taskTemplate = getRandomElement(businessTemplate.tasks);
 
-  // Only include location for Bud and Bloom levels
-  const taskLocation = (userLevel !== UserLevel.Sprout && location)
-    ? {
-      address: businessName,
-      latitude: location.latitude,
-      longitude: location.longitude,
-    }
-    : null; // Use null instead of undefined
-
-  // Create the task with location null check
-  return {
+  const baseTask: any = {
     title: taskTemplate.title.replace('a local', businessName),
     description: generateTaskVariation(taskTemplate.description.replace('a local', businessName)),
-    category: taskTemplate.category as any,
+    category: taskTemplate.category,
     estimatedTime: taskTemplate.estimatedTime,
-    locationType: taskTemplate.locationType as any,
-    // Only include location if it exists
-    ...(taskLocation ? { location: taskLocation } : {}),
-    requiredLevel: userLevel,
+    locationType: taskTemplate.locationType,
     isAssigned: false,
     completedBy: [],
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    status: 'open'
   };
+
+  // Only add location for non-Sprout users with valid coordinates
+  if (userLevel !== UserLevel.Sprout && 
+      location && 
+      typeof location.latitude === 'number' && 
+      typeof location.longitude === 'number' &&
+      !isNaN(location.latitude) && 
+      !isNaN(location.longitude)) {
+    baseTask.location = {
+      address: businessName,
+      coordinates: {
+        latitude: location.latitude,
+        longitude: location.longitude,
+      }
+    };
+  }
+
+  return createTaskData(baseTask) as VolunteerTask;
 };
 
 // Generate a batch of random tasks based on user preferences
@@ -347,12 +382,11 @@ export const generateRandomTasks = (
   count: number,
   userLevel: UserLevel,
   userLocation?: { latitude: number, longitude: number },
-  preferences?: { [key: string]: number } // Lower number = higher preference
+  preferences?: { [key: string]: number }
 ): VolunteerTask[] => {
   const tasks: VolunteerTask[] = [];
   const categories = Object.keys(taskTemplates) as Array<keyof typeof taskTemplates>;
 
-  // Sort categories by preference if provided
   let sortedCategories = [...categories];
   if (preferences) {
     sortedCategories.sort((a, b) =>
@@ -361,59 +395,53 @@ export const generateRandomTasks = (
   }
 
   for (let i = 0; i < count; i++) {
-    // Bias toward preferred categories, but still include some variety
-    const usePreference = Math.random() < 0.7; // 70% chance to use preference
+    const usePreference = Math.random() < 0.7;
     const category = usePreference
       ? sortedCategories[i % sortedCategories.length]
       : getRandomElement(categories);
 
-    // Get a random task template from the selected category
     const template = getRandomTaskTemplate(category);
 
-    // Determine if this should be a location-based task
-    const isLocationBased = template.locationType === 'inPerson' &&
-      userLevel !== 'Bud' &&
+    const baseTask: any = {
+      title: template.title,
+      description: generateTaskVariation(template.description),
+      category: category,
+      estimatedTime: template.estimatedTime,
+      locationType: template.locationType,
+      isAssigned: false,
+      completedBy: [],
+      status: 'open'
+    };
+
+    // Only add location for in-person tasks with valid user location
+    const shouldHaveLocation = template.locationType === 'inPerson' &&
+      userLevel !== 'Sprout' &&
       userLocation &&
+      typeof userLocation.latitude === 'number' &&
+      typeof userLocation.longitude === 'number' &&
+      !isNaN(userLocation.latitude) &&
+      !isNaN(userLocation.longitude) &&
       userLocation.latitude !== 0;
 
-    // Create location data if applicable
-    let location;
-    if (isLocationBased) {
-      // Add some randomness to the location to distribute tasks around the user
-      const radiusKm = 5; // 5km radius
+    if (shouldHaveLocation) {
+      const radiusKm = 5;
       const randomAngle = Math.random() * 2 * Math.PI;
       const randomDistance = Math.random() * radiusKm;
 
-      // Convert distance and angle to lat/lng offset
-      // Rough approximation (1 degree latitude ≈ 111km)
       const latOffset = (randomDistance * Math.cos(randomAngle)) / 111;
       const lngOffset = (randomDistance * Math.sin(randomAngle)) /
-        (111 * Math.cos(userLocation.latitude * Math.PI / 180));
+        (111 * Math.cos(userLocation!.latitude * Math.PI / 180));
 
-      location = {
+      baseTask.location = {
         address: getRandomElement(fallbackLocations).name,
-        latitude: userLocation.latitude + latOffset,
-        longitude: userLocation.longitude + lngOffset,
+        coordinates: {
+          latitude: userLocation!.latitude + latOffset,
+          longitude: userLocation!.longitude + lngOffset,
+        }
       };
     }
 
-    // Create the task
-    // Create the task
-    // Create the task with null check for location
-    tasks.push({
-      title: template.title,
-      description: generateTaskVariation(template.description),
-      category: category as any,
-      estimatedTime: template.estimatedTime,
-      locationType: template.locationType as any,
-      // If location is undefined, remove the field completely
-      ...(location ? { location } : {}),
-      requiredLevel: userLevel,
-      isAssigned: false,
-      completedBy: [],
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
+    tasks.push(createTaskData(baseTask) as VolunteerTask);
   }
 
   return tasks;

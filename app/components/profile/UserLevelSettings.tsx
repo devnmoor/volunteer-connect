@@ -15,7 +15,7 @@ interface UserLevelSettingsProps {
 const UserLevelSettings: React.FC<UserLevelSettingsProps> = ({ profile, userId, onLevelChanged }) => {
   const [selectedLevel, setSelectedLevel] = useState<UserLevel>(profile.level);
   const [showGuardianForm, setShowGuardianForm] = useState(false);
-  const [guardianEmail, setGuardianEmail] = useState('');
+  const [guardianEmail, setGuardianEmail] = useState(profile.guardianEmail || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -25,12 +25,17 @@ const UserLevelSettings: React.FC<UserLevelSettingsProps> = ({ profile, userId, 
     const age = profile.age;
     
     if (age < 16) {
-      return ['Sapling'];
+      return ['Sprout'];
     } else if (age >= 16 && age < 21) {
-      return ['Sapling', 'Sprout', 'Bloom']; // Bloom requires guardian for users under 21
+      return ['Sprout', 'Bud', 'Bloom']; // Bloom requires guardian for users under 21
     } else {
-      return ['Sapling', 'Sprout', 'Bloom'];
+      return ['Sprout', 'Bud', 'Bloom'];
     }
+  };
+
+  // Check if the user is eligible for a specific level
+  const isEligibleForLevel = (level: UserLevel): boolean => {
+    return getEligibleLevels().includes(level);
   };
 
   // Check if the user needs a guardian for the selected level
@@ -41,6 +46,12 @@ const UserLevelSettings: React.FC<UserLevelSettingsProps> = ({ profile, userId, 
   // Handle level change
   const handleLevelChange = async () => {
     if (selectedLevel === profile.level) return;
+    
+    // Check if user is eligible for the selected level
+    if (!isEligibleForLevel(selectedLevel)) {
+      setError(`You are not eligible for the ${selectedLevel} level`);
+      return;
+    }
     
     // Check if guardian is needed but not provided
     if (needsGuardian() && !guardianEmail) {
@@ -53,11 +64,20 @@ const UserLevelSettings: React.FC<UserLevelSettingsProps> = ({ profile, userId, 
       setError('');
       
       // Update user level in Firestore
-      await updateDoc(doc(db, 'users', userId), {
+      const updateData: any = {
         level: selectedLevel,
-        guardianEmail: needsGuardian() ? guardianEmail : null,
         updatedAt: serverTimestamp()
-      });
+      };
+      
+      // Add guardian email if needed
+      if (needsGuardian()) {
+        updateData.guardianEmail = guardianEmail;
+      } else if (updateData.guardianEmail) {
+        // Remove guardian email if not needed
+        updateData.guardianEmail = null;
+      }
+      
+      await updateDoc(doc(db, 'users', userId), updateData);
       
       // Notify parent component
       onLevelChanged(selectedLevel);
@@ -101,46 +121,92 @@ const UserLevelSettings: React.FC<UserLevelSettingsProps> = ({ profile, userId, 
         <h3 className="font-medium mb-2">Current Level: {profile.level}</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {getEligibleLevels().map((level) => (
-            <div 
-              key={level}
-              className={`border rounded-lg p-4 cursor-pointer transition-all ${
-                selectedLevel === level 
-                  ? 'border-green-500 bg-green-50 ring-2 ring-green-200' 
-                  : 'border-gray-200 hover:border-green-300'
-              }`}
-              onClick={() => {
-                setSelectedLevel(level);
-                if (level !== 'Bloom' || profile.age >= 21) {
-                  setShowGuardianForm(false);
-                }
-              }}
-            >
-              <div className="flex items-center mb-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 ${
-                  level === 'Sapling' ? 'bg-green-400' :
-                  level === 'Sprout' ? 'bg-green-600' : 'bg-green-800'
-                } text-white font-bold`}>
-                  {level.charAt(0)}
-                </div>
-                <h4 className="font-medium">{level}</h4>
+          {/* Sprout Level */}
+          <div 
+            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+              selectedLevel === 'Sprout' 
+                ? 'border-green-500 bg-green-50 ring-2 ring-green-200' 
+                : isEligibleForLevel('Sprout') ? 'border-gray-200 hover:border-green-300' : 'border-gray-200 opacity-50 cursor-not-allowed'
+            }`}
+            onClick={() => isEligibleForLevel('Sprout') && setSelectedLevel('Sprout')}
+          >
+            <div className="flex items-center mb-2">
+              <div className="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center mr-2 text-white font-bold">
+                S
               </div>
-              
-              <p className="text-sm text-gray-600">
-                {level === 'Sapling' 
-                  ? 'Beginner level: Participate in assigned tasks.' 
-                  : level === 'Sprout' 
-                    ? 'Intermediate level: Choose tasks and connect locally.' 
-                    : 'Advanced level: Host, create, mentor, and lead opportunities.'}
-              </p>
-              
-              {level === 'Bloom' && profile.age < 21 && (
-                <div className="mt-2 text-xs text-amber-600">
-                  Requires guardian approval for users under 21
-                </div>
-              )}
+              <h4 className="font-medium">Sprout</h4>
             </div>
-          ))}
+            
+            <p className="text-sm text-gray-600">
+              Beginner level: Participate in assigned tasks based on your interests and preferences.
+            </p>
+            
+            <div className="mt-2 text-xs text-green-600">
+              Available to all users
+            </div>
+          </div>
+          
+          {/* Bud Level */}
+          <div 
+            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+              selectedLevel === 'Bud' 
+                ? 'border-green-500 bg-green-50 ring-2 ring-green-200' 
+                : isEligibleForLevel('Bud') ? 'border-gray-200 hover:border-green-300' : 'border-gray-200 opacity-50 cursor-not-allowed'
+            }`}
+            onClick={() => isEligibleForLevel('Bud') && setSelectedLevel('Bud')}
+          >
+            <div className="flex items-center mb-2">
+              <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mr-2 text-white font-bold">
+                B
+              </div>
+              <h4 className="font-medium">Bud</h4>
+            </div>
+            
+            <p className="text-sm text-gray-600">
+              Intermediate level: Choose tasks and connect locally with other volunteers.
+            </p>
+            
+            <div className="mt-2 text-xs text-blue-600">
+              {profile.age < 16 
+                ? 'Available to users 16 and older' 
+                : 'Available to you'}
+            </div>
+          </div>
+          
+          {/* Bloom Level */}
+          <div 
+            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+              selectedLevel === 'Bloom' 
+                ? 'border-green-500 bg-green-50 ring-2 ring-green-200' 
+                : isEligibleForLevel('Bloom') ? 'border-gray-200 hover:border-green-300' : 'border-gray-200 opacity-50 cursor-not-allowed'
+            }`}
+            onClick={() => isEligibleForLevel('Bloom') && setSelectedLevel('Bloom')}
+          >
+            <div className="flex items-center mb-2">
+              <div className="w-8 h-8 bg-green-800 rounded-full flex items-center justify-center mr-2 text-white font-bold">
+                B
+              </div>
+              <h4 className="font-medium">Bloom</h4>
+            </div>
+            
+            <p className="text-sm text-gray-600">
+              Advanced level: Host, create, mentor, and lead volunteer opportunities.
+            </p>
+            
+            {profile.age < 16 ? (
+              <div className="mt-2 text-xs text-red-600">
+                Available to users 16 and older
+              </div>
+            ) : profile.age < 21 ? (
+              <div className="mt-2 text-xs text-amber-600">
+                Requires guardian approval for users under 21
+              </div>
+            ) : (
+              <div className="mt-2 text-xs text-green-600">
+                Available to you
+              </div>
+            )}
+          </div>
         </div>
       </div>
       

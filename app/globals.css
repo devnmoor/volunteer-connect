@@ -27,11 +27,13 @@ body {
 
 /* In your global CSS or in the relevant components */
 .modal-overlay {
-  z-index: 1000 !important; /* Higher than the map */
+  z-index: 1000 !important;
+  /* Higher than the map */
 }
 
 .map-container {
-  z-index: 10; /* Lower than modals */
+  z-index: 10;
+  /* Lower than modals */
 }
 
 /* In your global.css file */
@@ -42,9 +44,11 @@ body {
     transform: translate(0, 0) scale(0.3);
     opacity: 0;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     transform: translate(var(--random-x, 100px), var(--random-y, -100px)) scale(1);
     opacity: 0;
@@ -61,10 +65,12 @@ body {
     transform: scale(0.5);
     opacity: 0.3;
   }
+
   70% {
     transform: scale(1.1);
     opacity: 1;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -82,4 +88,167 @@ body {
 
 .map-container {
   z-index: 10;
+}
+
+/* Add these to app/globals.css */
+
+/* Plant growth and breathing animation */
+@keyframes plant-grow {
+  0% {
+    transform: scale(0.95);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(0.95);
+  }
+}
+
+.plant-animation {
+  animation: plant-grow 10s ease-in-out infinite;
+}
+
+/* Slow pulse animation for plants */
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.3;
+    transform: scale(1.2);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 7s infinite;
+}
+
+/* Wind movement for plants */
+@keyframes plant-sway {
+
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+.plant-sway-animation {
+  animation: plant-sway 8s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* Water droplet animation */
+@keyframes water-drop {
+  0% {
+    transform: translateY(-20px) scale(0);
+    opacity: 0;
+  }
+
+  50% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(20px) scale(0);
+    opacity: 0;
+  }
+}
+
+.water-animation {
+  animation: water-drop 2s ease-in-out;
+}
+
+/* Pollinator animation */
+@keyframes pollinator-float {
+
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+
+  25% {
+    transform: translateY(-10px) translateX(10px);
+  }
+
+  50% {
+    transform: translateY(5px) translateX(-10px);
+  }
+
+  75% {
+    transform: translateY(-5px) translateX(5px);
+  }
+}
+
+.pollinator-animation {
+  animation: pollinator-float 15s ease-in-out infinite;
+}
+
+/* Sparkle animation for special items */
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.sparkle-animation {
+  animation: sparkle 3s ease-in-out infinite;
+}
+
+/* Flying animation for items being moved */
+@keyframes fly-to-position {
+  0% {
+    transform: scale(0.2) translate(var(--start-x), var(--start-y));
+    opacity: 0.3;
+  }
+
+  80% {
+    transform: scale(1.1) translate(0, 0);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 1;
+  }
+}
+
+.fly-to-position {
+  animation: fly-to-position 0.8s ease-out forwards;
+}
+
+/* Growth stages for plants */
+@keyframes growth-stage {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.growth-stage-animation {
+  animation: growth-stage 5s ease-out forwards;
 }

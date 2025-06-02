@@ -127,17 +127,57 @@ const Navigation = () => {
                     className="flex items-center"
                     onClick={() => setIsOpen(!isOpen)}
                   >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 ${
-                      profile?.level === 'Sapling' ? 'bg-green-400' :
-                      profile?.level === 'Sprout' ? 'bg-green-600' : 'bg-green-800'
-                    } text-white font-bold`}>
-                      {profile?.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
+                    {/* Profile Picture */}
+                    <div className="w-8 h-8 rounded-full overflow-hidden mr-2 border border-gray-200">
+                      {profile?.photoURL ? (
+                        <img 
+                          src={profile.photoURL} 
+                          alt={profile.displayName || 'Profile'} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className={`w-full h-full flex items-center justify-center text-white font-bold text-sm ${
+                          profile?.level === 'Sprout' ? 'bg-green-400' :
+                          profile?.level === 'Bud' ? 'bg-green-600' : 'bg-green-800'
+                        }`}>
+                          {profile?.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
+                        </div>
+                      )}
                     </div>
-                    <span className="text-sm font-medium text-gray-700">{profile?.displayName || user.email}</span>
+                    
+                    <div className="text-left">
+                      <span className="text-sm font-medium text-gray-700 block">
+                        {profile?.displayName || user.email}
+                      </span>
+                      {profile?.level && (
+                        <span className="text-xs text-gray-500">
+                          {profile.level} Level
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Dropdown arrow */}
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      className="h-4 w-4 ml-1 text-gray-400" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
                   </button>
                   
                   {isOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                      <div className="px-4 py-2 border-b border-gray-100">
+                        <p className="text-sm font-medium text-gray-900">{profile?.displayName || user.email}</p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
+                        {profile?.level && (
+                          <p className="text-xs text-green-600 font-medium">{profile.level} Level</p>
+                        )}
+                      </div>
+                      
                       <Link
                         href="/profile"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -147,12 +187,30 @@ const Navigation = () => {
                       </Link>
                       
                       <Link
+                        href="/greenhouse"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Greenhouse
+                      </Link>
+                      
+                      <Link
+                        href="/store"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Store
+                      </Link>
+                      
+                      <Link
                         href="/settings"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setIsOpen(false)}
                       >
                         Settings
                       </Link>
+                      
+                      <div className="border-t border-gray-100 my-1"></div>
                       
                       <button
                         onClick={() => {
@@ -219,6 +277,43 @@ const Navigation = () => {
       <div className={`sm:hidden ${isOpen ? 'block' : 'hidden'}`}>
         {user ? (
           <div className="pt-2 pb-3 space-y-1">
+            {/* User info in mobile */}
+            <div className="px-3 py-2 border-b border-gray-200">
+              <div className="flex items-center">
+                <div className="w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-200">
+                  {profile?.photoURL ? (
+                    <img 
+                      src={profile.photoURL} 
+                      alt={profile.displayName || 'Profile'} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className={`w-full h-full flex items-center justify-center text-white font-bold ${
+                      profile?.level === 'Sprout' ? 'bg-green-400' :
+                      profile?.level === 'Bud' ? 'bg-green-600' : 'bg-green-800'
+                    }`}>
+                      {profile?.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">{profile?.displayName || user.email}</p>
+                  <p className="text-xs text-gray-500">{user.email}</p>
+                  {profile?.level && (
+                    <p className="text-xs text-green-600 font-medium">{profile.level} Level</p>
+                  )}
+                </div>
+                <div className="flex items-center ml-2">
+                  <img 
+                    src="/images/seed-icon.png" 
+                    alt="Seeds" 
+                    className="w-4 h-4 mr-1"
+                  />
+                  <span className="text-sm font-medium text-green-600">{profile?.seeds || 0}</span>
+                </div>
+              </div>
+            </div>
+            
             <Link
               href="/dashboard"
               className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
