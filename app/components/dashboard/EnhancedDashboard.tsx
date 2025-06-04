@@ -1,4 +1,4 @@
-// app/components/dashboard/EnhancedDashboard.tsx
+// app/components/dashboard/Dashboard.tsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -16,7 +16,7 @@ import LocationPermission from '../auth/LocationPermission';
 import EnhancedTaskCompletionModal from './EnhancedTaskCompletionModal';
 import CompletionAnimation from './CompletionAnimation';
 
-const EnhancedDashboard = () => {
+const Dashboard = () => {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -39,22 +39,18 @@ const EnhancedDashboard = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Check if user is authenticated
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         setUser(user);
         try {
-          // Get user profile
           const userProfile = await getUserProfile(user.uid);
           if (userProfile) {
             setProfile(userProfile);
             setProfileImage(userProfile.photoURL || null);
             
-            // Get user's tasks
             const userTasks = await getUserTasks(user.uid);
             setTasks(userTasks);
             
-            // Check if we need to request location
             if (
               !locationPromptShown && 
               (userProfile.level === 'Bud' || userProfile.level === 'Bloom') &&
@@ -63,7 +59,6 @@ const EnhancedDashboard = () => {
               setLocationPromptShown(true);
             }
           } else {
-            // Profile not found, redirect to onboarding
             router.push('/auth/onboarding');
           }
         } catch (err: any) {
@@ -72,15 +67,13 @@ const EnhancedDashboard = () => {
           setLoading(false);
         }
       } else {
-        // Not authenticated, redirect to login
         router.push('/auth/sign-in');
       }
     });
 
     return () => unsubscribe();
-  }, [router]);
+  }, [router, locationPromptShown]);
 
-  // Handle location update
   const handleLocationUpdated = (location?: { latitude: number; longitude: number }) => {
     if (profile && location) {
       setProfile({
@@ -90,7 +83,6 @@ const EnhancedDashboard = () => {
     }
   };
 
-  // Assign weekly tasks if user doesn't have any
   const handleAssignTasks = async () => {
     if (!user || !profile) return;
     
@@ -106,39 +98,31 @@ const EnhancedDashboard = () => {
   };
 
   useEffect(() => {
-    // Auto-assign tasks if user has none
     if (user && profile && tasks.length === 0 && !loading && !assigningTasks) {
       handleAssignTasks();
     }
-  }, [user, profile, tasks, loading]);
+  }, [user, profile, tasks, loading, assigningTasks]);
 
-  // Handle complete task action
   const handleCompleteTask = (task: VolunteerTask) => {
     setSelectedTask(task);
     setShowCompletionModal(true);
   };
 
-  // Handle task start
   const handleTaskStart = (taskId: string) => {
     setActiveTaskId(taskId);
   };
   
-  // Handle task pause
   const handleTaskPause = () => {
     setActiveTaskId(null);
   };
 
-  // Handle task completion
   const handleTaskCompleted = () => {
-    // Show completion animation
     setShowCompletionAnimation(true);
     
-    // After animation finishes, close it
     setTimeout(() => {
       setShowCompletionAnimation(false);
       setMysteryRewardReceived(null);
       
-      // Refresh tasks
       if (user) {
         getUserTasks(user.uid).then(updatedTasks => {
           setTasks(updatedTasks);
@@ -212,7 +196,6 @@ const EnhancedDashboard = () => {
                 </div>
               )}
               
-              {/* Hover overlay */}
               {isHovering && !isUploading && (
                 <div 
                   className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex flex-col items-center justify-center cursor-pointer"
@@ -225,7 +208,6 @@ const EnhancedDashboard = () => {
               )}
             </div>
 
-            {/* Level badge */}
             <div className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md">
               <img 
                 src={`/images/${profile.level.toLowerCase()}-badge.png`} 
@@ -235,7 +217,6 @@ const EnhancedDashboard = () => {
             </div>
           </div>
           
-          {/* Error message */}
           {uploadError && (
             <div className="text-red-500 text-xs mt-1 mb-2 text-center">
               {uploadError}
@@ -338,4 +319,4 @@ const EnhancedDashboard = () => {
   );
 };
 
-export default EnhancedDashboard;
+export default Dashboard;
