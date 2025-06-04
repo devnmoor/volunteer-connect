@@ -1,4 +1,4 @@
-// app/components/dashboard/TasksList.tsx - Enhanced Version
+// app/components/dashboard/TasksList.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -18,9 +18,20 @@ import CompletionAnimation from './CompletionAnimation';
 interface TasksListProps {
   tasks: VolunteerTask[];
   userId: string;
+  onTaskClick?: (task: VolunteerTask) => void;
+  activeTaskId?: string | null;
+  onTaskStart?: (taskId: string) => void;
+  onTaskPause?: (taskId: string) => void;
 }
 
-const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
+const TasksList: React.FC<TasksListProps> = ({ 
+  tasks, 
+  userId,
+  onTaskClick,
+  activeTaskId,
+  onTaskStart,
+  onTaskPause
+}) => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('open');
   const [selectedTask, setSelectedTask] = useState<VolunteerTask | null>(null);
@@ -29,7 +40,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
   const [showStartModal, setShowStartModal] = useState(false);
   const [showPauseConfirmation, setShowPauseConfirmation] = useState(false);
   const [showCompletionAnimation, setShowCompletionAnimation] = useState(false);
-  const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+  const [currentActiveTaskId, setCurrentActiveTaskId] = useState<string | null>(activeTaskId || null);
   const [mysteryRewardReceived, setMysteryRewardReceived] = useState<string | null>(null);
   const [pausedTaskData, setPausedTaskData] = useState<{
     taskId: string;
@@ -37,10 +48,9 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
     elapsedAtPause: number;
   } | null>(null);
   
-  // Enhanced state for better UX
   const [taskStartTimes, setTaskStartTimes] = useState<{[taskId: string]: Date}>({});
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [weeklyTarget, setWeeklyTarget] = useState(5); // Could be dynamic based on user level
+  const [weeklyTarget, setWeeklyTarget] = useState(5);
   const [showWeeklyStats, setShowWeeklyStats] = useState(true);
 
   // Update current time every second for live updates
@@ -82,14 +92,14 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
   };
 
   // Get active task details
-  const activeTask = activeTaskId ? tasks.find(t => t.id === activeTaskId) : null;
-  const activeTaskStartTime = activeTaskId ? taskStartTimes[activeTaskId] : null;
+  const activeTask = currentActiveTaskId ? tasks.find(t => t.id === currentActiveTaskId) : null;
+  const activeTaskStartTime = currentActiveTaskId ? taskStartTimes[currentActiveTaskId] : null;
 
   // Calculate live elapsed time for active task
   const getLiveElapsedTime = () => {
     if (!activeTask || !activeTaskStartTime) return 0;
     
-    const baseTime = activeTask.timeSpent || 0; // Previous time spent
+    const baseTime = activeTask.timeSpent || 0;
     const sessionTime = Math.floor((currentTime.getTime() - activeTaskStartTime.getTime()) / 1000);
     return baseTime + sessionTime;
   };
@@ -97,7 +107,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
   // Calculate remaining time for active task
   const getRemainingTime = () => {
     if (!activeTask) return 0;
-    const totalEstimated = (activeTask.estimatedTime || 60) * 60; // Convert to seconds
+    const totalEstimated = (activeTask.estimatedTime || 60) * 60;
     const elapsed = getLiveElapsedTime();
     return Math.max(totalEstimated - elapsed, 0);
   };
@@ -177,8 +187,8 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
       }
       
       // Clear active task if it was the completed one
-      if (activeTaskId === task.id) {
-        setActiveTaskId(null);
+      if (currentActiveTaskId === task.id) {
+        setCurrentActiveTaskId(null);
         setTaskStartTimes(prev => {
           const updated = { ...prev };
           delete updated[task.id!];
@@ -220,6 +230,11 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
     } else {
       setShowStartModal(true);
     }
+    
+    // Call parent component's onTaskClick if provided
+    if (onTaskClick) {
+      onTaskClick(task);
+    }
   };
 
   const closeAllModals = () => {
@@ -240,11 +255,16 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
         updatedAt: serverTimestamp()
       });
       
-      setActiveTaskId(taskId);
+      setCurrentActiveTaskId(taskId);
       setTaskStartTimes(prev => ({
         ...prev,
         [taskId]: new Date()
       }));
+
+      // Call parent component's onTaskStart if provided
+      if (onTaskStart) {
+        onTaskStart(taskId);
+      }
     } catch (error) {
       console.error('Error starting task:', error);
     }
@@ -269,7 +289,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
         updatedAt: serverTimestamp()
       });
       
-      setActiveTaskId(null);
+      setCurrentActiveTaskId(null);
       setTaskStartTimes(prev => {
         const updated = { ...prev };
         delete updated[taskId];
@@ -284,6 +304,11 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
       
       setSelectedTask(task);
       setShowPauseConfirmation(true);
+
+      // Call parent component's onTaskPause if provided
+      if (onTaskPause) {
+        onTaskPause(taskId);
+      }
       
     } catch (error) {
       console.error('Error pausing task:', error);
@@ -305,7 +330,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
           updatedAt: serverTimestamp()
         });
         
-        setActiveTaskId(pausedTaskData.taskId);
+        setCurrentActiveTaskId(pausedTaskData.taskId);
         setTaskStartTimes(prev => ({
           ...prev,
           [pausedTaskData.taskId]: new Date()
@@ -322,7 +347,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
   };
 
   const handleProgressSubmit = () => {
-    setActiveTaskId(null);
+    setCurrentActiveTaskId(null);
     setSelectedTask(null);
     setShowProgressModal(false);
     setPausedTaskData(null);
@@ -419,7 +444,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
         </div>
 
         {/* Enhanced Active Timer Display */}
-        {activeTaskId && activeTask && (
+        {currentActiveTaskId && activeTask && (
           <div className="mt-6 bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-md border-l-4 border-blue-500">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-center space-x-4 mb-4 lg:mb-0">
@@ -476,7 +501,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
                 </div>
                 
                 <button
-                  onClick={() => handleTaskPause(activeTaskId)}
+                  onClick={() => handleTaskPause(currentActiveTaskId)}
                   className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md text-sm font-medium flex items-center"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -490,7 +515,7 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
         )}
 
         {/* Next Scheduled Task */}
-        {!activeTaskId && nextScheduled && (
+        {!currentActiveTaskId && nextScheduled && (
           <div className="mt-4 bg-purple-50 p-3 rounded-lg border border-purple-200">
             <div className="flex items-center justify-between">
               <div>
@@ -610,10 +635,10 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
               isCompleted={task.completedBy?.includes(userId) || task.status === 'completed'}
               onComplete={() => handleTaskCardClick(task)}
               userId={userId}
-              isDisabled={activeTaskId !== null && activeTaskId !== task.id}
+              isDisabled={currentActiveTaskId !== null && currentActiveTaskId !== task.id}
               onTaskStart={handleTaskStart}
               onTaskPause={handleTaskPause}
-              activeTaskId={activeTaskId}
+              activeTaskId={currentActiveTaskId}
             />
           ))}
         </div>

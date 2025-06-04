@@ -1148,10 +1148,6 @@
     max-width: var(--container-xs);
   }
 
-  .min-w-\[80px\] {
-    min-width: 80px;
-  }
-
   .flex-1 {
     flex: 1;
   }
@@ -1730,16 +1726,6 @@
 
   .bg-white {
     background-color: var(--color-white);
-  }
-
-  .bg-white\/20 {
-    background-color: #fff3;
-  }
-
-  @supports (color: color-mix(in lab, red, red)) {
-    .bg-white\/20 {
-      background-color: color-mix(in oklab, var(--color-white) 20%, transparent);
-    }
   }
 
   .bg-white\/50 {

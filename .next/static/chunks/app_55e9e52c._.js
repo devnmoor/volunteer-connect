@@ -1,5 +1,176 @@
 (globalThis.TURBOPACK = globalThis.TURBOPACK || []).push([typeof document === "object" ? document.currentScript : undefined, {
 
+"[project]/app/lib/firebase/config.ts [app-client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
+{
+// app/lib/firebase/config.ts
+__turbopack_context__.s({
+    "auth": (()=>auth),
+    "db": (()=>db),
+    "default": (()=>__TURBOPACK__default__export__),
+    "storage": (()=>storage)
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$app$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/firebase/app/dist/esm/index.esm.js [app-client] (ecmascript) <module evaluation>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$app$2f$dist$2f$esm$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/@firebase/app/dist/esm/index.esm2017.js [app-client] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$auth$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/firebase/auth/dist/esm/index.esm.js [app-client] (ecmascript) <module evaluation>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$esm2017$2f$index$2d$9ae71ce3$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__p__as__getAuth$3e$__ = __turbopack_context__.i("[project]/node_modules/@firebase/auth/dist/esm2017/index-9ae71ce3.js [app-client] (ecmascript) <export p as getAuth>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$firestore$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/firebase/firestore/dist/esm/index.esm.js [app-client] (ecmascript) <module evaluation>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@firebase/firestore/dist/index.esm2017.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$storage$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/firebase/storage/dist/esm/index.esm.js [app-client] (ecmascript) <module evaluation>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$storage$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@firebase/storage/dist/index.esm2017.js [app-client] (ecmascript)");
+;
+;
+;
+;
+const firebaseConfig = {
+    apiKey: "AIzaSyDXsDtXK_yOf8bu9KO7m680-zgbBnK0g4A",
+    authDomain: "volunteer-connect-2d1b4.firebaseapp.com",
+    projectId: "volunteer-connect-2d1b4",
+    storageBucket: "volunteer-connect-2d1b4.firebasestorage.app",
+    messagingSenderId: "560928180195",
+    appId: "1:560928180195:web:1418c7c5348682621582d6",
+    measurementId: "G-MZ9J8536TZ"
+};
+// Initialize Firebase only if it hasn't been initialized yet
+const app = !(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$app$2f$dist$2f$esm$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getApps"])().length ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$app$2f$dist$2f$esm$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["initializeApp"])(firebaseConfig) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$app$2f$dist$2f$esm$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["getApps"])()[0];
+const auth = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$esm2017$2f$index$2d$9ae71ce3$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__p__as__getAuth$3e$__["getAuth"])(app);
+const db = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getFirestore"])(app);
+const storage = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$storage$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getStorage"])(app);
+const __TURBOPACK__default__export__ = app;
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
+"[project]/app/lib/firebase/auth.ts [app-client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
+{
+// app/lib/firebase/auth.ts
+__turbopack_context__.s({
+    "UserLevel": (()=>UserLevel),
+    "addSeeds": (()=>addSeeds),
+    "createUser": (()=>createUser),
+    "createUserProfile": (()=>createUserProfile),
+    "determineUserLevel": (()=>determineUserLevel),
+    "getUserProfile": (()=>getUserProfile),
+    "signIn": (()=>signIn),
+    "signOut": (()=>signOut),
+    "updateUserProfile": (()=>updateUserProfile)
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/lib/firebase/config.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$auth$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/firebase/auth/dist/esm/index.esm.js [app-client] (ecmascript) <module evaluation>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$esm2017$2f$index$2d$9ae71ce3$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__ab__as__createUserWithEmailAndPassword$3e$__ = __turbopack_context__.i("[project]/node_modules/@firebase/auth/dist/esm2017/index-9ae71ce3.js [app-client] (ecmascript) <export ab as createUserWithEmailAndPassword>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$esm2017$2f$index$2d$9ae71ce3$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__ac__as__signInWithEmailAndPassword$3e$__ = __turbopack_context__.i("[project]/node_modules/@firebase/auth/dist/esm2017/index-9ae71ce3.js [app-client] (ecmascript) <export ac as signInWithEmailAndPassword>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$esm2017$2f$index$2d$9ae71ce3$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__D__as__signOut$3e$__ = __turbopack_context__.i("[project]/node_modules/@firebase/auth/dist/esm2017/index-9ae71ce3.js [app-client] (ecmascript) <export D as signOut>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$firestore$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/firebase/firestore/dist/esm/index.esm.js [app-client] (ecmascript) <module evaluation>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@firebase/firestore/dist/index.esm2017.js [app-client] (ecmascript)");
+;
+;
+;
+var UserLevel = /*#__PURE__*/ function(UserLevel) {
+    UserLevel["Sprout"] = "Sprout";
+    UserLevel["Bud"] = "Bud";
+    UserLevel["Bloom"] = "Bloom";
+    return UserLevel;
+}({});
+const createUser = async (email, password)=>{
+    try {
+        const userCredential = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$esm2017$2f$index$2d$9ae71ce3$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__ab__as__createUserWithEmailAndPassword$3e$__["createUserWithEmailAndPassword"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["auth"], email, password);
+        return userCredential.user;
+    } catch (error) {
+        throw error;
+    }
+};
+const signIn = async (email, password)=>{
+    try {
+        const userCredential = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$esm2017$2f$index$2d$9ae71ce3$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__ac__as__signInWithEmailAndPassword$3e$__["signInWithEmailAndPassword"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["auth"], email, password);
+        return userCredential.user;
+    } catch (error) {
+        throw error;
+    }
+};
+const signOut = async ()=>{
+    try {
+        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$esm2017$2f$index$2d$9ae71ce3$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__D__as__signOut$3e$__["signOut"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["auth"]);
+    } catch (error) {
+        throw error;
+    }
+};
+const createUserProfile = async (user, profileData)=>{
+    try {
+        // Create a base user profile
+        const userProfile = {
+            uid: user.uid,
+            email: user.email || '',
+            seeds: 0,
+            completedTasks: 0,
+            createdAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
+            updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
+            ...profileData
+        };
+        // Remove undefined fields (like state if it's not provided)
+        const cleanedProfile = Object.fromEntries(Object.entries(userProfile).filter(([_, value])=>value !== undefined));
+        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["setDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'users', user.uid), cleanedProfile);
+        return userProfile;
+    } catch (error) {
+        throw error;
+    }
+};
+const getUserProfile = async (uid)=>{
+    try {
+        const userDoc = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDoc"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'users', uid));
+        if (userDoc.exists()) {
+            return userDoc.data();
+        }
+        return null;
+    } catch (error) {
+        throw error;
+    }
+};
+const updateUserProfile = async (uid, profileData)=>{
+    try {
+        const userRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'users', uid);
+        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["updateDoc"])(userRef, {
+            ...profileData,
+            updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+const determineUserLevel = (age, hasGuardian = false)=>{
+    if (age < 16) {
+        return "Sprout";
+    } else if (age >= 16 && age < 21) {
+        return hasGuardian ? "Bloom" : "Bud";
+    } else {
+        return "Bloom";
+    }
+};
+const addSeeds = async (uid, seeds)=>{
+    try {
+        const userRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["db"], 'users', uid);
+        const userDoc = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getDoc"])(userRef);
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["updateDoc"])(userRef, {
+                seeds: userData.seeds + seeds,
+                updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
+            });
+            return userData.seeds + seeds;
+        }
+        return null;
+    } catch (error) {
+        throw error;
+    }
+};
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
 "[project]/app/lib/firebase/firestore.ts [app-client] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
 
@@ -6245,7 +6416,7 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 
 var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
 {
-// app/components/dashboard/TasksList.tsx
+// app/components/dashboard/TasksList.tsx - Enhanced Version
 __turbopack_context__.s({
     "default": (()=>__TURBOPACK__default__export__)
 });
@@ -6276,7 +6447,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTaskPause })=>{
+const TasksList = ({ tasks, userId })=>{
     _s();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
     const [activeTab, setActiveTab] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('open');
@@ -6286,12 +6457,13 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
     const [showStartModal, setShowStartModal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [showPauseConfirmation, setShowPauseConfirmation] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [showCompletionAnimation, setShowCompletionAnimation] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const [currentActiveTaskId, setCurrentActiveTaskId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(activeTaskId || null);
+    const [activeTaskId, setActiveTaskId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [mysteryRewardReceived, setMysteryRewardReceived] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [pausedTaskData, setPausedTaskData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    // Enhanced state for better UX
     const [taskStartTimes, setTaskStartTimes] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({});
     const [currentTime, setCurrentTime] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(new Date());
-    const [weeklyTarget, setWeeklyTarget] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(5);
+    const [weeklyTarget, setWeeklyTarget] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(5); // Could be dynamic based on user level
     const [showWeeklyStats, setShowWeeklyStats] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     // Update current time every second for live updates
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
@@ -6320,19 +6492,19 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
         scheduled: scheduledTasksList.length
     };
     // Get active task details
-    const activeTask = currentActiveTaskId ? tasks.find((t)=>t.id === currentActiveTaskId) : null;
-    const activeTaskStartTime = currentActiveTaskId ? taskStartTimes[currentActiveTaskId] : null;
+    const activeTask = activeTaskId ? tasks.find((t)=>t.id === activeTaskId) : null;
+    const activeTaskStartTime = activeTaskId ? taskStartTimes[activeTaskId] : null;
     // Calculate live elapsed time for active task
     const getLiveElapsedTime = ()=>{
         if (!activeTask || !activeTaskStartTime) return 0;
-        const baseTime = activeTask.timeSpent || 0;
+        const baseTime = activeTask.timeSpent || 0; // Previous time spent
         const sessionTime = Math.floor((currentTime.getTime() - activeTaskStartTime.getTime()) / 1000);
         return baseTime + sessionTime;
     };
     // Calculate remaining time for active task
     const getRemainingTime = ()=>{
         if (!activeTask) return 0;
-        const totalEstimated = (activeTask.estimatedTime || 60) * 60;
+        const totalEstimated = (activeTask.estimatedTime || 60) * 60; // Convert to seconds
         const elapsed = getLiveElapsedTime();
         return Math.max(totalEstimated - elapsed, 0);
     };
@@ -6400,8 +6572,8 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                 });
             }
             // Clear active task if it was the completed one
-            if (currentActiveTaskId === task.id) {
-                setCurrentActiveTaskId(null);
+            if (activeTaskId === task.id) {
+                setActiveTaskId(null);
                 setTaskStartTimes((prev)=>{
                     const updated = {
                         ...prev
@@ -6437,10 +6609,6 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
         } else {
             setShowStartModal(true);
         }
-        // Call parent component's onTaskClick if provided
-        if (onTaskClick) {
-            onTaskClick(task);
-        }
     };
     const closeAllModals = ()=>{
         setShowCompletionModal(false);
@@ -6458,15 +6626,11 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                 startTime: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
                 updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
             });
-            setCurrentActiveTaskId(taskId);
+            setActiveTaskId(taskId);
             setTaskStartTimes((prev)=>({
                     ...prev,
                     [taskId]: new Date()
                 }));
-            // Call parent component's onTaskStart if provided
-            if (onTaskStart) {
-                onTaskStart(taskId);
-            }
         } catch (error) {
             console.error('Error starting task:', error);
         }
@@ -6487,7 +6651,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                 lastPauseTime: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
                 updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
             });
-            setCurrentActiveTaskId(null);
+            setActiveTaskId(null);
             setTaskStartTimes((prev)=>{
                 const updated = {
                     ...prev
@@ -6502,10 +6666,6 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
             });
             setSelectedTask(task);
             setShowPauseConfirmation(true);
-            // Call parent component's onTaskPause if provided
-            if (onTaskPause) {
-                onTaskPause(taskId);
-            }
         } catch (error) {
             console.error('Error pausing task:', error);
         }
@@ -6523,7 +6683,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                     startTime: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])(),
                     updatedAt: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$esm2017$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["serverTimestamp"])()
                 });
-                setCurrentActiveTaskId(pausedTaskData.taskId);
+                setActiveTaskId(pausedTaskData.taskId);
                 setTaskStartTimes((prev)=>({
                         ...prev,
                         [pausedTaskData.taskId]: new Date()
@@ -6537,7 +6697,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
         setPausedTaskData(null);
     };
     const handleProgressSubmit = ()=>{
-        setCurrentActiveTaskId(null);
+        setActiveTaskId(null);
         setSelectedTask(null);
         setShowProgressModal(false);
         setPausedTaskData(null);
@@ -6577,7 +6737,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                         children: "Weekly Volunteer Challenge"
                                     }, void 0, false, {
                                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 394,
+                                        lineNumber: 369,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6592,7 +6752,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 397,
+                                        lineNumber: 372,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6609,17 +6769,17 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                         className: "absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                        lineNumber: 414,
+                                                        lineNumber: 389,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                    lineNumber: 405,
+                                                    lineNumber: 380,
                                                     columnNumber: 17
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                lineNumber: 404,
+                                                lineNumber: 379,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6635,7 +6795,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                        lineNumber: 419,
+                                                        lineNumber: 394,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6646,25 +6806,25 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                        lineNumber: 422,
+                                                        lineNumber: 397,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                lineNumber: 418,
+                                                lineNumber: 393,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 403,
+                                        lineNumber: 378,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 393,
+                                lineNumber: 368,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6678,7 +6838,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                 children: "In Progress"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                lineNumber: 432,
+                                                lineNumber: 407,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6686,13 +6846,13 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                 children: weeklyProgress.inProgress
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                lineNumber: 433,
+                                                lineNumber: 408,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 431,
+                                        lineNumber: 406,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6703,7 +6863,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                 children: "Scheduled"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                lineNumber: 436,
+                                                lineNumber: 411,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6711,13 +6871,13 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                 children: weeklyProgress.scheduled
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                lineNumber: 437,
+                                                lineNumber: 412,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 435,
+                                        lineNumber: 410,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6728,7 +6888,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                 children: "Completed"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                lineNumber: 440,
+                                                lineNumber: 415,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6736,28 +6896,28 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                 children: weeklyProgress.completed
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                lineNumber: 441,
+                                                lineNumber: 416,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 439,
+                                        lineNumber: 414,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 430,
+                                lineNumber: 405,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 392,
+                        lineNumber: 367,
                         columnNumber: 9
                     }, this),
-                    currentActiveTaskId && activeTask && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    activeTaskId && activeTask && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mt-6 bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-md border-l-4 border-blue-500",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex flex-col lg:flex-row lg:items-center lg:justify-between",
@@ -6773,12 +6933,12 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                 size: "medium"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                lineNumber: 452,
+                                                lineNumber: 427,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                            lineNumber: 451,
+                                            lineNumber: 426,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6788,7 +6948,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                     children: activeTask.title
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                    lineNumber: 460,
+                                                    lineNumber: 435,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6805,7 +6965,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                            lineNumber: 464,
+                                                            lineNumber: 439,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6816,13 +6976,13 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                            lineNumber: 471,
+                                                            lineNumber: 446,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                    lineNumber: 463,
+                                                    lineNumber: 438,
                                                     columnNumber: 19
                                                 }, this),
                                                 getRemainingTime() > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6836,7 +6996,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                            lineNumber: 478,
+                                                            lineNumber: 453,
                                                             columnNumber: 23
                                                         }, this),
                                                         getEstimatedCompletion() && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6848,13 +7008,13 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                            lineNumber: 482,
+                                                            lineNumber: 457,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                    lineNumber: 477,
+                                                    lineNumber: 452,
                                                     columnNumber: 21
                                                 }, this),
                                                 getRemainingTime() <= 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6866,19 +7026,19 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                    lineNumber: 490,
+                                                    lineNumber: 465,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                            lineNumber: 459,
+                                            lineNumber: 434,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                    lineNumber: 450,
+                                    lineNumber: 425,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6891,7 +7051,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                     className: "w-2 h-2 bg-blue-500 rounded-full animate-pulse mr-2"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                    lineNumber: 499,
+                                                    lineNumber: 474,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6899,17 +7059,17 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                     children: "Timer Active"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                    lineNumber: 500,
+                                                    lineNumber: 475,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                            lineNumber: 498,
+                                            lineNumber: 473,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                            onClick: ()=>handleTaskPause(currentActiveTaskId),
+                                            onClick: ()=>handleTaskPause(activeTaskId),
                                             className: "px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md text-sm font-medium flex items-center",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
@@ -6925,39 +7085,39 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                                         d: "M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                        lineNumber: 508,
+                                                        lineNumber: 483,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                                    lineNumber: 507,
+                                                    lineNumber: 482,
                                                     columnNumber: 19
                                                 }, this),
                                                 "Pause"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                            lineNumber: 503,
+                                            lineNumber: 478,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                    lineNumber: 497,
+                                    lineNumber: 472,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                            lineNumber: 449,
+                            lineNumber: 424,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 448,
+                        lineNumber: 423,
                         columnNumber: 11
                     }, this),
-                    !currentActiveTaskId && nextScheduled && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    !activeTaskId && nextScheduled && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "mt-4 bg-purple-50 p-3 rounded-lg border border-purple-200",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex items-center justify-between",
@@ -6969,7 +7129,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                             children: "Next Scheduled Task"
                                         }, void 0, false, {
                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                            lineNumber: 522,
+                                            lineNumber: 497,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6977,13 +7137,13 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                             children: nextScheduled.task.title
                                         }, void 0, false, {
                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                            lineNumber: 523,
+                                            lineNumber: 498,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                    lineNumber: 521,
+                                    lineNumber: 496,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6997,7 +7157,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                             })
                                         }, void 0, false, {
                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                            lineNumber: 526,
+                                            lineNumber: 501,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7009,30 +7169,30 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                            lineNumber: 532,
+                                            lineNumber: 507,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                    lineNumber: 525,
+                                    lineNumber: 500,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                            lineNumber: 520,
+                            lineNumber: 495,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 519,
+                        lineNumber: 494,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 391,
+                lineNumber: 366,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7051,7 +7211,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 544,
+                                lineNumber: 519,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -7064,7 +7224,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 554,
+                                lineNumber: 529,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -7077,13 +7237,13 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 564,
+                                lineNumber: 539,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 543,
+                        lineNumber: 518,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7094,7 +7254,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                 children: "🎉 Week Complete!"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 578,
+                                lineNumber: 553,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -7114,31 +7274,31 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                             d: "M12 4v16m8-8H4"
                                         }, void 0, false, {
                                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                            lineNumber: 588,
+                                            lineNumber: 563,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 587,
+                                        lineNumber: 562,
                                         columnNumber: 13
                                     }, this),
                                     "Create Task"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 583,
+                                lineNumber: 558,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 576,
+                        lineNumber: 551,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 542,
+                lineNumber: 517,
                 columnNumber: 7
             }, this),
             displayedTasks.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7159,12 +7319,12 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                 d: "M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 601,
+                                lineNumber: 576,
                                 columnNumber: 17
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                            lineNumber: 600,
+                            lineNumber: 575,
                             columnNumber: 15
                         }, this) : activeTab === 'in-progress' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
                             xmlns: "http://www.w3.org/2000/svg",
@@ -7179,12 +7339,12 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                 d: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 605,
+                                lineNumber: 580,
                                 columnNumber: 17
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                            lineNumber: 604,
+                            lineNumber: 579,
                             columnNumber: 15
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
                             xmlns: "http://www.w3.org/2000/svg",
@@ -7199,17 +7359,17 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                                 d: "M5 13l4 4L19 7"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 609,
+                                lineNumber: 584,
                                 columnNumber: 17
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                            lineNumber: 608,
+                            lineNumber: 583,
                             columnNumber: 15
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 598,
+                        lineNumber: 573,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -7217,7 +7377,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                         children: activeTab === 'open' ? "No open tasks available right now." : activeTab === 'in-progress' ? "No tasks currently in progress." : "No completed tasks yet."
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 614,
+                        lineNumber: 589,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -7225,13 +7385,13 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                         children: activeTab === 'open' ? "New tasks are assigned weekly. Check back soon or create a custom task." : activeTab === 'in-progress' ? "Start a task to begin tracking your progress." : "Complete tasks to earn seeds and build your volunteering history."
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 621,
+                        lineNumber: 596,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 597,
+                lineNumber: 572,
                 columnNumber: 9
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
@@ -7240,18 +7400,18 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                         isCompleted: task.completedBy?.includes(userId) || task.status === 'completed',
                         onComplete: ()=>handleTaskCardClick(task),
                         userId: userId,
-                        isDisabled: currentActiveTaskId !== null && currentActiveTaskId !== task.id,
+                        isDisabled: activeTaskId !== null && activeTaskId !== task.id,
                         onTaskStart: handleTaskStart,
                         onTaskPause: handleTaskPause,
-                        activeTaskId: currentActiveTaskId
+                        activeTaskId: activeTaskId
                     }, task.id, false, {
                         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 632,
+                        lineNumber: 607,
                         columnNumber: 13
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 630,
+                lineNumber: 605,
                 columnNumber: 9
             }, this),
             showPauseConfirmation && selectedTask && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$PauseConfirmationModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -7260,7 +7420,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                 onCancel: handlePauseCancel
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 649,
+                lineNumber: 624,
                 columnNumber: 9
             }, this),
             showStartModal && selectedTask && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$TaskStartModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -7270,7 +7430,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                 onScheduled: handleTaskScheduled
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 658,
+                lineNumber: 633,
                 columnNumber: 9
             }, this),
             showCompletionModal && selectedTask && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$TaskCompletionModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -7282,7 +7442,7 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                 onTaskPause: handleTaskPause
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 668,
+                lineNumber: 643,
                 columnNumber: 9
             }, this),
             showProgressModal && selectedTask && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$ProgressRecordingModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -7292,24 +7452,24 @@ const TasksList = ({ tasks, userId, onTaskClick, activeTaskId, onTaskStart, onTa
                 onSubmit: handleProgressSubmit
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 680,
+                lineNumber: 655,
                 columnNumber: 9
             }, this),
             showCompletionAnimation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$CompletionAnimation$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 mysteryReward: mysteryRewardReceived
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 690,
+                lineNumber: 665,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/components/dashboard/TasksList.tsx",
-        lineNumber: 389,
+        lineNumber: 364,
         columnNumber: 5
     }, this);
 };
-_s(TasksList, "a6Ja49ebZ06wtB3RLNPGD1pR6sI=", false, function() {
+_s(TasksList, "rwEUmA1CYTY7fHTlXEMQtZ1X3Uk=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];
@@ -9883,7 +10043,7 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 
 var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
 {
-// app/components/dashboard/Dashboard.tsx
+// app/components/dashboard/EnhancedDashboard.tsx
 __turbopack_context__.s({
     "default": (()=>__TURBOPACK__default__export__)
 });
@@ -9917,7 +10077,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-const Dashboard = ()=>{
+const EnhancedDashboard = ()=>{
     _s();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
     const [user, setUser] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
@@ -9939,22 +10099,27 @@ const Dashboard = ()=>{
     const [uploadError, setUploadError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const fileInputRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "Dashboard.useEffect": ()=>{
+        "EnhancedDashboard.useEffect": ()=>{
+            // Check if user is authenticated
             const unsubscribe = __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["auth"].onAuthStateChanged({
-                "Dashboard.useEffect.unsubscribe": async (user)=>{
+                "EnhancedDashboard.useEffect.unsubscribe": async (user)=>{
                     if (user) {
                         setUser(user);
                         try {
+                            // Get user profile
                             const userProfile = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getUserProfile"])(user.uid);
                             if (userProfile) {
                                 setProfile(userProfile);
                                 setProfileImage(userProfile.photoURL || null);
+                                // Get user's tasks
                                 const userTasks = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$firestore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getUserTasks"])(user.uid);
                                 setTasks(userTasks);
+                                // Check if we need to request location
                                 if (!locationPromptShown && (userProfile.level === 'Bud' || userProfile.level === 'Bloom') && (!userProfile.location || userProfile.location.latitude === 0)) {
                                     setLocationPromptShown(true);
                                 }
                             } else {
+                                // Profile not found, redirect to onboarding
                                 router.push('/auth/onboarding');
                             }
                         } catch (err) {
@@ -9963,18 +10128,19 @@ const Dashboard = ()=>{
                             setLoading(false);
                         }
                     } else {
+                        // Not authenticated, redirect to login
                         router.push('/auth/sign-in');
                     }
                 }
-            }["Dashboard.useEffect.unsubscribe"]);
+            }["EnhancedDashboard.useEffect.unsubscribe"]);
             return ({
-                "Dashboard.useEffect": ()=>unsubscribe()
-            })["Dashboard.useEffect"];
+                "EnhancedDashboard.useEffect": ()=>unsubscribe()
+            })["EnhancedDashboard.useEffect"];
         }
-    }["Dashboard.useEffect"], [
-        router,
-        locationPromptShown
+    }["EnhancedDashboard.useEffect"], [
+        router
     ]);
+    // Handle location update
     const handleLocationUpdated = (location)=>{
         if (profile && location) {
             setProfile({
@@ -9983,6 +10149,7 @@ const Dashboard = ()=>{
             });
         }
     };
+    // Assign weekly tasks if user doesn't have any
     const handleAssignTasks = async ()=>{
         if (!user || !profile) return;
         try {
@@ -9996,33 +10163,40 @@ const Dashboard = ()=>{
         }
     };
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "Dashboard.useEffect": ()=>{
+        "EnhancedDashboard.useEffect": ()=>{
+            // Auto-assign tasks if user has none
             if (user && profile && tasks.length === 0 && !loading && !assigningTasks) {
                 handleAssignTasks();
             }
         }
-    }["Dashboard.useEffect"], [
+    }["EnhancedDashboard.useEffect"], [
         user,
         profile,
         tasks,
-        loading,
-        assigningTasks
+        loading
     ]);
+    // Handle complete task action
     const handleCompleteTask = (task)=>{
         setSelectedTask(task);
         setShowCompletionModal(true);
     };
+    // Handle task start
     const handleTaskStart = (taskId)=>{
         setActiveTaskId(taskId);
     };
+    // Handle task pause
     const handleTaskPause = ()=>{
         setActiveTaskId(null);
     };
+    // Handle task completion
     const handleTaskCompleted = ()=>{
+        // Show completion animation
         setShowCompletionAnimation(true);
+        // After animation finishes, close it
         setTimeout(()=>{
             setShowCompletionAnimation(false);
             setMysteryRewardReceived(null);
+            // Refresh tasks
             if (user) {
                 (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$firestore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getUserTasks"])(user.uid).then((updatedTasks)=>{
                     setTasks(updatedTasks);
@@ -10037,12 +10211,12 @@ const Dashboard = ()=>{
                 className: "animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 137,
+                lineNumber: 153,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-            lineNumber: 136,
+            lineNumber: 152,
             columnNumber: 7
         }, this);
     }
@@ -10059,7 +10233,7 @@ const Dashboard = ()=>{
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 146,
+                        lineNumber: 162,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -10068,18 +10242,18 @@ const Dashboard = ()=>{
                         children: "Return to Sign In"
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 147,
+                        lineNumber: 163,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 145,
+                lineNumber: 161,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-            lineNumber: 144,
+            lineNumber: 160,
             columnNumber: 7
         }, this);
     }
@@ -10097,12 +10271,12 @@ const Dashboard = ()=>{
                     onLocationUpdated: handleLocationUpdated
                 }, void 0, false, {
                     fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                    lineNumber: 167,
+                    lineNumber: 183,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 166,
+                lineNumber: 182,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10125,14 +10299,14 @@ const Dashboard = ()=>{
                                                 className: "w-24 h-24 rounded-full object-cover"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                                lineNumber: 185,
+                                                lineNumber: 201,
                                                 columnNumber: 17
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: `w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white ${profile.level === 'Sprout' ? 'bg-green-400' : profile.level === 'Bud' ? 'bg-green-600' : 'bg-green-800'}`,
                                                 children: profile.displayName.charAt(0)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                                lineNumber: 191,
+                                                lineNumber: 207,
                                                 columnNumber: 17
                                             }, this),
                                             isHovering && !isUploading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10151,7 +10325,7 @@ const Dashboard = ()=>{
                                                             d: "M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                                            lineNumber: 204,
+                                                            lineNumber: 221,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -10161,24 +10335,24 @@ const Dashboard = ()=>{
                                                             d: "M15 13a3 3 0 11-6 0 3 3 0 016 0z"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                                            lineNumber: 205,
+                                                            lineNumber: 222,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                                    lineNumber: 203,
+                                                    lineNumber: 220,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                                lineNumber: 200,
+                                                lineNumber: 217,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                        lineNumber: 179,
+                                        lineNumber: 195,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10189,18 +10363,18 @@ const Dashboard = ()=>{
                                             className: "w-8 h-8"
                                         }, void 0, false, {
                                             fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                            lineNumber: 212,
+                                            lineNumber: 230,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                        lineNumber: 211,
+                                        lineNumber: 229,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 178,
+                                lineNumber: 194,
                                 columnNumber: 11
                             }, this),
                             uploadError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10208,7 +10382,7 @@ const Dashboard = ()=>{
                                 children: uploadError
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 221,
+                                lineNumber: 240,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -10216,7 +10390,7 @@ const Dashboard = ()=>{
                                 children: profile.displayName
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 226,
+                                lineNumber: 245,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -10227,20 +10401,20 @@ const Dashboard = ()=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 227,
+                                lineNumber: 246,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$SeedCounter$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                 seeds: profile.seeds
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 228,
+                                lineNumber: 247,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 177,
+                        lineNumber: 193,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10251,7 +10425,7 @@ const Dashboard = ()=>{
                                 children: "Your Progress"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 233,
+                                lineNumber: 252,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$ProgressStats$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -10260,19 +10434,19 @@ const Dashboard = ()=>{
                                 level: profile.level
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 234,
+                                lineNumber: 253,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 232,
+                        lineNumber: 251,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 175,
+                lineNumber: 191,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10286,7 +10460,7 @@ const Dashboard = ()=>{
                                 children: "Your Weekly Volunteering Tasks"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 245,
+                                lineNumber: 264,
                                 columnNumber: 11
                             }, this),
                             tasks.length === 0 && !assigningTasks && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -10295,13 +10469,13 @@ const Dashboard = ()=>{
                                 children: "Get New Tasks"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 248,
+                                lineNumber: 267,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 244,
+                        lineNumber: 263,
                         columnNumber: 9
                     }, this),
                     assigningTasks ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10311,7 +10485,7 @@ const Dashboard = ()=>{
                                 className: "animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500 mb-4"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 259,
+                                lineNumber: 278,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -10319,13 +10493,13 @@ const Dashboard = ()=>{
                                 children: "Finding the perfect volunteering opportunities for you..."
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 260,
+                                lineNumber: 279,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 258,
+                        lineNumber: 277,
                         columnNumber: 11
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$TasksList$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                         tasks: tasks,
@@ -10336,13 +10510,13 @@ const Dashboard = ()=>{
                         onTaskPause: handleTaskPause
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 263,
+                        lineNumber: 282,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 243,
+                lineNumber: 262,
                 columnNumber: 7
             }, this),
             profile.level !== 'Sprout' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10353,7 +10527,7 @@ const Dashboard = ()=>{
                         children: "Volunteering Opportunities Near You"
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 277,
+                        lineNumber: 296,
                         columnNumber: 11
                     }, this),
                     profile.location && profile.location.latitude !== 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -10364,12 +10538,12 @@ const Dashboard = ()=>{
                             userId: user.uid
                         }, void 0, false, {
                             fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                            lineNumber: 280,
+                            lineNumber: 299,
                             columnNumber: 15
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 279,
+                        lineNumber: 298,
                         columnNumber: 13
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "bg-gray-50 rounded-lg p-6 text-center",
@@ -10379,7 +10553,7 @@ const Dashboard = ()=>{
                                 children: "Enable location services to see volunteering opportunities near you."
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 288,
+                                lineNumber: 307,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -10388,19 +10562,19 @@ const Dashboard = ()=>{
                                 children: "Enable Location"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 289,
+                                lineNumber: 308,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 287,
+                        lineNumber: 306,
                         columnNumber: 13
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 276,
+                lineNumber: 295,
                 columnNumber: 9
             }, this),
             showCompletionModal && selectedTask && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$EnhancedTaskCompletionModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -10412,32 +10586,32 @@ const Dashboard = ()=>{
                 onTaskPause: handleTaskPause
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 302,
+                lineNumber: 321,
                 columnNumber: 9
             }, this),
             showCompletionAnimation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$CompletionAnimation$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 mysteryReward: mysteryRewardReceived
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 314,
+                lineNumber: 333,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-        lineNumber: 163,
+        lineNumber: 179,
         columnNumber: 5
     }, this);
 };
-_s(Dashboard, "RYPAU4j2sFYyuQ5j0S4atOWxnew=", false, function() {
+_s(EnhancedDashboard, "RYPAU4j2sFYyuQ5j0S4atOWxnew=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];
 });
-_c = Dashboard;
-const __TURBOPACK__default__export__ = Dashboard;
+_c = EnhancedDashboard;
+const __TURBOPACK__default__export__ = EnhancedDashboard;
 var _c;
-__turbopack_context__.k.register(_c, "Dashboard");
+__turbopack_context__.k.register(_c, "EnhancedDashboard");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
 }
@@ -10472,4 +10646,4 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 }}),
 }]);
 
-//# sourceMappingURL=app_fc0e9a60._.js.map
+//# sourceMappingURL=app_55e9e52c._.js.map

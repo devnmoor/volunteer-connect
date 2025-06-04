@@ -1,9 +1,5 @@
 {
   "/dashboard/page": "app/dashboard/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/greenhouse/page": "app/greenhouse/page.js",
-  "/history/page": "app/history/page.js",
-  "/page": "app/page.js",
-  "/store/page": "app/store/page.js",
-  "/tasks/create/page": "app/tasks/create/page.js"
+  "/greenhouse/page": "app/greenhouse/page.js"
 }
