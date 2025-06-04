@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
+    {"offset": {"line": 15, "column": 0}, "map": {"version":3,"sources":["file:///Users/noramoor/Downloads/Programming/Applications/Volunteer%20Connect/volunteer-connect/app/dashboard/page.tsx"],"sourcesContent":["// app/dashboard/page.tsx\n'use client';\n\nimport EnhancedDashboard from '@/app/components/dashboard/EnhancedDashboard';\n\nexport default function DashboardPage() {\n  return <EnhancedDashboard />;\n}"],"names":[],"mappings":"AAAA,yBAAyB;;;;;AAGzB;AAFA;;;AAIe,SAAS;IACtB,qBAAO,6LAAC,uJAAA,CAAA,UAAiB;;;;;AAC3B;KAFwB","debugId":null}}]
+}

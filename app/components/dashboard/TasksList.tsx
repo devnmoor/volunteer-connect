@@ -1,4 +1,4 @@
-// app/components/dashboard/TasksList.tsx
+// app/components/dashboard/TasksList.tsx - Enhanced Version
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -29,10 +29,6 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
   const [showStartModal, setShowStartModal] = useState(false);
   const [showPauseConfirmation, setShowPauseConfirmation] = useState(false);
   const [showCompletionAnimation, setShowCompletionAnimation] = useState(false);
-  const [scheduledTasks, setScheduledTasks] = useState<{
-    task: VolunteerTask;
-    scheduledTime: Date;
-  }[]>([]);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
   const [mysteryRewardReceived, setMysteryRewardReceived] = useState<string | null>(null);
   const [pausedTaskData, setPausedTaskData] = useState<{
@@ -40,8 +36,22 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
     pauseTime: Date;
     elapsedAtPause: number;
   } | null>(null);
+  
+  // Enhanced state for better UX
+  const [taskStartTimes, setTaskStartTimes] = useState<{[taskId: string]: Date}>({});
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [weeklyTarget, setWeeklyTarget] = useState(5); // Could be dynamic based on user level
+  const [showWeeklyStats, setShowWeeklyStats] = useState(true);
 
-  // Group tasks by status
+  // Update current time every second for live updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Group tasks by status with enhanced logic
   const openTasks = tasks.filter(task => 
     !task.completedBy?.includes(userId) && 
     (!task.status || task.status === 'open')
@@ -62,21 +72,66 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
     task.status === 'completed'
   );
 
+  // Calculate weekly progress
+  const weeklyProgress = {
+    completed: completedTasks.length,
+    total: tasks.length,
+    percentage: tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0,
+    inProgress: inProgressTasks.length,
+    scheduled: scheduledTasksList.length
+  };
+
+  // Get active task details
+  const activeTask = activeTaskId ? tasks.find(t => t.id === activeTaskId) : null;
+  const activeTaskStartTime = activeTaskId ? taskStartTimes[activeTaskId] : null;
+
+  // Calculate live elapsed time for active task
+  const getLiveElapsedTime = () => {
+    if (!activeTask || !activeTaskStartTime) return 0;
+    
+    const baseTime = activeTask.timeSpent || 0; // Previous time spent
+    const sessionTime = Math.floor((currentTime.getTime() - activeTaskStartTime.getTime()) / 1000);
+    return baseTime + sessionTime;
+  };
+
+  // Calculate remaining time for active task
+  const getRemainingTime = () => {
+    if (!activeTask) return 0;
+    const totalEstimated = (activeTask.estimatedTime || 60) * 60; // Convert to seconds
+    const elapsed = getLiveElapsedTime();
+    return Math.max(totalEstimated - elapsed, 0);
+  };
+
+  // Format time display
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${secs}s`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${secs}s`;
+    } else {
+      return `${secs}s`;
+    }
+  };
+
+  // Get estimated completion time
+  const getEstimatedCompletion = () => {
+    const remaining = getRemainingTime();
+    if (remaining <= 0) return null;
+    
+    const completionTime = new Date(currentTime.getTime() + (remaining * 1000));
+    return completionTime.toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
+
   // Combine open and scheduled tasks for the "Open Tasks" tab
   const allOpenTasks = [...openTasks, ...scheduledTasksList];
-
-  // Effect to update scheduled tasks
-  useEffect(() => {
-    // Find tasks with scheduled times
-    const scheduledTasksData = tasks
-      .filter(task => task.scheduledTime && !task.completedBy?.includes(userId))
-      .map(task => ({
-        task,
-        scheduledTime: task.scheduledTime.toDate ? task.scheduledTime.toDate() : new Date(task.scheduledTime)
-      }));
-    
-    setScheduledTasks(scheduledTasksData);
-  }, [tasks, userId]);
 
   // Handle complete task action
   const handleCompleteTask = async (task: VolunteerTask) => {
@@ -88,21 +143,17 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
       
       const taskRef = doc(db, 'tasks', task.id);
       
-      // Create a basic update object without any undefined values
       const updateData: Record<string, any> = {
         completionDate: serverTimestamp(),
         status: 'completed'
       };
       
-      // Only add completedBy if userId exists
       if (userId) {
         updateData.completedBy = arrayUnion(userId);
       }
       
-      // Update the task in Firestore
       await updateDoc(taskRef, updateData);
       
-      // Add a seed to the user
       const userRef = doc(db, 'users', userId);
       await updateDoc(userRef, {
         seeds: increment(1),
@@ -114,12 +165,10 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
       if (mysteryReward) {
         setMysteryRewardReceived(mysteryReward);
         
-        // Add the mystery seed to user's collection
         await updateDoc(userRef, {
           [`mysterySeeds.${mysteryReward}`]: increment(1)
         });
         
-        // Add a public shoutout
         await addDoc(collection(db, 'shoutouts'), {
           userId: userId,
           seedType: mysteryReward,
@@ -127,10 +176,18 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
         });
       }
       
-      // Show completion animation
+      // Clear active task if it was the completed one
+      if (activeTaskId === task.id) {
+        setActiveTaskId(null);
+        setTaskStartTimes(prev => {
+          const updated = { ...prev };
+          delete updated[task.id!];
+          return updated;
+        });
+      }
+      
       setShowCompletionAnimation(true);
       
-      // After animation finishes, close it
       setTimeout(() => {
         setShowCompletionAnimation(false);
         setMysteryRewardReceived(null);
@@ -141,31 +198,26 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
     }
   };
   
-  // Check for mystery seed based on probabilities
   const checkForMysteryReward = (): string | null => {
-    const random = Math.random() * 100; // Percentage
+    const random = Math.random() * 100;
     
-    if (random <= 0.001) return 'mystery'; // 0.001% chance for X mystery seed
-    if (random <= 0.01) return 'eternity'; // 0.01% chance for Eternity seed
-    if (random <= 0.1) return 'diamond'; // 0.1% chance for Diamond seed
-    if (random <= 5) return 'gold'; // 5% chance for Gold seed
-    if (random <= 10) return 'silver'; // 10% chance for Silver seed
+    if (random <= 0.001) return 'mystery';
+    if (random <= 0.01) return 'eternity';
+    if (random <= 0.1) return 'diamond';
+    if (random <= 5) return 'gold';
+    if (random <= 10) return 'silver';
     
-    return null; // No mystery seed
+    return null;
   };
 
   const handleTaskCardClick = (task: VolunteerTask) => {
     setSelectedTask(task);
     
-    // Determine which modal to show based on task state
     if (task.status === 'in-progress' || task.status === 'paused') {
-      // Show completion modal for in-progress tasks
       setShowCompletionModal(true);
     } else if (task.completedBy?.includes(userId)) {
-      // Show completion modal for completed tasks (view only)
       setShowCompletionModal(true);
     } else {
-      // Show start modal for open/scheduled tasks
       setShowStartModal(true);
     }
   };
@@ -181,7 +233,6 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
   
   const handleTaskStart = async (taskId: string) => {
     try {
-      // Update task status to in-progress and record start time
       const taskRef = doc(db, 'tasks', taskId);
       await updateDoc(taskRef, {
         status: 'in-progress',
@@ -190,6 +241,10 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
       });
       
       setActiveTaskId(taskId);
+      setTaskStartTimes(prev => ({
+        ...prev,
+        [taskId]: new Date()
+      }));
     } catch (error) {
       console.error('Error starting task:', error);
     }
@@ -197,19 +252,15 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
   
   const handleTaskPause = async (taskId: string) => {
     try {
-      // Find the task
       const task = tasks.find(t => t.id === taskId);
       if (!task) return;
       
-      // Calculate elapsed time up to this point
       let currentElapsed = task.timeSpent || 0;
-      if (task.startTime) {
-        const startTime = task.startTime.toDate ? task.startTime.toDate() : new Date(task.startTime);
-        const sessionElapsed = Math.floor((new Date().getTime() - startTime.getTime()) / 1000);
+      if (taskStartTimes[taskId]) {
+        const sessionElapsed = Math.floor((new Date().getTime() - taskStartTimes[taskId].getTime()) / 1000);
         currentElapsed += Math.max(sessionElapsed, 0);
       }
       
-      // Immediately pause the timer in the database
       const taskRef = doc(db, 'tasks', taskId);
       await updateDoc(taskRef, {
         status: 'paused',
@@ -218,17 +269,19 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
         updatedAt: serverTimestamp()
       });
       
-      // Stop the active timer immediately
       setActiveTaskId(null);
+      setTaskStartTimes(prev => {
+        const updated = { ...prev };
+        delete updated[taskId];
+        return updated;
+      });
       
-      // Store pause data for potential resume
       setPausedTaskData({
         taskId,
         pauseTime: new Date(),
         elapsedAtPause: currentElapsed
       });
       
-      // Set selected task and show confirmation modal
       setSelectedTask(task);
       setShowPauseConfirmation(true);
       
@@ -238,61 +291,64 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
   };
 
   const handlePauseConfirm = () => {
-    // User confirmed pause - show progress recording modal
     setShowPauseConfirmation(false);
     setShowProgressModal(true);
   };
 
   const handlePauseCancel = async () => {
-    // User wants to continue - resume the timer
     if (pausedTaskData && selectedTask) {
       try {
         const taskRef = doc(db, 'tasks', pausedTaskData.taskId);
         await updateDoc(taskRef, {
           status: 'in-progress',
-          startTime: serverTimestamp(), // Reset start time for new session
+          startTime: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
         
-        // Resume the active timer
         setActiveTaskId(pausedTaskData.taskId);
+        setTaskStartTimes(prev => ({
+          ...prev,
+          [pausedTaskData.taskId]: new Date()
+        }));
         
       } catch (error) {
         console.error('Error resuming task:', error);
       }
     }
     
-    // Close modals and clear state
     setShowPauseConfirmation(false);
     setSelectedTask(null);
     setPausedTaskData(null);
   };
 
   const handleProgressSubmit = () => {
-    // Clear active task and refresh
     setActiveTaskId(null);
     setSelectedTask(null);
     setShowProgressModal(false);
     setPausedTaskData(null);
-    
-    // The task status will be updated to 'paused' by the modal
-    // and will appear in the in-progress section
   };
 
   const handleTaskScheduled = () => {
-    // Task has been scheduled, refresh the UI
     setSelectedTask(null);
     setShowStartModal(false);
   };
 
-  // Get current time to check for scheduled tasks that should start
-  const now = new Date();
-  const tasksStartingSoon = scheduledTasks.filter(
-    scheduled => {
-      const timeDiff = scheduled.scheduledTime.getTime() - now.getTime();
-      return timeDiff <= 15 * 60 * 1000 && timeDiff > 0; // 15 minutes or less
-    }
-  );
+  // Calculate time until next scheduled task
+  const getNextScheduledTask = () => {
+    const now = new Date();
+    const scheduledWithTimes = scheduledTasksList
+      .filter(task => task.scheduledTime)
+      .map(task => ({
+        task,
+        scheduledTime: task.scheduledTime.toDate ? task.scheduledTime.toDate() : new Date(task.scheduledTime)
+      }))
+      .filter(({ scheduledTime }) => scheduledTime > now)
+      .sort((a, b) => a.scheduledTime.getTime() - b.scheduledTime.getTime());
+
+    return scheduledWithTimes[0] || null;
+  };
+
+  const nextScheduled = getNextScheduledTask();
 
   // Determine which tasks to display based on active tab
   const displayedTasks = 
@@ -300,145 +356,253 @@ const TasksList: React.FC<TasksListProps> = ({ tasks, userId }) => {
     activeTab === 'in-progress' ? inProgressTasks :
     completedTasks;
 
-  // Create custom task function
   const handleCreateCustomTask = () => {
     router.push('/tasks/create');
   };
 
   return (
     <div>
-      {/* Weekly Reward Banner */}
-      <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 mb-6 shadow-sm border border-green-100">
-        <h3 className="text-lg font-medium text-green-800 mb-2">Weekly Reward: Complete all tasks to earn 5 seeds!</h3>
-        <div className="flex items-center">
-          <div className="h-3 flex-grow bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-green-500 rounded-full" 
-              style={{ width: `${(completedTasks.length / tasks.length) * 100}%` }}
-            ></div>
+      {/* Enhanced Weekly Reward Banner */}
+      <div className="bg-gradient-to-r from-green-50 via-blue-50 to-purple-50 rounded-lg p-6 mb-6 shadow-sm border border-green-100">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+          <div className="mb-4 lg:mb-0">
+            <h3 className="text-xl font-bold text-green-800 mb-2">
+              Weekly Volunteer Challenge
+            </h3>
+            <p className="text-green-700 mb-3">
+              Complete all {weeklyProgress.total} tasks to earn {weeklyTarget} seeds! 
+              {weeklyProgress.percentage === 100 && " 🎉 Congratulations!"}
+            </p>
+            
+            {/* Enhanced Progress Bar */}
+            <div className="relative">
+              <div className="h-4 flex-grow bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full transition-all duration-500 ease-out ${
+                    weeklyProgress.percentage === 100 
+                      ? 'bg-gradient-to-r from-green-400 to-green-600' 
+                      : 'bg-gradient-to-r from-green-400 to-green-500'
+                  }`}
+                  style={{ width: `${weeklyProgress.percentage}%` }}
+                >
+                  {weeklyProgress.percentage === 100 && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-sm font-semibold text-gray-700">
+                  {weeklyProgress.completed}/{weeklyProgress.total} tasks
+                </span>
+                <span className="text-sm font-medium text-green-600">
+                  {weeklyProgress.percentage}% complete
+                </span>
+              </div>
+            </div>
           </div>
-          <span className="ml-3 text-sm font-medium text-gray-700">
-            {completedTasks.length}/{tasks.length} tasks
-          </span>
+
+          {/* Weekly Stats */}
+          <div className="flex flex-wrap gap-3">
+            <div className="bg-white px-3 py-2 rounded-full shadow-sm border">
+              <span className="text-xs text-gray-600">In Progress</span>
+              <span className="ml-1 font-bold text-blue-600">{weeklyProgress.inProgress}</span>
+            </div>
+            <div className="bg-white px-3 py-2 rounded-full shadow-sm border">
+              <span className="text-xs text-gray-600">Scheduled</span>
+              <span className="ml-1 font-bold text-purple-600">{weeklyProgress.scheduled}</span>
+            </div>
+            <div className="bg-white px-3 py-2 rounded-full shadow-sm border">
+              <span className="text-xs text-gray-600">Completed</span>
+              <span className="ml-1 font-bold text-green-600">{weeklyProgress.completed}</span>
+            </div>
+          </div>
         </div>
-        
-        {/* Active Timer (if any) */}
-        {activeTaskId && (
-          <div className="mt-4 bg-white p-3 rounded-md shadow-sm border border-green-200 flex items-center">
-            <div className="mr-3">
-              <TaskTimeDisplay 
-                task={tasks.find(t => t.id === activeTaskId)!}
-                isActive={true}
-                size="small"
-              />
+
+        {/* Enhanced Active Timer Display */}
+        {activeTaskId && activeTask && (
+          <div className="mt-6 bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-md border-l-4 border-blue-500">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-center space-x-4 mb-4 lg:mb-0">
+                <div className="relative">
+                  <TaskTimeDisplay 
+                    task={activeTask}
+                    isActive={true}
+                    size="medium"
+                  />
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-1">
+                    {activeTask.title}
+                  </h4>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <span>
+                      Started: {activeTaskStartTime?.toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                    </span>
+                    <span className="font-mono font-semibold text-blue-600">
+                      Live: {formatTime(getLiveElapsedTime())}
+                    </span>
+                  </div>
+                  
+                  {getRemainingTime() > 0 && (
+                    <div className="mt-1 text-sm">
+                      <span className="text-orange-600 font-medium">
+                        {formatTime(getRemainingTime())} remaining
+                      </span>
+                      {getEstimatedCompletion() && (
+                        <span className="text-gray-500 ml-2">
+                          (Est. done: {getEstimatedCompletion()})
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {getRemainingTime() <= 0 && (
+                    <div className="mt-1 text-sm text-red-600 font-medium animate-pulse">
+                      ⚠️ Task is {formatTime(Math.abs(getRemainingTime()))} overtime
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center bg-blue-100 px-3 py-1 rounded-full">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse mr-2"></div>
+                  <span className="text-xs font-medium text-blue-800">Timer Active</span>
+                </div>
+                
+                <button
+                  onClick={() => handleTaskPause(activeTaskId)}
+                  className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md text-sm font-medium flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Pause
+                </button>
+              </div>
             </div>
-            <div className="flex-grow">
-              <p className="text-sm font-medium text-gray-700">
-                {tasks.find(t => t.id === activeTaskId)?.title} in progress
-              </p>
-              <p className="text-xs text-gray-500">
-                Timer started at {new Date().toLocaleTimeString()}
-              </p>
-            </div>
-            <div className="text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full text-xs font-medium">
-              Active Timer
+          </div>
+        )}
+
+        {/* Next Scheduled Task */}
+        {!activeTaskId && nextScheduled && (
+          <div className="mt-4 bg-purple-50 p-3 rounded-lg border border-purple-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h5 className="font-medium text-purple-800">Next Scheduled Task</h5>
+                <p className="text-sm text-purple-700">{nextScheduled.task.title}</p>
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-medium text-purple-800">
+                  {nextScheduled.scheduledTime.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </div>
+                <div className="text-xs text-purple-600">
+                  in {Math.ceil((nextScheduled.scheduledTime.getTime() - currentTime.getTime()) / 60000)} min
+                </div>
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Task Actions Bar */}
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex">
+      {/* Enhanced Task Actions Bar */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+        <div className="flex flex-wrap gap-1">
           <button
             onClick={() => setActiveTab('open')}
-            className={`px-4 py-2 text-sm font-medium ${
+            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
               activeTab === 'open'
-                ? 'text-green-700 border-b-2 border-green-500'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-green-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
             Open Tasks ({allOpenTasks.length})
           </button>
           <button
             onClick={() => setActiveTab('in-progress')}
-            className={`px-4 py-2 text-sm font-medium ${
+            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
               activeTab === 'in-progress'
-                ? 'text-blue-700 border-b-2 border-blue-500'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            In-Progress Tasks ({inProgressTasks.length})
+            In-Progress ({inProgressTasks.length})
           </button>
           <button
             onClick={() => setActiveTab('completed')}
-            className={`px-4 py-2 text-sm font-medium ${
+            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
               activeTab === 'completed'
-                ? 'text-gray-700 border-b-2 border-gray-500'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-gray-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            Completed Tasks ({completedTasks.length})
+            Completed ({completedTasks.length})
           </button>
         </div>
         
-        <button
-          onClick={handleCreateCustomTask}
-          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium flex items-center"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add Custom Task
-        </button>
-      </div>
-
-      {/* Scheduled Task Reminders */}
-      {tasksStartingSoon.length > 0 && (
-        <div className="fixed top-4 right-4 z-50">
-          {tasksStartingSoon.map((scheduled, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-lg p-3 mb-2 flex items-center">
-              <div className="bg-purple-100 rounded-full p-2 mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-medium">{scheduled.task.title}</p>
-                <p className="text-xs text-gray-500">
-                  {`Starts in ${Math.ceil((scheduled.scheduledTime.getTime() - now.getTime()) / 60000)} minutes`}
-                </p>
-              </div>
-              <button className="ml-3 text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+        <div className="flex items-center space-x-2">
+          {weeklyProgress.percentage === 100 && (
+            <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
+              🎉 Week Complete!
             </div>
-          ))}
+          )}
+          
+          <button
+            onClick={handleCreateCustomTask}
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium flex items-center shadow-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Create Task
+          </button>
         </div>
-      )}
+      </div>
 
       {/* Tasks Display */}
       {displayedTasks.length === 0 ? (
-        <div className="bg-gray-50 rounded-lg p-6 text-center">
-          <p className="text-gray-600">
+        <div className="bg-gray-50 rounded-lg p-8 text-center">
+          <div className="mb-4">
+            {activeTab === 'open' ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            ) : activeTab === 'in-progress' ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+          
+          <p className="text-gray-600 mb-2">
             {activeTab === 'open' 
-              ? "You don't have any open tasks." 
+              ? "No open tasks available right now." 
               : activeTab === 'in-progress' 
-                ? "You don't have any tasks in progress." 
-                : "You haven't completed any tasks yet."}
+                ? "No tasks currently in progress." 
+                : "No completed tasks yet."}
           </p>
-          <p className="text-gray-500 text-sm mt-2">
+          <p className="text-gray-500 text-sm">
             {activeTab === 'open' 
-              ? "Check back soon or create a custom task." 
+              ? "New tasks are assigned weekly. Check back soon or create a custom task." 
               : activeTab === 'in-progress' 
-                ? "Start a task to track your progress." 
-                : "Complete tasks to earn seeds and rewards."}
+                ? "Start a task to begin tracking your progress." 
+                : "Complete tasks to earn seeds and build your volunteering history."}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayedTasks.map((task) => (
             <TaskCard
               key={task.id}
