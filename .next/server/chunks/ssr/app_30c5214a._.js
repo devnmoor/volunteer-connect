@@ -1269,577 +1269,10 @@ const forceResetUserTasks = async (userId)=>{
     }
 };
 }}),
-"[project]/app/components/dashboard/TasksList.tsx [app-ssr] (ecmascript)": ((__turbopack_context__) => {
-"use strict";
+"[project]/app/components/dashboard/TasksList.tsx [app-ssr] (ecmascript)": (function(__turbopack_context__) {
 
-var { g: global, __dirname } = __turbopack_context__;
+var { g: global, __dirname, m: module, e: exports } = __turbopack_context__;
 {
-__turbopack_context__.s({
-    "default": (()=>__TURBOPACK__default__export__)
-});
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
-;
-const TasksList = ({ tasks, userId })=>{
-    const router = useRouter();
-    const [activeTab, setActiveTab] = useState('open');
-    const [selectedTask, setSelectedTask] = useState(null);
-    const [showCompletionModal, setShowCompletionModal] = useState(false);
-    const [showProgressModal, setShowProgressModal] = useState(false);
-    const [showStartModal, setShowStartModal] = useState(false);
-    const [showCompletionAnimation, setShowCompletionAnimation] = useState(false);
-    const [scheduledTasks, setScheduledTasks] = useState([]);
-    const [activeTaskId, setActiveTaskId] = useState(null);
-    const [mysteryRewardReceived, setMysteryRewardReceived] = useState(null);
-    // Group tasks by status
-    const openTasks = tasks.filter((task)=>!task.completedBy?.includes(userId) && (!task.status || task.status === 'open'));
-    const scheduledTasksList = tasks.filter((task)=>!task.completedBy?.includes(userId) && task.status === 'scheduled');
-    const inProgressTasks = tasks.filter((task)=>!task.completedBy?.includes(userId) && (task.status === 'in-progress' || task.status === 'paused'));
-    const completedTasks = tasks.filter((task)=>task.completedBy?.includes(userId) || task.status === 'completed');
-    // Combine open and scheduled tasks for the "Open Tasks" tab
-    const allOpenTasks = [
-        ...openTasks,
-        ...scheduledTasksList
-    ];
-    // Effect to update scheduled tasks
-    useEffect(()=>{
-        // Find tasks with scheduled times
-        const scheduledTasksData = tasks.filter((task)=>task.scheduledTime && !task.completedBy?.includes(userId)).map((task)=>({
-                task,
-                scheduledTime: task.scheduledTime.toDate ? task.scheduledTime.toDate() : new Date(task.scheduledTime)
-            }));
-        setScheduledTasks(scheduledTasksData);
-    }, [
-        tasks,
-        userId
-    ]);
-    // Handle complete task action
-    const handleCompleteTask = async (task)=>{
-        try {
-            if (!task || !task.id) {
-                console.error('Invalid task or missing task ID');
-                return;
-            }
-            const taskRef = doc(db, 'tasks', task.id);
-            // Create a basic update object without any undefined values
-            const updateData = {
-                completionDate: serverTimestamp(),
-                status: 'completed'
-            };
-            // Only add completedBy if userId exists
-            if (userId) {
-                updateData.completedBy = arrayUnion(userId);
-            }
-            // Update the task in Firestore
-            await updateDoc(taskRef, updateData);
-            // Add a seed to the user
-            const userRef = doc(db, 'users', userId);
-            await updateDoc(userRef, {
-                seeds: increment(1),
-                completedTasks: increment(1)
-            });
-            // Check for mystery seed
-            const mysteryReward = checkForMysteryReward();
-            if (mysteryReward) {
-                setMysteryRewardReceived(mysteryReward);
-                // Add the mystery seed to user's collection
-                await updateDoc(userRef, {
-                    [`mysterySeeds.${mysteryReward}`]: increment(1)
-                });
-                // Add a public shoutout
-                await addDoc(collection(db, 'shoutouts'), {
-                    userId: userId,
-                    seedType: mysteryReward,
-                    timestamp: serverTimestamp()
-                });
-            }
-            // Show completion animation
-            setShowCompletionAnimation(true);
-            // After animation finishes, close it
-            setTimeout(()=>{
-                setShowCompletionAnimation(false);
-                setMysteryRewardReceived(null);
-            }, 5000);
-        } catch (error) {
-            console.error('Error completing task:', error);
-        }
-    };
-    // Check for mystery seed based on probabilities
-    const checkForMysteryReward = ()=>{
-        const random = Math.random() * 100; // Percentage
-        if (random <= 0.001) return 'mystery'; // 0.001% chance for X mystery seed
-        if (random <= 0.01) return 'eternity'; // 0.01% chance for Eternity seed
-        if (random <= 0.1) return 'diamond'; // 0.1% chance for Diamond seed
-        if (random <= 5) return 'gold'; // 5% chance for Gold seed
-        if (random <= 10) return 'silver'; // 10% chance for Silver seed
-        return null; // No mystery seed
-    };
-    const handleTaskCardClick = (task)=>{
-        setSelectedTask(task);
-        // Determine which modal to show based on task state
-        if (task.status === 'in-progress' || task.status === 'paused') {
-            // Show completion modal for in-progress tasks
-            setShowCompletionModal(true);
-        } else if (task.completedBy?.includes(userId)) {
-            // Show completion modal for completed tasks (view only)
-            setShowCompletionModal(true);
-        } else {
-            // Show start modal for open/scheduled tasks
-            setShowStartModal(true);
-        }
-    };
-    const closeAllModals = ()=>{
-        setShowCompletionModal(false);
-        setShowProgressModal(false);
-        setShowStartModal(false);
-        setSelectedTask(null);
-    };
-    const handleTaskStart = async (taskId)=>{
-        try {
-            // Update task status to in-progress and record start time
-            const taskRef = doc(db, 'tasks', taskId);
-            await updateDoc(taskRef, {
-                status: 'in-progress',
-                startTime: serverTimestamp(),
-                updatedAt: serverTimestamp()
-            });
-            setActiveTaskId(taskId);
-        } catch (error) {
-            console.error('Error starting task:', error);
-        }
-    };
-    const handleTaskPause = (taskId)=>{
-        // Find the task and show progress recording modal
-        const task = tasks.find((t)=>t.id === taskId);
-        if (task) {
-            setSelectedTask(task);
-            setShowProgressModal(true);
-        }
-    };
-    const handleProgressSubmit = ()=>{
-        // Clear active task and refresh
-        setActiveTaskId(null);
-        setSelectedTask(null);
-        setShowProgressModal(false);
-    // The task status will be updated to 'paused' by the modal
-    // and will appear in the in-progress section
-    };
-    const handleTaskScheduled = ()=>{
-        // Task has been scheduled, refresh the UI
-        setSelectedTask(null);
-        setShowStartModal(false);
-    };
-    // Get current time to check for scheduled tasks that should start
-    const now = new Date();
-    const tasksStartingSoon = scheduledTasks.filter((scheduled)=>{
-        const timeDiff = scheduled.scheduledTime.getTime() - now.getTime();
-        return timeDiff <= 15 * 60 * 1000 && timeDiff > 0; // 15 minutes or less
-    });
-    // Determine which tasks to display based on active tab
-    const displayedTasks = activeTab === 'open' ? allOpenTasks : activeTab === 'in-progress' ? inProgressTasks : completedTasks;
-    // Create custom task function
-    const handleCreateCustomTask = ()=>{
-        router.push('/tasks/create');
-    };
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        children: [
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 mb-6 shadow-sm border border-green-100",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                        className: "text-lg font-medium text-green-800 mb-2",
-                        children: "Weekly Reward: Complete all tasks to earn 5 seeds!"
-                    }, void 0, false, {
-                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 222,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex items-center",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "h-3 flex-grow bg-gray-200 rounded-full overflow-hidden",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "h-full bg-green-500 rounded-full",
-                                    style: {
-                                        width: `${completedTasks.length / tasks.length * 100}%`
-                                    }
-                                }, void 0, false, {
-                                    fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                    lineNumber: 225,
-                                    columnNumber: 13
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 224,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "ml-3 text-sm font-medium text-gray-700",
-                                children: [
-                                    completedTasks.length,
-                                    "/",
-                                    tasks.length,
-                                    " tasks"
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 230,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 223,
-                        columnNumber: 9
-                    }, this),
-                    activeTaskId && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "mt-4 bg-white p-3 rounded-md shadow-sm border border-green-200 flex items-center",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "mr-3",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(TaskTimeDisplay, {
-                                    task: tasks.find((t)=>t.id === activeTaskId),
-                                    isActive: true,
-                                    size: "small"
-                                }, void 0, false, {
-                                    fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                    lineNumber: 239,
-                                    columnNumber: 15
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 238,
-                                columnNumber: 13
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "flex-grow",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "text-sm font-medium text-gray-700",
-                                        children: [
-                                            tasks.find((t)=>t.id === activeTaskId)?.title,
-                                            " in progress"
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 246,
-                                        columnNumber: 15
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "text-xs text-gray-500",
-                                        children: [
-                                            "Timer started at ",
-                                            new Date().toLocaleTimeString()
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 249,
-                                        columnNumber: 15
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 245,
-                                columnNumber: 13
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full text-xs font-medium",
-                                children: "Active Timer"
-                            }, void 0, false, {
-                                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 253,
-                                columnNumber: 13
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 237,
-                        columnNumber: 11
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 221,
-                columnNumber: 7
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "flex justify-between items-center mb-4",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                onClick: ()=>setActiveTab('open'),
-                                className: `px-4 py-2 text-sm font-medium ${activeTab === 'open' ? 'text-green-700 border-b-2 border-green-500' : 'text-gray-500 hover:text-gray-700'}`,
-                                children: [
-                                    "Open Tasks (",
-                                    allOpenTasks.length,
-                                    ")"
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 263,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                onClick: ()=>setActiveTab('in-progress'),
-                                className: `px-4 py-2 text-sm font-medium ${activeTab === 'in-progress' ? 'text-blue-700 border-b-2 border-blue-500' : 'text-gray-500 hover:text-gray-700'}`,
-                                children: [
-                                    "In-Progress Tasks (",
-                                    inProgressTasks.length,
-                                    ")"
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 273,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                onClick: ()=>setActiveTab('completed'),
-                                className: `px-4 py-2 text-sm font-medium ${activeTab === 'completed' ? 'text-gray-700 border-b-2 border-gray-500' : 'text-gray-500 hover:text-gray-700'}`,
-                                children: [
-                                    "Completed Tasks (",
-                                    completedTasks.length,
-                                    ")"
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 283,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 262,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                        onClick: handleCreateCustomTask,
-                        className: "px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium flex items-center",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                className: "h-4 w-4 mr-2",
-                                fill: "none",
-                                viewBox: "0 0 24 24",
-                                stroke: "currentColor",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                    strokeLinecap: "round",
-                                    strokeLinejoin: "round",
-                                    strokeWidth: 2,
-                                    d: "M12 4v16m8-8H4"
-                                }, void 0, false, {
-                                    fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                    lineNumber: 300,
-                                    columnNumber: 13
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 299,
-                                columnNumber: 11
-                            }, this),
-                            "Add Custom Task"
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 295,
-                        columnNumber: 9
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 261,
-                columnNumber: 7
-            }, this),
-            tasksStartingSoon.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "fixed top-4 right-4 z-50",
-                children: tasksStartingSoon.map((scheduled, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "bg-white rounded-lg shadow-lg p-3 mb-2 flex items-center",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "bg-purple-100 rounded-full p-2 mr-3",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    className: "h-5 w-5 text-purple-600",
-                                    fill: "none",
-                                    viewBox: "0 0 24 24",
-                                    stroke: "currentColor",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                        strokeLinecap: "round",
-                                        strokeLinejoin: "round",
-                                        strokeWidth: 2,
-                                        d: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 313,
-                                        columnNumber: 19
-                                    }, this)
-                                }, void 0, false, {
-                                    fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                    lineNumber: 312,
-                                    columnNumber: 17
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 311,
-                                columnNumber: 15
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "text-sm font-medium",
-                                        children: scheduled.task.title
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 317,
-                                        columnNumber: 17
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "text-xs text-gray-500",
-                                        children: `Starts in ${Math.ceil((scheduled.scheduledTime.getTime() - now.getTime()) / 60000)} minutes`
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 318,
-                                        columnNumber: 17
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 316,
-                                columnNumber: 15
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                className: "ml-3 text-gray-500 hover:text-gray-700",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    className: "h-4 w-4",
-                                    fill: "none",
-                                    viewBox: "0 0 24 24",
-                                    stroke: "currentColor",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                        strokeLinecap: "round",
-                                        strokeLinejoin: "round",
-                                        strokeWidth: 2,
-                                        d: "M6 18L18 6M6 6l12 12"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                        lineNumber: 324,
-                                        columnNumber: 19
-                                    }, this)
-                                }, void 0, false, {
-                                    fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                    lineNumber: 323,
-                                    columnNumber: 17
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                                lineNumber: 322,
-                                columnNumber: 15
-                            }, this)
-                        ]
-                    }, index, true, {
-                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 310,
-                        columnNumber: 13
-                    }, this))
-            }, void 0, false, {
-                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 308,
-                columnNumber: 9
-            }, this),
-            displayedTasks.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "bg-gray-50 rounded-lg p-6 text-center",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        className: "text-gray-600",
-                        children: activeTab === 'open' ? "You don't have any open tasks." : activeTab === 'in-progress' ? "You don't have any tasks in progress." : "You haven't completed any tasks yet."
-                    }, void 0, false, {
-                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 335,
-                        columnNumber: 11
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        className: "text-gray-500 text-sm mt-2",
-                        children: activeTab === 'open' ? "Check back soon or create a custom task." : activeTab === 'in-progress' ? "Start a task to track your progress." : "Complete tasks to earn seeds and rewards."
-                    }, void 0, false, {
-                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 342,
-                        columnNumber: 11
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 334,
-                columnNumber: 9
-            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
-                children: displayedTasks.map((task)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(TaskCard, {
-                        task: task,
-                        isCompleted: task.completedBy?.includes(userId) || task.status === 'completed',
-                        onComplete: ()=>handleTaskCardClick(task),
-                        userId: userId,
-                        isDisabled: activeTaskId !== null && activeTaskId !== task.id,
-                        onTaskStart: handleTaskStart,
-                        onTaskPause: handleTaskPause,
-                        activeTaskId: activeTaskId
-                    }, task.id, false, {
-                        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                        lineNumber: 353,
-                        columnNumber: 13
-                    }, this))
-            }, void 0, false, {
-                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 351,
-                columnNumber: 9
-            }, this),
-            showStartModal && selectedTask && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(TaskStartModal, {
-                task: selectedTask,
-                onClose: closeAllModals,
-                onStartTimer: handleTaskStart,
-                onScheduled: handleTaskScheduled
-            }, void 0, false, {
-                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 370,
-                columnNumber: 9
-            }, this),
-            showCompletionModal && selectedTask && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(TaskCompletionModal, {
-                task: selectedTask,
-                userId: userId,
-                onClose: closeAllModals,
-                onComplete: ()=>handleCompleteTask(selectedTask),
-                onTaskStart: handleTaskStart,
-                onTaskPause: handleTaskPause
-            }, void 0, false, {
-                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 380,
-                columnNumber: 9
-            }, this),
-            showProgressModal && selectedTask && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(ProgressRecordingModal, {
-                task: selectedTask,
-                userId: userId,
-                onClose: ()=>setShowProgressModal(false),
-                onSubmit: handleProgressSubmit
-            }, void 0, false, {
-                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 392,
-                columnNumber: 9
-            }, this),
-            showCompletionAnimation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(CompletionAnimation, {
-                mysteryReward: mysteryRewardReceived
-            }, void 0, false, {
-                fileName: "[project]/app/components/dashboard/TasksList.tsx",
-                lineNumber: 402,
-                columnNumber: 9
-            }, this)
-        ]
-    }, void 0, true, {
-        fileName: "[project]/app/components/dashboard/TasksList.tsx",
-        lineNumber: 219,
-        columnNumber: 5
-    }, this);
-};
-const __TURBOPACK__default__export__ = TasksList;
- // app/components/dashboard/TasksList.tsx
 }}),
 "[project]/app/components/dashboard/ProgressStats.tsx [app-ssr] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
@@ -3028,7 +2461,7 @@ const __TURBOPACK__default__export__ = LocationPermission;
 
 var { g: global, __dirname } = __turbopack_context__;
 {
-// app/components/dashboard/PauseReasonModal.tsx
+// app/components/dashboard/PauseReasonModal.tsx - Enhanced version
 __turbopack_context__.s({
     "default": (()=>__TURBOPACK__default__export__)
 });
@@ -3037,18 +2470,30 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 'use client';
 ;
 ;
-const PauseReasonModal = ({ onSubmit, onResume })=>{
+const PauseReasonModal = ({ onSubmit, onCancel })=>{
     const [selectedReasons, setSelectedReasons] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
     const [description, setDescription] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
-    const reasons = [
+    const [customReason, setCustomReason] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [showCustomInput, setShowCustomInput] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const predefinedReasons = [
         'Taking a break',
         'Need to attend to something urgent',
         'Technical issues',
         'Meeting with someone',
         'Waiting for resources/information',
-        'Other'
+        'Personal emergency',
+        'Need more time to plan',
+        'Weather conditions'
     ];
     const handleReasonToggle = (reason)=>{
+        if (reason === 'Other') {
+            setShowCustomInput(!showCustomInput);
+            if (showCustomInput) {
+                setSelectedReasons((prev)=>prev.filter((r)=>r !== 'Other' && r !== customReason));
+                setCustomReason('');
+            }
+            return;
+        }
         if (selectedReasons.includes(reason)) {
             setSelectedReasons((prev)=>prev.filter((r)=>r !== reason));
         } else {
@@ -3058,139 +2503,450 @@ const PauseReasonModal = ({ onSubmit, onResume })=>{
                 ]);
         }
     };
+    const handleCustomReasonChange = (value)=>{
+        setCustomReason(value);
+        if (value.trim()) {
+            setSelectedReasons((prev)=>{
+                const filtered = prev.filter((r)=>r !== 'Other' && !prev.includes(customReason));
+                return [
+                    ...filtered,
+                    'Other',
+                    value.trim()
+                ];
+            });
+        } else {
+            setSelectedReasons((prev)=>prev.filter((r)=>r !== 'Other' && r !== customReason));
+        }
+    };
     const handleSubmit = ()=>{
         if (selectedReasons.length === 0 || !description.trim()) return;
-        onSubmit(selectedReasons.join(', '), description);
+        const finalReasons = selectedReasons.filter((r)=>r !== 'Other' || customReason.trim());
+        onSubmit(finalReasons.join(', '), description);
     };
+    const isFormValid = selectedReasons.length > 0 && description.trim().length > 0;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "fixed inset-0 bg-black/50 flex items-center justify-center z-[70] p-4",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "bg-white rounded-lg max-w-md w-full p-6",
+            className: "bg-white rounded-lg max-w-md w-full shadow-xl",
             children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                    className: "text-lg font-semibold mb-4",
-                    children: "Why are you pausing this task?"
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "p-6 border-b",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex items-center",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "bg-yellow-100 rounded-full p-3 mr-4",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    className: "h-6 w-6 text-yellow-600",
+                                    fill: "none",
+                                    viewBox: "0 0 24 24",
+                                    stroke: "currentColor",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                        strokeLinecap: "round",
+                                        strokeLinejoin: "round",
+                                        strokeWidth: 2,
+                                        d: "M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                        lineNumber: 74,
+                                        columnNumber: 17
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                    lineNumber: 73,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                lineNumber: 72,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                        className: "text-lg font-semibold text-gray-900",
+                                        children: "Pause Task"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                        lineNumber: 78,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-sm text-gray-600",
+                                        children: "Tell us why you're pausing this task"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                        lineNumber: 79,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                lineNumber: 77,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                        lineNumber: 71,
+                        columnNumber: 11
+                    }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                    lineNumber: 41,
+                    lineNumber: 70,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "mb-4",
+                    className: "p-6",
                     children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                            className: "text-sm text-gray-700 mb-2",
-                            children: "Select all that apply:"
-                        }, void 0, false, {
-                            fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                            lineNumber: 44,
-                            columnNumber: 11
-                        }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "space-y-2",
-                            children: reasons.map((reason)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                    className: "flex items-center",
+                            className: "mb-6",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                    className: "block text-sm font-medium text-gray-700 mb-3",
+                                    children: "Why are you pausing? (Select all that apply)"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                    lineNumber: 88,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "space-y-2",
                                     children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "checkbox",
-                                            checked: selectedReasons.includes(reason),
-                                            onChange: ()=>handleReasonToggle(reason),
-                                            className: "h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                                        }, void 0, false, {
+                                        predefinedReasons.map((reason)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                className: "flex items-center cursor-pointer",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                        type: "checkbox",
+                                                        checked: selectedReasons.includes(reason),
+                                                        onChange: ()=>handleReasonToggle(reason),
+                                                        className: "h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                                        lineNumber: 95,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "ml-3 text-sm text-gray-700",
+                                                        children: reason
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                                        lineNumber: 101,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, reason, true, {
+                                                fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                                lineNumber: 94,
+                                                columnNumber: 17
+                                            }, this)),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                            className: "flex items-center cursor-pointer",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                    type: "checkbox",
+                                                    checked: showCustomInput,
+                                                    onChange: ()=>handleReasonToggle('Other'),
+                                                    className: "h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                                    lineNumber: 107,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "ml-3 text-sm text-gray-700",
+                                                    children: "Other"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                                    lineNumber: 113,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
                                             fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                                            lineNumber: 49,
-                                            columnNumber: 17
+                                            lineNumber: 106,
+                                            columnNumber: 15
                                         }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "ml-2 text-sm text-gray-700",
-                                            children: reason
+                                        showCustomInput && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "ml-7 mt-2",
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                type: "text",
+                                                value: customReason,
+                                                onChange: (e)=>handleCustomReasonChange(e.target.value),
+                                                className: "w-full px-3 py-2 border border-gray-300 rounded-md text-sm",
+                                                placeholder: "Please specify..."
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                                lineNumber: 119,
+                                                columnNumber: 19
+                                            }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                                            lineNumber: 55,
+                                            lineNumber: 118,
                                             columnNumber: 17
                                         }, this)
                                     ]
-                                }, reason, true, {
+                                }, void 0, true, {
                                     fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                                    lineNumber: 48,
-                                    columnNumber: 15
-                                }, this))
-                        }, void 0, false, {
+                                    lineNumber: 92,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
                             fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                            lineNumber: 46,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                    lineNumber: 43,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "mb-6",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                            className: "block text-sm font-medium text-gray-700 mb-1",
-                            children: "Please provide more details:"
-                        }, void 0, false, {
-                            fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                            lineNumber: 62,
+                            lineNumber: 87,
                             columnNumber: 11
                         }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
-                            value: description,
-                            onChange: (e)=>setDescription(e.target.value),
-                            className: "w-full px-3 py-2 border rounded-md h-32",
-                            placeholder: "Add more context about why you're pausing...",
-                            required: true
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "mb-6",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                    className: "block text-sm font-medium text-gray-700 mb-2",
+                                    children: "Progress Note *"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                    lineNumber: 133,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
+                                    value: description,
+                                    onChange: (e)=>setDescription(e.target.value),
+                                    className: "w-full px-3 py-2 border border-gray-300 rounded-md h-32 text-sm",
+                                    placeholder: "Describe what you've accomplished so far and any important details about pausing...",
+                                    required: true
+                                }, void 0, false, {
+                                    fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                    lineNumber: 136,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex justify-between items-center mt-1",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-xs text-gray-500",
+                                            children: "This note will be added to your task activity log"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                            lineNumber: 144,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: `text-xs ${description.length < 10 ? 'text-red-500' : 'text-green-600'}`,
+                                            children: [
+                                                description.length,
+                                                "/500"
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                            lineNumber: 147,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                    lineNumber: 143,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                            lineNumber: 132,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "mb-6",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                    className: "block text-sm font-medium text-gray-700 mb-2",
+                                    children: "Quick Templates (Click to use)"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                    lineNumber: 155,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "grid grid-cols-1 gap-2",
+                                    children: [
+                                        "Made good progress, need to step away briefly",
+                                        "Completed first phase, taking a planned break",
+                                        "Waiting for additional information to continue",
+                                        "Need to handle an urgent matter, will resume soon"
+                                    ].map((template, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            type: "button",
+                                            onClick: ()=>setDescription(template),
+                                            className: "text-left text-xs bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded p-2 transition-colors",
+                                            children: [
+                                                '"',
+                                                template,
+                                                '"'
+                                            ]
+                                        }, index, true, {
+                                            fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                            lineNumber: 165,
+                                            columnNumber: 17
+                                        }, this))
+                                }, void 0, false, {
+                                    fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                    lineNumber: 158,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                            lineNumber: 154,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                        xmlns: "http://www.w3.org/2000/svg",
+                                        className: "h-5 w-5 text-blue-600 mr-2 mt-0.5",
+                                        fill: "none",
+                                        viewBox: "0 0 24 24",
+                                        stroke: "currentColor",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                            strokeLinecap: "round",
+                                            strokeLinejoin: "round",
+                                            strokeWidth: 2,
+                                            d: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                            lineNumber: 181,
+                                            columnNumber: 17
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                        lineNumber: 180,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-sm text-blue-800 font-medium",
+                                                children: "Reminder"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                                lineNumber: 184,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "text-xs text-blue-700",
+                                                children: "Your timer will be paused and your progress will be saved. You can resume this task anytime from your dashboard."
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                                lineNumber: 185,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                        lineNumber: 183,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                lineNumber: 179,
+                                columnNumber: 13
+                            }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                            lineNumber: 65,
+                            lineNumber: 178,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                    lineNumber: 61,
+                    lineNumber: 85,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "flex justify-between",
+                    className: "p-6 border-t bg-gray-50 flex justify-between",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                            onClick: onResume,
-                            className: "px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700",
-                            children: "Resume Instead"
-                        }, void 0, false, {
+                            onClick: onCancel,
+                            className: "px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium flex items-center",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    className: "h-4 w-4 mr-1",
+                                    fill: "none",
+                                    viewBox: "0 0 24 24",
+                                    stroke: "currentColor",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                        strokeLinecap: "round",
+                                        strokeLinejoin: "round",
+                                        strokeWidth: 2,
+                                        d: "M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                        lineNumber: 200,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                    lineNumber: 199,
+                                    columnNumber: 13
+                                }, this),
+                                "Keep Working"
+                            ]
+                        }, void 0, true, {
                             fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                            lineNumber: 75,
+                            lineNumber: 195,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                             onClick: handleSubmit,
-                            disabled: selectedReasons.length === 0 || !description.trim(),
-                            className: `px-4 py-2 ${selectedReasons.length === 0 || !description.trim() ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-yellow-500 text-white hover:bg-yellow-600'} rounded-md`,
-                            children: "Pause Task"
-                        }, void 0, false, {
+                            disabled: !isFormValid,
+                            className: `px-6 py-2 rounded-md font-medium flex items-center ${isFormValid ? 'bg-yellow-600 hover:bg-yellow-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`,
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                                    xmlns: "http://www.w3.org/2000/svg",
+                                    className: "h-4 w-4 mr-1",
+                                    fill: "none",
+                                    viewBox: "0 0 24 24",
+                                    stroke: "currentColor",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                                        strokeLinecap: "round",
+                                        strokeLinejoin: "round",
+                                        strokeWidth: 2,
+                                        d: "M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                        lineNumber: 215,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
+                                    lineNumber: 214,
+                                    columnNumber: 13
+                                }, this),
+                                "Pause Task"
+                            ]
+                        }, void 0, true, {
                             fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                            lineNumber: 82,
+                            lineNumber: 205,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-                    lineNumber: 74,
+                    lineNumber: 194,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-            lineNumber: 40,
+            lineNumber: 68,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/components/dashboard/PauseReasonModal.tsx",
-        lineNumber: 39,
+        lineNumber: 67,
         columnNumber: 5
     }, this);
 };
@@ -4649,7 +4405,7 @@ const __TURBOPACK__default__export__ = CompletionAnimation;
 
 var { g: global, __dirname } = __turbopack_context__;
 {
-// app/components/dashboard/EnhancedDashboard.tsx
+// app/components/dashboard/Dashboard.tsx
 __turbopack_context__.s({
     "default": (()=>__TURBOPACK__default__export__)
 });
@@ -4682,7 +4438,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboa
 ;
 ;
 ;
-const EnhancedDashboard = ()=>{
+const Dashboard = ()=>{
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRouter"])();
     const [user, setUser] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [profile, setProfile] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
@@ -4703,25 +4459,20 @@ const EnhancedDashboard = ()=>{
     const [uploadError, setUploadError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const fileInputRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        // Check if user is authenticated
         const unsubscribe = __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$config$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["auth"].onAuthStateChanged(async (user)=>{
             if (user) {
                 setUser(user);
                 try {
-                    // Get user profile
                     const userProfile = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$auth$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getUserProfile"])(user.uid);
                     if (userProfile) {
                         setProfile(userProfile);
                         setProfileImage(userProfile.photoURL || null);
-                        // Get user's tasks
                         const userTasks = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$firestore$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getUserTasks"])(user.uid);
                         setTasks(userTasks);
-                        // Check if we need to request location
                         if (!locationPromptShown && (userProfile.level === 'Bud' || userProfile.level === 'Bloom') && (!userProfile.location || userProfile.location.latitude === 0)) {
                             setLocationPromptShown(true);
                         }
                     } else {
-                        // Profile not found, redirect to onboarding
                         router.push('/auth/onboarding');
                     }
                 } catch (err) {
@@ -4730,15 +4481,14 @@ const EnhancedDashboard = ()=>{
                     setLoading(false);
                 }
             } else {
-                // Not authenticated, redirect to login
                 router.push('/auth/sign-in');
             }
         });
         return ()=>unsubscribe();
     }, [
-        router
+        router,
+        locationPromptShown
     ]);
-    // Handle location update
     const handleLocationUpdated = (location)=>{
         if (profile && location) {
             setProfile({
@@ -4747,7 +4497,6 @@ const EnhancedDashboard = ()=>{
             });
         }
     };
-    // Assign weekly tasks if user doesn't have any
     const handleAssignTasks = async ()=>{
         if (!user || !profile) return;
         try {
@@ -4761,7 +4510,6 @@ const EnhancedDashboard = ()=>{
         }
     };
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        // Auto-assign tasks if user has none
         if (user && profile && tasks.length === 0 && !loading && !assigningTasks) {
             handleAssignTasks();
         }
@@ -4769,30 +4517,24 @@ const EnhancedDashboard = ()=>{
         user,
         profile,
         tasks,
-        loading
+        loading,
+        assigningTasks
     ]);
-    // Handle complete task action
     const handleCompleteTask = (task)=>{
         setSelectedTask(task);
         setShowCompletionModal(true);
     };
-    // Handle task start
     const handleTaskStart = (taskId)=>{
         setActiveTaskId(taskId);
     };
-    // Handle task pause
     const handleTaskPause = ()=>{
         setActiveTaskId(null);
     };
-    // Handle task completion
     const handleTaskCompleted = ()=>{
-        // Show completion animation
         setShowCompletionAnimation(true);
-        // After animation finishes, close it
         setTimeout(()=>{
             setShowCompletionAnimation(false);
             setMysteryRewardReceived(null);
-            // Refresh tasks
             if (user) {
                 (0, __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$lib$2f$firebase$2f$firestore$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getUserTasks"])(user.uid).then((updatedTasks)=>{
                     setTasks(updatedTasks);
@@ -4807,12 +4549,12 @@ const EnhancedDashboard = ()=>{
                 className: "animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 153,
+                lineNumber: 137,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-            lineNumber: 152,
+            lineNumber: 136,
             columnNumber: 7
         }, this);
     }
@@ -4829,7 +4571,7 @@ const EnhancedDashboard = ()=>{
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 162,
+                        lineNumber: 146,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -4838,18 +4580,18 @@ const EnhancedDashboard = ()=>{
                         children: "Return to Sign In"
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 163,
+                        lineNumber: 147,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 161,
+                lineNumber: 145,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-            lineNumber: 160,
+            lineNumber: 144,
             columnNumber: 7
         }, this);
     }
@@ -4867,12 +4609,12 @@ const EnhancedDashboard = ()=>{
                     onLocationUpdated: handleLocationUpdated
                 }, void 0, false, {
                     fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                    lineNumber: 183,
+                    lineNumber: 167,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 182,
+                lineNumber: 166,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4895,14 +4637,14 @@ const EnhancedDashboard = ()=>{
                                                 className: "w-24 h-24 rounded-full object-cover"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                                lineNumber: 201,
+                                                lineNumber: 185,
                                                 columnNumber: 17
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: `w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white ${profile.level === 'Sprout' ? 'bg-green-400' : profile.level === 'Bud' ? 'bg-green-600' : 'bg-green-800'}`,
                                                 children: profile.displayName.charAt(0)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                                lineNumber: 207,
+                                                lineNumber: 191,
                                                 columnNumber: 17
                                             }, this),
                                             isHovering && !isUploading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4921,7 +4663,7 @@ const EnhancedDashboard = ()=>{
                                                             d: "M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                                            lineNumber: 221,
+                                                            lineNumber: 204,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -4931,24 +4673,24 @@ const EnhancedDashboard = ()=>{
                                                             d: "M15 13a3 3 0 11-6 0 3 3 0 016 0z"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                                            lineNumber: 222,
+                                                            lineNumber: 205,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                                    lineNumber: 220,
+                                                    lineNumber: 203,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                                lineNumber: 217,
+                                                lineNumber: 200,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                        lineNumber: 195,
+                                        lineNumber: 179,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4959,18 +4701,18 @@ const EnhancedDashboard = ()=>{
                                             className: "w-8 h-8"
                                         }, void 0, false, {
                                             fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                            lineNumber: 230,
+                                            lineNumber: 212,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                        lineNumber: 229,
+                                        lineNumber: 211,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 194,
+                                lineNumber: 178,
                                 columnNumber: 11
                             }, this),
                             uploadError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4978,7 +4720,7 @@ const EnhancedDashboard = ()=>{
                                 children: uploadError
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 240,
+                                lineNumber: 221,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -4986,7 +4728,7 @@ const EnhancedDashboard = ()=>{
                                 children: profile.displayName
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 245,
+                                lineNumber: 226,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4997,20 +4739,20 @@ const EnhancedDashboard = ()=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 246,
+                                lineNumber: 227,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$SeedCounter$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                                 seeds: profile.seeds
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 247,
+                                lineNumber: 228,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 193,
+                        lineNumber: 177,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5021,7 +4763,7 @@ const EnhancedDashboard = ()=>{
                                 children: "Your Progress"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 252,
+                                lineNumber: 233,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$ProgressStats$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -5030,19 +4772,19 @@ const EnhancedDashboard = ()=>{
                                 level: profile.level
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 253,
+                                lineNumber: 234,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 251,
+                        lineNumber: 232,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 191,
+                lineNumber: 175,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5056,7 +4798,7 @@ const EnhancedDashboard = ()=>{
                                 children: "Your Weekly Volunteering Tasks"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 264,
+                                lineNumber: 245,
                                 columnNumber: 11
                             }, this),
                             tasks.length === 0 && !assigningTasks && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -5065,13 +4807,13 @@ const EnhancedDashboard = ()=>{
                                 children: "Get New Tasks"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 267,
+                                lineNumber: 248,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 263,
+                        lineNumber: 244,
                         columnNumber: 9
                     }, this),
                     assigningTasks ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5081,7 +4823,7 @@ const EnhancedDashboard = ()=>{
                                 className: "animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500 mb-4"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 278,
+                                lineNumber: 259,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5089,13 +4831,13 @@ const EnhancedDashboard = ()=>{
                                 children: "Finding the perfect volunteering opportunities for you..."
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 279,
+                                lineNumber: 260,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 277,
+                        lineNumber: 258,
                         columnNumber: 11
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$TasksList$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                         tasks: tasks,
@@ -5106,13 +4848,13 @@ const EnhancedDashboard = ()=>{
                         onTaskPause: handleTaskPause
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 282,
+                        lineNumber: 263,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 262,
+                lineNumber: 243,
                 columnNumber: 7
             }, this),
             profile.level !== 'Sprout' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5123,7 +4865,7 @@ const EnhancedDashboard = ()=>{
                         children: "Volunteering Opportunities Near You"
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 296,
+                        lineNumber: 277,
                         columnNumber: 11
                     }, this),
                     profile.location && profile.location.latitude !== 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5134,12 +4876,12 @@ const EnhancedDashboard = ()=>{
                             userId: user.uid
                         }, void 0, false, {
                             fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                            lineNumber: 299,
+                            lineNumber: 280,
                             columnNumber: 15
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 298,
+                        lineNumber: 279,
                         columnNumber: 13
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "bg-gray-50 rounded-lg p-6 text-center",
@@ -5149,7 +4891,7 @@ const EnhancedDashboard = ()=>{
                                 children: "Enable location services to see volunteering opportunities near you."
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 307,
+                                lineNumber: 288,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -5158,19 +4900,19 @@ const EnhancedDashboard = ()=>{
                                 children: "Enable Location"
                             }, void 0, false, {
                                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                                lineNumber: 308,
+                                lineNumber: 289,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                        lineNumber: 306,
+                        lineNumber: 287,
                         columnNumber: 13
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 295,
+                lineNumber: 276,
                 columnNumber: 9
             }, this),
             showCompletionModal && selectedTask && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$EnhancedTaskCompletionModal$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -5182,24 +4924,24 @@ const EnhancedDashboard = ()=>{
                 onTaskPause: handleTaskPause
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 321,
+                lineNumber: 302,
                 columnNumber: 9
             }, this),
             showCompletionAnimation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$dashboard$2f$CompletionAnimation$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                 mysteryReward: mysteryRewardReceived
             }, void 0, false, {
                 fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-                lineNumber: 333,
+                lineNumber: 314,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/components/dashboard/EnhancedDashboard.tsx",
-        lineNumber: 179,
+        lineNumber: 163,
         columnNumber: 5
     }, this);
 };
-const __TURBOPACK__default__export__ = EnhancedDashboard;
+const __TURBOPACK__default__export__ = Dashboard;
 }}),
 "[project]/app/dashboard/page.tsx [app-ssr] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
