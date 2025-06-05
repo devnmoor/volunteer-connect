@@ -40,7 +40,7 @@ const TaskCompletionCongratulationsModal: React.FC<TaskCompletionCongratulations
                 }}
               >
                 <img
-                  src="/images/confetti-seed.png"
+                  src="/images/seed-icon.png"
                   alt="Confetti seed"
                   className="w-4 h-4"
                   style={{

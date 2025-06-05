@@ -1273,7 +1273,11 @@ const forceResetUserTasks = async (userId)=>{
 
 var { g: global, __dirname, m: module, e: exports } = __turbopack_context__;
 {
-}}),
+const e = new Error(`Could not parse module '[project]/app/components/dashboard/TasksList.tsx'
+
+Unexpected token `div`. Expected jsx identifier`);
+e.code = 'MODULE_UNPARSEABLE';
+throw e;}}),
 "[project]/app/components/dashboard/ProgressStats.tsx [app-ssr] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
 

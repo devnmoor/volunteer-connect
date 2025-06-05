@@ -33,8 +33,8 @@ interface PauseEntry {
   resumeTimestamp?: Date;
 }
 
-const TasksList: React.FC<TasksListProps> = ({ 
-  tasks, 
+const TasksList: React.FC<TasksListProps> = ({
+  tasks,
   userId,
   onTaskClick,
   activeTaskId,
@@ -44,23 +44,23 @@ const TasksList: React.FC<TasksListProps> = ({
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('open');
   const [selectedTask, setSelectedTask] = useState<VolunteerTask | null>(null);
-  
+
   // Modal states
   const [showStartModal, setShowStartModal] = useState(false);
   const [showPauseReasonModal, setShowPauseReasonModal] = useState(false);
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [showCongratulationsModal, setShowCongratulationsModal] = useState(false);
   const [showFinalCompletionModal, setShowFinalCompletionModal] = useState(false);
-  
+
   // Timer and task state
   const [currentActiveTaskId, setCurrentActiveTaskId] = useState<string | null>(activeTaskId || null);
-  const [taskStartTimes, setTaskStartTimes] = useState<{[taskId: string]: Date}>({});
+  const [taskStartTimes, setTaskStartTimes] = useState<{ [taskId: string]: Date }>({});
   const [currentTime, setCurrentTime] = useState(new Date());
   const [mysteryRewardReceived, setMysteryRewardReceived] = useState<string | null>(null);
-  
+
   // Pause tracking
-  const [pauseEntries, setPauseEntries] = useState<{[taskId: string]: PauseEntry[]}>({});
-  
+  const [pauseEntries, setPauseEntries] = useState<{ [taskId: string]: PauseEntry[] }>({});
+
   // Expanded history tasks
   const [expandedHistoryTasks, setExpandedHistoryTasks] = useState<Set<string>>(new Set());
 
@@ -79,7 +79,7 @@ const TasksList: React.FC<TasksListProps> = ({
       if (activeTask && taskStartTimes[currentActiveTaskId]) {
         const elapsedTime = getLiveElapsedTime();
         const totalTime = (activeTask.estimatedTime || 60) * 60; // Convert to seconds
-        
+
         if (elapsedTime >= totalTime) {
           // Timer completed - show congratulations
           handleTimerCompletion(activeTask);
@@ -89,23 +89,23 @@ const TasksList: React.FC<TasksListProps> = ({
   }, [currentTime, currentActiveTaskId, taskStartTimes]);
 
   // Group tasks by status
-  const openTasks = tasks.filter(task => 
-    !task.completedBy?.includes(userId) && 
+  const openTasks = tasks.filter(task =>
+    !task.completedBy?.includes(userId) &&
     (!task.status || task.status === 'open')
   );
-  
+
   const scheduledTasksList = tasks.filter(task =>
-    !task.completedBy?.includes(userId) && 
+    !task.completedBy?.includes(userId) &&
     task.status === 'scheduled'
   );
-  
-  const inProgressTasks = tasks.filter(task => 
-    !task.completedBy?.includes(userId) && 
+
+  const inProgressTasks = tasks.filter(task =>
+    !task.completedBy?.includes(userId) &&
     (task.status === 'in-progress' || task.status === 'paused')
   );
-  
-  const completedTasks = tasks.filter(task => 
-    task.completedBy?.includes(userId) || 
+
+  const completedTasks = tasks.filter(task =>
+    task.completedBy?.includes(userId) ||
     task.status === 'completed'
   );
 
@@ -125,7 +125,7 @@ const TasksList: React.FC<TasksListProps> = ({
   // Calculate live elapsed time for active task
   const getLiveElapsedTime = () => {
     if (!activeTask || !activeTaskStartTime) return 0;
-    
+
     const baseTime = activeTask.timeSpent || 0;
     const sessionTime = Math.floor((currentTime.getTime() - activeTaskStartTime.getTime()) / 1000);
     return baseTime + sessionTime;
@@ -149,7 +149,7 @@ const TasksList: React.FC<TasksListProps> = ({
   // Handle task card clicks
   const handleTaskCardClick = (task: VolunteerTask) => {
     setSelectedTask(task);
-    
+
     if (task.status === 'completed' || task.completedBy?.includes(userId)) {
       // For completed tasks, just show in expanded view (for history tab)
       if (activeTab === 'completed') {
@@ -157,7 +157,7 @@ const TasksList: React.FC<TasksListProps> = ({
       }
       return;
     }
-    
+
     if (task.status === 'in-progress' || task.status === 'paused') {
       // Show progress modal for in-progress/paused tasks
       setShowProgressModal(true);
@@ -165,7 +165,7 @@ const TasksList: React.FC<TasksListProps> = ({
       // Show start modal for new tasks
       setShowStartModal(true);
     }
-    
+
     if (onTaskClick) {
       onTaskClick(task);
     }
@@ -180,7 +180,7 @@ const TasksList: React.FC<TasksListProps> = ({
         startTime: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
-      
+
       setCurrentActiveTaskId(taskId);
       setTaskStartTimes(prev => ({
         ...prev,
@@ -209,27 +209,27 @@ const TasksList: React.FC<TasksListProps> = ({
   // Handle pause reason submission
   const handlePauseReasonSubmit = async (reason: string, description: string) => {
     if (!currentActiveTaskId) return;
-    
+
     try {
       const pauseEntry: PauseEntry = {
         timestamp: new Date(),
         reason,
         description
       };
-      
+
       // Update local pause entries
       setPauseEntries(prev => ({
         ...prev,
         [currentActiveTaskId]: [...(prev[currentActiveTaskId] || []), pauseEntry]
       }));
-      
+
       // Calculate elapsed time
       let currentElapsed = activeTask?.timeSpent || 0;
       if (taskStartTimes[currentActiveTaskId]) {
         const sessionElapsed = Math.floor((new Date().getTime() - taskStartTimes[currentActiveTaskId].getTime()) / 1000);
         currentElapsed += Math.max(sessionElapsed, 0);
       }
-      
+
       // Update task in Firestore
       const taskRef = doc(db, 'tasks', currentActiveTaskId);
       await updateDoc(taskRef, {
@@ -239,7 +239,7 @@ const TasksList: React.FC<TasksListProps> = ({
         lastPauseTime: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
-      
+
       // Clear active task
       setCurrentActiveTaskId(null);
       setTaskStartTimes(prev => {
@@ -247,13 +247,13 @@ const TasksList: React.FC<TasksListProps> = ({
         delete updated[currentActiveTaskId];
         return updated;
       });
-      
+
       setShowPauseReasonModal(false);
-      
+
       if (onTaskPause) {
         onTaskPause(currentActiveTaskId);
       }
-      
+
     } catch (error) {
       console.error('Error pausing task:', error);
     }
@@ -271,13 +271,13 @@ const TasksList: React.FC<TasksListProps> = ({
           ...updatedEntries[lastIndex],
           resumeTimestamp: new Date()
         };
-        
+
         setPauseEntries(prev => ({
           ...prev,
           [taskId]: updatedEntries
         }));
       }
-      
+
       // Update task status
       const taskRef = doc(db, 'tasks', taskId);
       await updateDoc(taskRef, {
@@ -285,15 +285,15 @@ const TasksList: React.FC<TasksListProps> = ({
         startTime: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
-      
+
       setCurrentActiveTaskId(taskId);
       setTaskStartTimes(prev => ({
         ...prev,
         [taskId]: new Date()
       }));
-      
+
       setShowProgressModal(false);
-      
+
       if (onTaskStart) {
         onTaskStart(taskId);
       }
@@ -311,7 +311,7 @@ const TasksList: React.FC<TasksListProps> = ({
       delete updated[task.id!];
       return updated;
     });
-    
+
     // Show congratulations modal
     setSelectedTask(task);
     setShowCongratulationsModal(true);
@@ -326,31 +326,31 @@ const TasksList: React.FC<TasksListProps> = ({
   // Handle final task completion
   const handleFinalTaskCompletion = async () => {
     if (!selectedTask) return;
-    
+
     try {
       // Check for mystery seed
       const mysteryReward = checkForMysteryReward();
       if (mysteryReward) {
         setMysteryRewardReceived(mysteryReward);
-        
+
         const userRef = doc(db, 'users', userId);
         await updateDoc(userRef, {
           [`mysterySeeds.${mysteryReward}`]: increment(1)
         });
-        
+
         await addDoc(collection(db, 'shoutouts'), {
           userId: userId,
           seedType: mysteryReward,
           timestamp: serverTimestamp()
         });
       }
-      
+
       setShowFinalCompletionModal(false);
       setSelectedTask(null);
-      
+
       // Refresh tasks list
       window.location.reload(); // Simple refresh for now
-      
+
     } catch (error) {
       console.error('Error in final completion:', error);
     }
@@ -359,13 +359,13 @@ const TasksList: React.FC<TasksListProps> = ({
   // Check for mystery reward
   const checkForMysteryReward = (): string | null => {
     const random = Math.random() * 100;
-    
+
     if (random <= 0.001) return 'mystery';
     if (random <= 0.01) return 'eternity';
     if (random <= 0.1) return 'diamond';
     if (random <= 5) return 'gold';
     if (random <= 10) return 'silver';
-    
+
     return null;
   };
 
@@ -391,10 +391,10 @@ const TasksList: React.FC<TasksListProps> = ({
   };
 
   // Determine which tasks to display based on active tab
-  const displayedTasks = 
+  const displayedTasks =
     activeTab === 'open' ? [...openTasks, ...scheduledTasksList] :
-    activeTab === 'in-progress' ? inProgressTasks :
-    completedTasks;
+      activeTab === 'in-progress' ? inProgressTasks :
+        completedTasks;
 
   const handleCreateCustomTask = () => {
     router.push('/tasks/create');
@@ -410,19 +410,18 @@ const TasksList: React.FC<TasksListProps> = ({
               Weekly Volunteer Challenge
             </h3>
             <p className="text-green-700 mb-3">
-              Complete all {weeklyProgress.total} tasks to earn 5 seeds! 
+              Complete all {weeklyProgress.total} tasks to earn 5 seeds!
               {weeklyProgress.percentage === 100 && " 🎉 Congratulations!"}
             </p>
-            
+
             {/* Enhanced Progress Bar */}
             <div className="relative">
               <div className="h-4 flex-grow bg-gray-200 rounded-full overflow-hidden">
-                <div 
-                  className={`h-full transition-all duration-500 ease-out ${
-                    weeklyProgress.percentage === 100 
-                      ? 'bg-gradient-to-r from-green-400 to-green-600' 
-                      : 'bg-gradient-to-r from-green-400 to-green-500'
-                  }`}
+                <div
+                  className={`h-full transition-all duration-500 ease-out ${weeklyProgress.percentage === 100
+                    ? 'bg-gradient-to-r from-green-400 to-green-600'
+                    : 'bg-gradient-to-r from-green-400 to-green-500'
+                    }`}
                   style={{ width: `${weeklyProgress.percentage}%` }}
                 >
                   {weeklyProgress.percentage === 100 && (
@@ -464,21 +463,21 @@ const TasksList: React.FC<TasksListProps> = ({
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-center space-x-4 mb-4 lg:mb-0">
                 <div className="relative">
-                  <TaskTimeDisplay 
+                  <TaskTimeDisplay
                     task={activeTask}
                     isActive={true}
                     size="medium"
                   />
                 </div>
-                
+
                 <div>
                   <h4 className="font-semibold text-gray-800 mb-1">
                     {activeTask.title}
                   </h4>
                   <div className="flex items-center space-x-4 text-sm text-gray-600">
                     <span>
-                      Started: {activeTaskStartTime?.toLocaleTimeString([], { 
-                        hour: '2-digit', 
+                      Started: {activeTaskStartTime?.toLocaleTimeString([], {
+                        hour: '2-digit',
                         minute: '2-digit',
                         second: '2-digit'
                       })}
@@ -487,7 +486,7 @@ const TasksList: React.FC<TasksListProps> = ({
                       Live: {formatTime(getLiveElapsedTime())}
                     </span>
                   </div>
-                  
+
                   {getRemainingTime() > 0 && (
                     <div className="mt-1 text-sm">
                       <span className="text-orange-600 font-medium">
@@ -495,7 +494,6 @@ const TasksList: React.FC<TasksListProps> = ({
                       </span>
                     </div>
                   )}
-
                   {getRemainingTime() <= 0 && (
                     <div className="mt-1 text-sm text-red-600 font-medium animate-pulse">
                       ⚠️ Task timer completed! Ready for final submission.
@@ -509,12 +507,12 @@ const TasksList: React.FC<TasksListProps> = ({
                   <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse mr-2"></div>
                   <span className="text-xs font-medium text-blue-800">Timer Active</span>
                 </div>
-                
+
                 <button
                   onClick={handlePauseClick}
                   className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md text-sm font-medium flex items-center"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Pause
@@ -524,49 +522,45 @@ const TasksList: React.FC<TasksListProps> = ({
           </div>
         )}
       </div>
-
       {/* Enhanced Task Actions Bar */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
         <div className="flex flex-wrap gap-1">
           <button
             onClick={() => setActiveTab('open')}
-            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
-              activeTab === 'open'
-                ? 'bg-green-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
+            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${activeTab === 'open'
+              ? 'bg-green-600 text-white shadow-md'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
           >
             Open Tasks ({openTasks.length + scheduledTasksList.length})
           </button>
           <button
             onClick={() => setActiveTab('in-progress')}
-            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
-              activeTab === 'in-progress'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
+            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${activeTab === 'in-progress'
+              ? 'bg-blue-600 text-white shadow-md'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
           >
             In-Progress ({inProgressTasks.length})
           </button>
           <button
             onClick={() => setActiveTab('completed')}
-            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
-              activeTab === 'completed'
-                ? 'bg-gray-600 text-white shadow-md'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
+            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${activeTab === 'completed'
+              ? 'bg-gray-600 text-white shadow-md'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
           >
             History ({completedTasks.length})
           </button>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {weeklyProgress.percentage === 100 && (
             <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
               🎉 Week Complete!
             </div>
           )}
-          
+
           <button
             onClick={handleCreateCustomTask}
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium flex items-center shadow-sm"
@@ -597,19 +591,19 @@ const TasksList: React.FC<TasksListProps> = ({
               </svg>
             )}
           </div>
-          
+
           <p className="text-gray-600 mb-2">
-            {activeTab === 'open' 
-              ? "No open tasks available right now." 
-              : activeTab === 'in-progress' 
-                ? "No tasks currently in progress." 
+            {activeTab === 'open'
+              ? "No open tasks available right now."
+              : activeTab === 'in-progress'
+                ? "No tasks currently in progress."
                 : "No completed tasks yet."}
           </p>
           <p className="text-gray-500 text-sm">
-            {activeTab === 'open' 
-              ? "New tasks are assigned weekly. Check back soon or create a custom task." 
-              : activeTab === 'in-progress' 
-                ? "Start a task to begin tracking your progress." 
+            {activeTab === 'open'
+              ? "New tasks are assigned weekly. Check back soon or create a custom task."
+              : activeTab === 'in-progress'
+                ? "Start a task to begin tracking your progress."
                 : "Complete tasks to build your volunteering history."}
           </p>
         </div>
@@ -620,7 +614,7 @@ const TasksList: React.FC<TasksListProps> = ({
             <div className="space-y-4">
               {displayedTasks.map((task) => (
                 <div key={task.id} className="bg-white rounded-lg shadow-md border">
-                  <div 
+                  <div
                     className="p-4 cursor-pointer hover:bg-gray-50"
                     onClick={() => toggleHistoryTaskExpansion(task.id!)}
                   >
@@ -639,24 +633,23 @@ const TasksList: React.FC<TasksListProps> = ({
                           )}
                         </div>
                       </div>
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        className={`h-5 w-5 text-gray-400 transition-transform ${
-                          expandedHistoryTasks.has(task.id!) ? 'rotate-180' : ''
-                        }`} 
-                        fill="none" 
-                        viewBox="0 0 24 24" 
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={`h-5 w-5 text-gray-400 transition-transform ${expandedHistoryTasks.has(task.id!) ? 'rotate-180' : ''
+                          }`}
+                        fill="none"
+                        viewBox="0 0 24 24"
                         stroke="currentColor"
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </div>
                   </div>
-                  
+
                   {expandedHistoryTasks.has(task.id!) && (
                     <div className="border-t bg-gray-50 p-4">
                       <h4 className="font-medium text-gray-800 mb-3">Task Activity</h4>
-                      
+
                       {/* Pause entries */}
                       {task.pauseEntries && task.pauseEntries.length > 0 ? (
                         <div className="space-y-3">
@@ -683,7 +676,7 @@ const TasksList: React.FC<TasksListProps> = ({
                       ) : (
                         <p className="text-sm text-gray-500">No pause entries recorded for this task.</p>
                       )}
-                      
+
                       {/* Completion data */}
                       {task.completionData && (
                         <div className="mt-4 pt-3 border-t">
@@ -706,4 +699,78 @@ const TasksList: React.FC<TasksListProps> = ({
                     </div>
                   )}
                 </div>
-              )
+              ))}
+            </div>
+          ) : (
+            // Regular grid layout for open and in-progress tasks
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayedTasks.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  isCompleted={task.completedBy?.includes(userId) || task.status === 'completed'}
+                  onComplete={() => handleTaskCardClick(task)}
+                  userId={userId}
+                  isDisabled={currentActiveTaskId !== null && currentActiveTaskId !== task.id}
+                  onTaskStart={handleTaskStart}
+                  onTaskPause={handlePauseClick}
+                  activeTaskId={currentActiveTaskId}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Modals */}
+
+      {/* Task Start Modal */}
+      {showStartModal && selectedTask && (
+        <TaskStartModal
+          task={selectedTask}
+          onClose={() => setShowStartModal(false)}
+          onStartTimer={handleTaskStart}
+          onScheduled={handleTaskScheduled}
+        />
+      )}
+
+      {/* Pause Reason Modal */}
+      {showPauseReasonModal && (
+        <PauseReasonModal
+          onSubmit={handlePauseReasonSubmit}
+          onCancel={() => setShowPauseReasonModal(false)}
+        />
+      )}
+
+      {/* Task Progress Modal */}
+      {showProgressModal && selectedTask && (
+        <TaskProgressModal
+          task={selectedTask}
+          pauseEntries={pauseEntries[selectedTask.id!] || []}
+          onClose={() => setShowProgressModal(false)}
+          onResume={() => handleResumeTask(selectedTask.id!)}
+        />
+      )}
+
+      {/* Congratulations Modal */}
+      {showCongratulationsModal && selectedTask && (
+        <TaskCompletionCongratulationsModal
+          task={selectedTask}
+          onNext={handleCongratulationsNext}
+        />
+      )}
+
+      {/* Final Completion Modal */}
+      {showFinalCompletionModal && selectedTask && (
+        <TaskFinalCompletionModal
+          task={selectedTask}
+          userId={userId}
+          onClose={() => setShowFinalCompletionModal(false)}
+          onComplete={handleFinalTaskCompletion}
+        />
+      )}
+    </div>
+  );
+};
+
+export default TasksList;
