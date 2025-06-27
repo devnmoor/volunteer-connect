@@ -105,11 +105,9 @@ const VolunteerMap: React.FC<VolunteerMapProps> = ({ userLocation, userLevel, us
 
   // Prompt user to share location if not already set
   const requestLocationPermission = () => {
-    if (navigator.geolocation) {
+    if (typeof window !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // Here you would normally update the user's location in the database
-          // For demo purposes, we'll just log it
           console.log('Location updated:', {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
