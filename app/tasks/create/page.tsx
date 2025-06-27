@@ -183,7 +183,7 @@ const CreateTaskPage = () => {
                 type="number"
                 value={estimatedTime}
                 onChange={(e) => setEstimatedTime(parseInt(e.target.value))}
-                min={5}
+                min={1}
                 max={480}
                 className="w-full px-3 py-2 border rounded-md"
               />
