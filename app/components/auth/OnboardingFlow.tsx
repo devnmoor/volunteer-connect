@@ -311,7 +311,7 @@ const OnboardingFlow = () => {
         <div className="h-2 bg-gray-200 rounded-full">
           <div
             className="h-full bg-green-600 rounded-full transition-all duration-300"
-            style={{ width: `${(step / 5) * 100}%` }}
+            style={{ width: `${100}%` }}
           ></div>
         </div>
       </div>

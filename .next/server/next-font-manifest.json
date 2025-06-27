@@ -1,6 +1,6 @@
 {
   "app": {
-    "[project]/app/_not-found/page": [
+    "[project]/app/auth/sign-in/page": [
       "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.0faac26c.woff2"
     ],
     "[project]/app/dashboard/page": [
@@ -13,15 +13,6 @@
       "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.0faac26c.woff2"
     ],
     "[project]/app/page": [
-      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.0faac26c.woff2"
-    ],
-    "[project]/app/profile/page": [
-      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.0faac26c.woff2"
-    ],
-    "[project]/app/store/page": [
-      "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.0faac26c.woff2"
-    ],
-    "[project]/app/tasks/create/page": [
       "static/media/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw-s.p.0faac26c.woff2"
     ]
   },
